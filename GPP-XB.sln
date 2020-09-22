@@ -12,9 +12,38 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microservices", "Microservi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{C90AA9C8-1AAC-4981-833D-D2C445771687}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XB.Astrea.Connector", "XB.Astrea.Connector\XB.Astrea.Connector.csproj", "{F1E45045-D3A4-4842-AF41-AC60EB7D660E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PEX.Connectors.MQ", "Dependencies\PEX.Connectors.MQ\PEX.Connectors.MQ.csproj", "{FE7D5865-8E67-4F60-B546-2A2403BC2B44}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PEX.Connectors.MQAdapter", "Dependencies\PEX.Connectors.MQAdapter\PEX.Connectors.MQAdapter.csproj", "{3B6E926E-6B21-45BC-A9E5-ED78D4635944}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1E45045-D3A4-4842-AF41-AC60EB7D660E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1E45045-D3A4-4842-AF41-AC60EB7D660E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1E45045-D3A4-4842-AF41-AC60EB7D660E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1E45045-D3A4-4842-AF41-AC60EB7D660E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE7D5865-8E67-4F60-B546-2A2403BC2B44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE7D5865-8E67-4F60-B546-2A2403BC2B44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE7D5865-8E67-4F60-B546-2A2403BC2B44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE7D5865-8E67-4F60-B546-2A2403BC2B44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B6E926E-6B21-45BC-A9E5-ED78D4635944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B6E926E-6B21-45BC-A9E5-ED78D4635944}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B6E926E-6B21-45BC-A9E5-ED78D4635944}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B6E926E-6B21-45BC-A9E5-ED78D4635944}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F1E45045-D3A4-4842-AF41-AC60EB7D660E} = {83EE2955-B60F-402F-A896-3F10D58CEEDA}
+		{FE7D5865-8E67-4F60-B546-2A2403BC2B44} = {C90AA9C8-1AAC-4981-833D-D2C445771687}
+		{3B6E926E-6B21-45BC-A9E5-ED78D4635944} = {C90AA9C8-1AAC-4981-833D-D2C445771687}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7419513B-B6C5-4BAA-B4E3-7DA935561B70}
