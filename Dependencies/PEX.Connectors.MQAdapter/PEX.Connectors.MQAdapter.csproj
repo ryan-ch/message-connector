@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ProjectGuid>{3B6E926E-6B21-45BC-A9E5-ED78D4635944}</ProjectGuid>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="IBM.MQ.NET.Classes" Version="9.1.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != '' AND '$(TargetFramework)' == 'net461'">
+    <PackageReference Include="IBM.MQ.NET.Classes" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>
