@@ -2,11 +2,19 @@
 using System.Collections.Generic;
 using System.Text;
 using PMC.Common.Logging;
+using PMC.Kafka.Producer;
 
 namespace XB.Astrea.Connector.Logger
 {
     public class ClientLogger : IClientLogger
     {
+        private readonly IKafkaProducer _kafkaProducer;
+
+        public ClientLogger(IKafkaProducer kafkaProducer)
+        {
+            _kafkaProducer = kafkaProducer;
+        }
+
         public void Log(string logMessage, LogLevel logLevel)
         {
             Console.WriteLine(logMessage);

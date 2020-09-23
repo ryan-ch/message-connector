@@ -25,41 +25,18 @@ namespace PEX.Connectors.MQ.Reader
         {
             _cancellationTokenSource = new CancellationTokenSource();
 
-            /*while(true)
-            {
-                try
-                {
-                    using (var mqAdapter = _mqAdapterFactory.Create())
-                    {
-                        mqAdapter.Connect(connectionSettings);
-                        do
-                        {
-                            _mqQueuePoller.Poll(mqAdapter, proccessMessageFunc, queueName);
-                            Thread.Sleep(connectionSettings.PollInterval);
-                            Console.WriteLine("Polling and conncetion OK");
-                        } while (!_cancellationTokenSource.IsCancellationRequested);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-
-            return Task.CompletedTask;*/
-
             return _taskFactory.StartNew(() =>
             {
                 using (var mqAdapter = _mqAdapterFactory.Create(properties))
                 {
                     mqAdapter.Connect(connectionSettings);
-                    do
-                    {
-                        _mqQueuePoller.Poll(mqAdapter, proccessMessageFunc, queueName);
-                        Thread.Sleep(connectionSettings.PollInterval);
-                    } while (!_cancellationTokenSource.IsCancellationRequested);
+                    //do
+                    //{
+                    _mqQueuePoller.Poll(mqAdapter, proccessMessageFunc, queueName);
+                    //    Thread.Sleep(connectionSettings.PollInterval);
+                    //} while (!_cancellationTokenSource.IsCancellationRequested);
                 }
-            }, _cancellationTokenSource, TaskCreationOptions.LongRunning, TaskScheduler.Current, TaskMode.InfiniteRetries);
+            }, _cancellationTokenSource, TaskCreationOptions.LongRunning, TaskScheduler.Current, TaskMode.Default);
         }
 
         public void Dispose()
