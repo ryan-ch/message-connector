@@ -19,7 +19,7 @@ namespace XB.Astrea
 
         public Task<string> SayHelloAsync()
         {
-            return _httpClient.GetStringAsync("/hello");
+            return _httpClient.GetStringAsync("/sas/v3/hello");
         }
     }
 }

@@ -19,10 +19,10 @@ namespace PEX.Connectors.MQ.Reader
         public Task Start(string queueName, Dictionary<string, string> properties)
         {
             var mqConnectionSettings = GetMqSettings();
-            return _mqQueueProcessor.Start(ProcessMessage, mqConnectionSettings, queueName, properties);
+            return _mqQueueProcessor.Start(message => ProcessMessage(message), mqConnectionSettings, queueName, properties);
         }
 
-        public abstract void ProcessMessage(MqMessage message);
+        public abstract Task ProcessMessage(MqMessage message);
 
         private IMqConnectionSettings GetMqSettings(string queueName = "")
         {

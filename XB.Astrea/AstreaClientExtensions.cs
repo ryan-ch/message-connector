@@ -11,8 +11,8 @@ namespace XB.Astrea
         {
             services.AddHttpClient("astrea", c =>
             {
-                c.BaseAddress = new Uri("https://assess-service-fcp-astrea-dev.cumulus.sebank.se/sas/v3");
-                c.DefaultRequestHeaders.Add("Accept", "Accept: text/plain");
+                c.BaseAddress = new Uri("https://assess-service-fcp-astrea-dev.cumulus.sebank.se");
+                c.DefaultRequestHeaders.Add("Accept", "text/plain");
             });
 
             services.AddTransient<IAstreaClient, AstreaClient>();
