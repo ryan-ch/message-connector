@@ -1,9 +1,9 @@
-﻿using System;
+﻿using PEX.Connectors.MQAdapter;
+using PMC.Common.Threading;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using PEX.Connectors.MQAdapter;
-using PMC.Common.Threading;
 
 namespace PEX.Connectors.MQ.Reader
 {
@@ -12,6 +12,7 @@ namespace PEX.Connectors.MQ.Reader
         private readonly IMqAdapterFactory _mqAdapterFactory;
         private readonly IMqQueuePoller _mqQueuePoller;
         private readonly ITaskFactory _taskFactory;
+
         private CancellationTokenSource _cancellationTokenSource;
 
         public MqQueueProcessor(IMqAdapterFactory mqAdapterFactory, IMqQueuePoller mqQueuePoller, ITaskFactory taskFactory)
