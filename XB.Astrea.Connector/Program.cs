@@ -1,3 +1,5 @@
+using System;
+using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PEX.Connectors.MQ.Reader;
@@ -35,6 +37,8 @@ namespace XB.Astrea.Connector
                     services.AddSingleton<IMqQueueManagerFactory, MqQueueManagerFactory>();
 
                     services.AddTransient<IMqReader, LocalMqReader>();
+
+                    services.AddAstreaClient();
 
                     services.AddHostedService<Worker>();
                 });

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.8" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="PMC.Common" Version="1.13.51" />
     <PackageReference Include="PMC.Kafka" Version="1.13.51" />
@@ -16,5 +17,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Dependencies\PEX.Connectors.MQAdapter\PEX.Connectors.MQAdapter.csproj" />
     <ProjectReference Include="..\Dependencies\PEX.Connectors.MQ\PEX.Connectors.MQ.csproj" />
+    <ProjectReference Include="..\XB.Astrea\XB.Astrea.csproj" />
   </ItemGroup>
 </Project>
