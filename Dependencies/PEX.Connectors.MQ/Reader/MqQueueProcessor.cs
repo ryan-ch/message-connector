@@ -37,7 +37,7 @@ namespace PEX.Connectors.MQ.Reader
                     //    Thread.Sleep(connectionSettings.PollInterval);
                     //} while (!_cancellationTokenSource.IsCancellationRequested);
                 }
-            }, _cancellationTokenSource, TaskCreationOptions.LongRunning, TaskScheduler.Current, TaskMode.Default);
+            }, _cancellationTokenSource, TaskCreationOptions.RunContinuationsAsynchronously, TaskScheduler.Default, TaskMode.Default);
         }
 
         public void Dispose()

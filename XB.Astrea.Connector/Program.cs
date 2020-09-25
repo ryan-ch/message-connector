@@ -1,13 +1,6 @@
-using System;
-using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PEX.Connectors.MQ.Reader;
-using PEX.Connectors.MQAdapter;
-using PMC.Common.Logging;
-using PMC.Common.Threading;
-using PMC.Common.Wrappers;
-using XB.Astrea.Connector.Logger;
+using XB.IBM.MQ;
 
 namespace XB.Astrea.Connector
 {
@@ -22,23 +15,8 @@ namespace XB.Astrea.Connector
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddTransient<IMqAdapterFactory, MqAdapterFactory>();
-                    services.AddTransient<IMqQueuePoller, MqQueuePoller>();
-                    services.AddTransient<IClientLogger, ClientLogger>();
-                    services.AddTransient<IThreadExceptionHandler, ThreadExceptionHandler>();
-                    services.AddTransient<IThreadSleep, ThreadSleepWrapper>();
-                    services.AddTransient<IActionExceptionHandler, ActionExceptionHandler>();
-                    services.AddTransient<ITaskFactory, TaskFactory>();
-                    services.AddTransient<IMqMessageBuilder, MqMessageBuilder>();
-
-                    services.AddTransient<IMqQueueProcessor, MqQueueProcessor>();
-                    services.AddTransient<IConfigurationManagerWrapper, ConfigurationManagerWrapper>();
-
-                    services.AddSingleton<IMqQueueManagerFactory, MqQueueManagerFactory>();
-
-                    services.AddTransient<IMqReader, LocalMqReader>();
-
                     services.AddAstreaClient();
+                    services.AddMqClient();
 
                     services.AddHostedService<Worker>();
                 });

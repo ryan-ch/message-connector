@@ -1,35 +1,47 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using PEX.Connectors.MQ.Reader;
-using PMC.Common.Logging;
+using XB.IBM.MQ;
 
 namespace XB.Astrea.Connector
 {
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
-        private readonly IMqReader _mqReader;
+        private readonly IMqClient _mqClient;
 
-
-        public Worker(ILogger<Worker> logger, IMqReader mqReader)
+        public Worker(ILogger<Worker> logger, IMqClient mqClient)
         {
             _logger = logger;
-            _mqReader = mqReader;
+            _mqClient = mqClient;
+            _mqClient.Start();
+
+            //for (int i = 0; i < 1000; i++)
+            //{
+            //    _mqClient.WriteMessageAsync("test " + i);
+            //}
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
+        { // Create new stopwatch.
+            Stopwatch stopwatch = new Stopwatch();
+
+            // Begin timing.
+            stopwatch.Start(); 
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await _mqReader.Start("DEV.XB.IN");
-                await Task.Delay(1000, stoppingToken);
+                await _mqClient.ReceiveMessageAsync(stoppingToken);
             }
+
+            _mqClient.Stop();
+            // Stop timing.
+            stopwatch.Stop();
+
+            // Write result.
+            _logger.LogInformation("Time elapsed: {0}", stopwatch.Elapsed);
         }
     }
 }
