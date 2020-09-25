@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.Astrea", "XB.Astrea\XB.A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.IBM.MQ", "XB.IBM.MQ\XB.IBM.MQ.csproj", "{3A5660AE-5849-4FFA-BA8D-EF66AE5A3FDB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{871733D3-1DFE-4615-80E5-376145B17869}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

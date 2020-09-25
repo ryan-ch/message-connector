@@ -11,45 +11,43 @@ namespace XB.IBM.MQ
 {
     public class MqClient : IMqClient
     {
-        private readonly XMSFactoryFactory _factoryFactory;
         private readonly IConnectionFactory _cf;
-        private readonly IConnection _connectionWmq;
-        private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IConfiguration _configuration;
         private readonly IDictionary<string, object> _properties = new Dictionary<string, object>();
         private readonly ILogger<MqClient> _logger;
 
+        private IConnection _connectionWmq;
         private ISession _sessionWmq;
         private IDestination _destination;
+        private IMessageConsumer _consumer;
+        private IMessageProducer _producer;
 
         public MqClient(ILogger<MqClient> logger, IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
-            _serviceScopeFactory = serviceScopeFactory;
-            _configuration = _serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<IConfiguration>();
-            _factoryFactory = XMSFactoryFactory.GetInstance(XMSC.CT_WMQ);
-            _cf = _factoryFactory.CreateConnectionFactory();
+            _configuration = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<IConfiguration>();
+            var factoryFactory = XMSFactoryFactory.GetInstance(XMSC.CT_WMQ);
+            _cf = factoryFactory.CreateConnectionFactory();
 
             SetupProperties();
             SetupConnectionProperties();
-
-            _connectionWmq = _cf.CreateConnection();
         }
 
         public void Start()
         {
+            _connectionWmq = _cf.CreateConnection();
             _sessionWmq = _connectionWmq.CreateSession(false, AcknowledgeMode.AutoAcknowledge);
             _destination = _sessionWmq.CreateQueue((string)_properties[XMSC.WMQ_QUEUE_NAME]);
             _connectionWmq.Start();
+            _producer = _sessionWmq.CreateProducer(_destination);
+            _consumer = _sessionWmq.CreateConsumer(_destination);
         }
 
         public async Task ReceiveMessageAsync(CancellationToken token)
         {
             await Task.Run(() =>
             {
-                var consumer = _sessionWmq.CreateConsumer(_destination);
-
-                ITextMessage message = (ITextMessage)consumer.Receive();
+                ITextMessage message = (ITextMessage)_consumer.Receive();
 
                 _logger.LogInformation(message.Text);
             }, token);
@@ -59,20 +57,20 @@ namespace XB.IBM.MQ
         {
             await Task.Run(() =>
             {
-
-                var producer = _sessionWmq.CreateProducer(_destination);
-
                 var textMessage = _sessionWmq.CreateTextMessage();
                 textMessage.Text = message;
 
-                producer.Send(textMessage);
+                _producer.Send(textMessage);
             }, token);
         }
 
         public void Stop()
         {
+            _destination.Dispose();
             _connectionWmq.Stop();
             _sessionWmq.Close();
+            _producer.Close();
+            _consumer.Close();
         }
 
 
