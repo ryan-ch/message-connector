@@ -7,7 +7,7 @@ namespace XB.IBM.MQ
     {
         void Start();
 
-        Task ReceiveMessageAsync(CancellationToken token);
+        Task<string> ReceiveMessageAsync(CancellationToken token);
 
         Task WriteMessageAsync(string message, CancellationToken token);
 

@@ -43,13 +43,13 @@ namespace XB.IBM.MQ
             _consumer = _sessionWmq.CreateConsumer(_destination);
         }
 
-        public async Task ReceiveMessageAsync(CancellationToken token)
+        public async Task<string> ReceiveMessageAsync(CancellationToken token)
         {
-            await Task.Run(() =>
+            return await Task.Run(() =>
             {
                 ITextMessage message = (ITextMessage)_consumer.Receive();
 
-                _logger.LogInformation(message.Text);
+                return message.Text;
             }, token);
         }
 
