@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "MqWriter": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
