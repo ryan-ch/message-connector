@@ -11,11 +11,13 @@ namespace XB.Astrea.Connector
     {
         private readonly ILogger<Worker> _logger;
         private readonly IMqClient _mqClient;
+        private readonly IAstreaClient _astreaClient;
 
-        public Worker(ILogger<Worker> logger, IMqClient mqClient)
+        public Worker(ILogger<Worker> logger, IMqClient mqClient, IAstreaClient astreaClient)
         {
             _logger = logger;
             _mqClient = mqClient;
+            _astreaClient = astreaClient;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -44,12 +46,12 @@ namespace XB.Astrea.Connector
 
                 if (message != string.Empty)
                 {
+                    string astreaResponse = await _astreaClient.SayHelloAsync();
                     counter++;
                 }
             }
 
             stopwatch.Stop();
-
 
             _mqClient.Stop();
 

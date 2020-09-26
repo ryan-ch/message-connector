@@ -36,7 +36,7 @@ namespace XB.IBM.MQ
         public void Start()
         {
             _connectionWmq = _cf.CreateConnection();
-            _sessionWmq = _connectionWmq.CreateSession(false, AcknowledgeMode.AutoAcknowledge);
+            _sessionWmq = _connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
             _destination = _sessionWmq.CreateQueue((string)_properties[XMSC.WMQ_QUEUE_NAME]);
             _connectionWmq.Start();
             _producer = _sessionWmq.CreateProducer(_destination);
@@ -48,7 +48,7 @@ namespace XB.IBM.MQ
             return await Task.Run(() =>
             {
                 ITextMessage message = (ITextMessage)_consumer.Receive();
-
+                _sessionWmq.Commit();
                 return message.Text;
             }, token);
         }
@@ -76,6 +76,8 @@ namespace XB.IBM.MQ
 
         private void SetupConnectionProperties()
         {
+            _cf.SetStringProperty(XMSC.WMQ_SSL_CIPHER_SPEC, (string)_properties[XMSC.WMQ_SSL_CIPHER_SPEC]);
+            _cf.SetStringProperty(XMSC.WMQ_SSL_KEY_REPOSITORY, (string)_properties[XMSC.WMQ_SSL_KEY_REPOSITORY]);
             _cf.SetStringProperty(XMSC.WMQ_HOST_NAME, (string)_properties[XMSC.WMQ_HOST_NAME]);
             _cf.SetIntProperty(XMSC.WMQ_PORT, Convert.ToInt32(_properties[XMSC.WMQ_PORT]));
             _cf.SetStringProperty(XMSC.WMQ_CHANNEL, (string)_properties[XMSC.WMQ_CHANNEL]);
@@ -87,6 +89,8 @@ namespace XB.IBM.MQ
 
         private void SetupProperties()
         {
+            _properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherReader"]);
+            _properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, _configuration["AppSettings:MqSslPathReader"]);
             _properties.Add(XMSC.WMQ_HOST_NAME, _configuration["AppSettings:MqHostnameReader"]);
             _properties.Add(XMSC.WMQ_PORT, _configuration["AppSettings:MqPortReader"]);
             _properties.Add(XMSC.WMQ_CHANNEL, _configuration["AppSettings:MqChannelReader"]);
