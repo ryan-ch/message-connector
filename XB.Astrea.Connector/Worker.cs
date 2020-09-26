@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,15 +36,15 @@ namespace XB.Astrea.Connector
             // Begin timing.
             stopwatch.Start();
 
-            while (!stoppingToken.IsCancellationRequested && counter < iterations)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 var message = await _mqClient.ReceiveMessageAsync(stoppingToken);
+                _logger.LogInformation(DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ": Message read");
 
-                if (message != string.Empty)
-                {
-                    string astreaResponse = await _astreaClient.SayHelloAsync();
-                    counter++;
-                }
+                //if (message != string.Empty)
+                //{
+                //    string astreaResponse = await _astreaClient.SayHelloAsync();
+                //}
             }
 
             stopwatch.Stop();

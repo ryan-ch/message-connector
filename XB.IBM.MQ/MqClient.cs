@@ -61,6 +61,7 @@ namespace XB.IBM.MQ
                 textMessage.Text = message;
 
                 _producer.Send(textMessage);
+                _sessionWmq.Commit();
             }, token);
         }
 
