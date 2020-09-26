@@ -23,17 +23,9 @@ namespace XB.Astrea.Connector
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
-            int iterations = 2000;
-
             _mqClient.Start();
 
-            int counter = 0;
-
-            // Create new stopwatch.
             Stopwatch stopwatch = new Stopwatch();
-
-            // Begin timing.
             stopwatch.Start();
 
             while (!stoppingToken.IsCancellationRequested)
