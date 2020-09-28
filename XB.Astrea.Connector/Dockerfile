@@ -6,8 +6,8 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["XB.Astrea.Connector/XB.Astrea.Connector.csproj", "XB.Astrea.Connector/"]
-COPY ["Dependencies/PEX.Connectors.MQAdapter/PEX.Connectors.MQAdapter.csproj", "Dependencies/PEX.Connectors.MQAdapter/"]
-COPY ["Dependencies/PEX.Connectors.MQ/PEX.Connectors.MQ.csproj", "Dependencies/PEX.Connectors.MQ/"]
+COPY ["XB.IBM.MQ/XB.IBM.MQ.csproj", "XB.IBM.MQ/"]
+COPY ["XB.Astrea/XB.Astrea.csproj", "XB.Astrea/"]
 RUN dotnet restore "XB.Astrea.Connector/XB.Astrea.Connector.csproj"
 COPY . .
 WORKDIR "/src/XB.Astrea.Connector"
