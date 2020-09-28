@@ -43,8 +43,6 @@ namespace MqTool
 
                 }
             }
-
-            mqClient.Stop();
         }
     }
 }

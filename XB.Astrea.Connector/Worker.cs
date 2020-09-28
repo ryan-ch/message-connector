@@ -41,8 +41,6 @@ namespace XB.Astrea.Connector
 
             stopwatch.Stop();
 
-            _mqClient.Stop();
-
             _logger.LogInformation("Time elapsed: {0}", stopwatch.Elapsed);
         }
 
