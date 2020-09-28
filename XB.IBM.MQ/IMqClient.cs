@@ -10,7 +10,5 @@ namespace XB.IBM.MQ
         Task<string> ReceiveMessageAsync(CancellationToken token);
 
         Task WriteMessageAsync(string message, CancellationToken token);
-
-        void Stop();
     }
 }

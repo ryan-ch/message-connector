@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace XB.IBM.MQ
 {
-    public class MqClient : IMqClient
+    public class MqClient : IMqClient, IDisposable
     {
         private readonly IConnectionFactory _cf;
         private readonly IConfiguration _configuration;
@@ -65,16 +65,6 @@ namespace XB.IBM.MQ
             }, token);
         }
 
-        public void Stop()
-        {
-            _destination.Dispose();
-            _connectionWmq.Stop();
-            _sessionWmq.Close();
-            _producer.Close();
-            _consumer.Close();
-        }
-
-
         private void SetupConnectionProperties()
         {
             //_cf.SetStringProperty(XMSC.WMQ_SSL_CIPHER_SPEC, (string)_properties[XMSC.WMQ_SSL_CIPHER_SPEC]);
@@ -99,6 +89,15 @@ namespace XB.IBM.MQ
             _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration["AppSettings:MqQueueNameReader"]);
             _properties.Add(XMSC.USERID, _configuration["AppSettings:MqUserName"]);
             _properties.Add(XMSC.PASSWORD, _configuration["AppSettings:MqPassword"]);
+        }
+
+        public void Dispose()
+        {
+            _destination.Dispose();
+            _connectionWmq.Stop();
+            _sessionWmq.Close();
+            _producer.Close();
+            _consumer.Close();
         }
     }
 }
