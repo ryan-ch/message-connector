@@ -11,7 +11,7 @@ namespace XB.IBM.MQ
     {
         protected readonly IConfiguration _configuration;
         protected readonly ILogger<T> _logger;
-        protected IConnectionFactory _cf;
+        protected readonly IConnectionFactory _cf;
         protected IDictionary<string, object> _properties = new Dictionary<string, object>();
         protected IConnection _connectionWmq;
         protected ISession _sessionWmq;
