@@ -5,7 +5,14 @@ services:
     image: ${DOCKER_REGISTRY-}xbastreaconnector
     build:
       context: .
-      dockerfile: XB.Astrea.Connector/Dockerfile
+      dockerfile: Microservices/XB.Astrea.Connector/Dockerfile
+  xb.astrea.webapi:
+    image: ${DOCKER_REGISTRY-}xbastreawebapi
+    ports:
+      - "80:80" 
+    build:
+      context: .
+      dockerfile: Microservices/XB.Astrea.WebAPI/Dockerfile
 
 networks:
     default:

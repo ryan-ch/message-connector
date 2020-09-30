@@ -24,6 +24,8 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.Astrea.Connector", "Microservices\XB.Astrea.Connector\XB.Astrea.Connector.csproj", "{EE60FCAF-792E-408E-938D-38F3E60786F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XB.Astrea.WebAPI", "Microservices\XB.Astrea.WebAPI\XB.Astrea.WebAPI.csproj", "{C7F00439-8087-46C7-9864-579A51AA9E83}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{EE60FCAF-792E-408E-938D-38F3E60786F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE60FCAF-792E-408E-938D-38F3E60786F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE60FCAF-792E-408E-938D-38F3E60786F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7F00439-8087-46C7-9864-579A51AA9E83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7F00439-8087-46C7-9864-579A51AA9E83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7F00439-8087-46C7-9864-579A51AA9E83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7F00439-8087-46C7-9864-579A51AA9E83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +65,7 @@ Global
 		{3A5660AE-5849-4FFA-BA8D-EF66AE5A3FDB} = {C90AA9C8-1AAC-4981-833D-D2C445771687}
 		{4F982902-F851-4C88-9CB5-EA1928E412B1} = {871733D3-1DFE-4615-80E5-376145B17869}
 		{EE60FCAF-792E-408E-938D-38F3E60786F3} = {83EE2955-B60F-402F-A896-3F10D58CEEDA}
+		{C7F00439-8087-46C7-9864-579A51AA9E83} = {83EE2955-B60F-402F-A896-3F10D58CEEDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7419513B-B6C5-4BAA-B4E3-7DA935561B70}

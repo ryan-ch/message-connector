@@ -34,6 +34,7 @@ namespace XB.IBM.MQ
         public string ReceiveMessage()
         {
             var message = _consumer.Receive() as ITextMessage;
+            _sessionWmq.Commit();
             return message?.Text;
         }
 
@@ -42,7 +43,6 @@ namespace XB.IBM.MQ
             _destination.Dispose();
             _connectionWmq.Stop();
             _sessionWmq.Close();
-            _producer.Close();
             _consumer.Close();
         }
     }

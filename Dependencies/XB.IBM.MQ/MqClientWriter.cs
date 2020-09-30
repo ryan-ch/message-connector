@@ -39,7 +39,6 @@ namespace XB.IBM.MQ
             _connectionWmq.Stop();
             _sessionWmq.Close();
             _producer.Close();
-            _consumer.Close();
         }
     }
 }
