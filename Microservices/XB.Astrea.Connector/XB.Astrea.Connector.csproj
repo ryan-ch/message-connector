@@ -16,4 +16,6 @@
     <ProjectReference Include="..\XB.Astrea\XB.Astrea.csproj" />
     <ProjectReference Include="..\XB.IBM.MQ\XB.IBM.MQ.csproj" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

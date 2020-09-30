@@ -6,3 +6,8 @@ services:
     build:
       context: .
       dockerfile: XB.Astrea.Connector/Dockerfile
+
+networks:
+    default:
+      external: true
+      name: gpp-local

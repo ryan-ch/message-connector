@@ -14,9 +14,9 @@ namespace XB.Astrea
             _httpClient = _httpClientFactory.CreateClient("astrea");
         }
 
-        public Task<string> SayHelloAsync()
+        public async Task<string> SayHelloAsync()
         {
-            return _httpClient.GetStringAsync("/sas/v3/hello");
+            return await _httpClient.GetStringAsync("/sas/v3/hello");
         }
     }
 }
