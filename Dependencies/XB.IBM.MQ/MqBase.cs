@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace XB.IBM.MQ
 {
-    public class MqClientBase<T>
+    public class MqBase<T>
     {
         protected readonly IConfiguration _configuration;
         protected readonly ILogger<T> _logger;
@@ -19,7 +19,7 @@ namespace XB.IBM.MQ
         protected IMessageConsumer _consumer;
         protected IMessageProducer _producer;
 
-        public MqClientBase(ILogger<T> logger, IConfiguration configuration)
+        public MqBase(ILogger<T> logger, IConfiguration configuration)
         {
             _configuration = configuration;
             _logger = logger;

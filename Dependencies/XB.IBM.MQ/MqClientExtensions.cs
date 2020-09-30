@@ -4,16 +4,16 @@ namespace XB.IBM.MQ
 {
     public static class MqClientExtensions
     {
-        public static IServiceCollection AddMqClientReader(this IServiceCollection services)
+        public static IServiceCollection AddMqConsumer(this IServiceCollection services)
         {
-            services.AddTransient<IMqClientReader, MqClientReader>();
+            services.AddTransient<IMqConsumer, MqConsumer>();
 
             return services;
         }
 
-        public static IServiceCollection AddMqClientWriter(this IServiceCollection services)
+        public static IServiceCollection AddMqProducer(this IServiceCollection services)
         {
-            services.AddTransient<IMqClientWriter, MqClientWriter>();
+            services.AddTransient<IMqProducer, MqProducer>();
 
             return services;
         }

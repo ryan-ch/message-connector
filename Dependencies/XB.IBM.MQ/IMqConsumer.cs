@@ -1,6 +1,6 @@
 ﻿namespace XB.IBM.MQ
 {
-    public interface IMqClientReader
+    public interface IMqConsumer
     {
         void Start();
 

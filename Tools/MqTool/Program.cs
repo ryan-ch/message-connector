@@ -13,7 +13,7 @@ namespace MqTool
         static void Main(string[] args)
         {
             var startup = new Startup();
-            var mqClient = startup.Provider.GetRequiredService<IMqClientWriter>();
+            var mqClient = startup.Provider.GetRequiredService<IMqProducer>();
 
             mqClient.Start();
 

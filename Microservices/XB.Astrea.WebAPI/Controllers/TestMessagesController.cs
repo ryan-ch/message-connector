@@ -12,12 +12,12 @@ namespace XB.Astrea.WebAPI.Controllers
     [ApiController]
     public class TestMessagesController : ControllerBase
     {
-        private readonly IMqClientWriter _mqClientWriter;
+        private readonly IMqProducer _mqProducer;
 
-        public TestMessagesController(IMqClientWriter mqClientWriter)
+        public TestMessagesController(IMqProducer mqProducer)
         {
-            _mqClientWriter = mqClientWriter;
-            _mqClientWriter.Start();
+            _mqProducer = mqProducer;
+            _mqProducer.Start();
         }
 
         [HttpPost]
@@ -25,9 +25,9 @@ namespace XB.Astrea.WebAPI.Controllers
         {
             for (int i = 0; i < numberOfMessages; i++)
             {
-                _mqClientWriter.WriteMessage(@"{ 1:F01ESSESES0AXXX8000427729}
+                _mqProducer.WriteMessage(@"{ 1:F01ESSESES0AXXX8000427729}
                 { 2:O1030955100518ANZBAU3MAXXX76763960792009301009N}
-                { 3:{ 108:78} { 111:001} { 121:b5c8ae42 - 5e1b - 44da - 909d - c145baab4394} }
+                { 3:{ 108:78} { 111:001} { 121:b5c8ae42-5e1b-44da-909d-c145baab4394} }
                 { 4:
                         :20:MG - AUD
                         :23B: CRED
@@ -44,9 +44,8 @@ namespace XB.Astrea.WebAPI.Controllers
                         :70:BETORSAK RAD 1
                     BETORSAK RAD 2
                         :71A: SHA
-                        -}
-                { S: { MAN: UAKOUAK4600} }
-                ");
+                -}
+                { S: { MAN: UAKOUAK4600} }");
             }
 
             return Ok(numberOfMessages);

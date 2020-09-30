@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace XB.IBM.MQ
 {
-    public class MqClientWriter : MqClientBase<MqClientWriter>, IMqClientWriter, IDisposable
+    public class MqProducer : MqBase<MqProducer>, IMqProducer, IDisposable
     {
 
-        private readonly ILogger<MqClientWriter> _logger;
+        private readonly ILogger<MqProducer> _logger;
 
-        public MqClientWriter(ILogger<MqClientWriter> logger, IConfiguration configuration)
+        public MqProducer(ILogger<MqProducer> logger, IConfiguration configuration)
         : base(logger, configuration)
         {
             _logger = logger;

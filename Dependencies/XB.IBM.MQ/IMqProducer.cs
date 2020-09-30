@@ -1,6 +1,6 @@
 ﻿namespace XB.IBM.MQ
 {
-    public interface IMqClientWriter
+    public interface IMqProducer
     {
         void Start();
 

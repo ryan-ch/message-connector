@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace XB.IBM.MQ
 {
-    public class MqClientReader : MqClientBase<MqClientReader>, IMqClientReader, IDisposable
+    public class MqConsumer : MqBase<MqConsumer>, IMqConsumer, IDisposable
     {
 
-        private readonly ILogger<MqClientReader> _logger;
+        private readonly ILogger<MqConsumer> _logger;
 
-        public MqClientReader(ILogger<MqClientReader> logger, IConfiguration configuration)
+        public MqConsumer(ILogger<MqConsumer> logger, IConfiguration configuration)
         : base(logger, configuration)
         {
             _logger = logger;
@@ -19,7 +19,7 @@ namespace XB.IBM.MQ
         public void Start()
         {
             _connectionWmq = _cf.CreateConnection();
-            _sessionWmq = _connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
+            _sessionWmq = _connectionWmq.CreateSession(false, AcknowledgeMode.AutoAcknowledge);
             _destination = _sessionWmq.CreateQueue((string)_properties[XMSC.WMQ_QUEUE_NAME]);
             _connectionWmq.Start();
             _consumer = _sessionWmq.CreateConsumer(_destination);
@@ -34,7 +34,6 @@ namespace XB.IBM.MQ
         public string ReceiveMessage()
         {
             var message = _consumer.Receive() as ITextMessage;
-            _sessionWmq.Commit();
             return message?.Text;
         }
 
