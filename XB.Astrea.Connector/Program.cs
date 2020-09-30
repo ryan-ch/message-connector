@@ -16,7 +16,7 @@ namespace XB.Astrea.Connector
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddAstreaClient();
-                    services.AddMqClient();
+                    services.AddMqClientReader();
 
                     services.AddHostedService<Worker>();
 

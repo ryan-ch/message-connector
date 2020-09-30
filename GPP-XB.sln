@@ -20,7 +20,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.IBM.MQ", "XB.IBM.MQ\XB.I
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{871733D3-1DFE-4615-80E5-376145B17869}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MqTool", "MqTool\MqTool.csproj", "{4F982902-F851-4C88-9CB5-EA1928E412B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MqTool", "MqTool\MqTool.csproj", "{4F982902-F851-4C88-9CB5-EA1928E412B1}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{835E41FC-C863-4EB1-905D-823834F7BB5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,10 @@ Global
 		{4F982902-F851-4C88-9CB5-EA1928E412B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F982902-F851-4C88-9CB5-EA1928E412B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F982902-F851-4C88-9CB5-EA1928E412B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{835E41FC-C863-4EB1-905D-823834F7BB5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{835E41FC-C863-4EB1-905D-823834F7BB5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{835E41FC-C863-4EB1-905D-823834F7BB5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{835E41FC-C863-4EB1-905D-823834F7BB5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

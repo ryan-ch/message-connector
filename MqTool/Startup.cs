@@ -25,7 +25,7 @@ namespace MqTool
             // add necessary services
             services.AddLogging(configure => configure.AddConsole());
             services.AddSingleton<IConfiguration>(_configuration);
-            services.AddTransient<IMqClient, MqClient>();
+            services.AddMqClientWriter();
 
             // build the pipeline
             _provider = services.BuildServiceProvider();

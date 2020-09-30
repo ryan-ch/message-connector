@@ -11,10 +11,10 @@ namespace XB.Astrea.Connector
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
-        private readonly IMqClient _mqClient;
+        private readonly IMqClientReader _mqClient;
         private readonly IAstreaClient _astreaClient;
 
-        public Worker(ILogger<Worker> logger, IMqClient mqClient, IAstreaClient astreaClient)
+        public Worker(ILogger<Worker> logger, IMqClientReader mqClient, IAstreaClient astreaClient)
         {
             _logger = logger;
             _mqClient = mqClient;
@@ -28,20 +28,22 @@ namespace XB.Astrea.Connector
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            while (!stoppingToken.IsCancellationRequested)
+            var counter = 0;
+
+            while (!stoppingToken.IsCancellationRequested && counter < 1000)
             {
-                var message = await _mqClient.ReceiveMessageAsync(stoppingToken);
-                _logger.LogInformation(DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ": Message read");
+                var message = _mqClient.ReceiveMessage();
 
                 //if (message != string.Empty)
                 //{
                 //    string astreaResponse = await _astreaClient.SayHelloAsync();
                 //}
+                counter++;
             }
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Time elapsed: {0}", stopwatch.Elapsed);
+            _logger.LogInformation($"Time elapsed: {stopwatch.Elapsed / counter} {stopwatch.Elapsed}");
         }
 
         private async Task Log(string message)

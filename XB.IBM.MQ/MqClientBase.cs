@@ -1,68 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Text;
 using IBM.XMS;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace XB.IBM.MQ
 {
-    public class MqClient : IMqClient, IDisposable
+    public class MqClientBase<T>
     {
-        private readonly IConnectionFactory _cf;
-        private readonly IConfiguration _configuration;
-        private readonly IDictionary<string, object> _properties = new Dictionary<string, object>();
-        private readonly ILogger<MqClient> _logger;
+        protected readonly IConfiguration _configuration;
+        protected readonly ILogger<T> _logger;
+        protected IConnectionFactory _cf;
+        protected IDictionary<string, object> _properties = new Dictionary<string, object>();
+        protected IConnection _connectionWmq;
+        protected ISession _sessionWmq;
+        protected IDestination _destination;
+        protected IMessageConsumer _consumer;
+        protected IMessageProducer _producer;
 
-        private IConnection _connectionWmq;
-        private ISession _sessionWmq;
-        private IDestination _destination;
-        private IMessageConsumer _consumer;
-        private IMessageProducer _producer;
-
-        public MqClient(ILogger<MqClient> logger, IServiceScopeFactory serviceScopeFactory)
+        public MqClientBase(ILogger<T> logger, IConfiguration configuration)
         {
+            _configuration = configuration;
             _logger = logger;
-            _configuration = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<IConfiguration>();
             var factoryFactory = XMSFactoryFactory.GetInstance(XMSC.CT_WMQ);
             _cf = factoryFactory.CreateConnectionFactory();
 
             SetupProperties();
             SetupConnectionProperties();
-        }
-
-        public void Start()
-        {
-            _connectionWmq = _cf.CreateConnection();
-            _sessionWmq = _connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
-            _destination = _sessionWmq.CreateQueue((string)_properties[XMSC.WMQ_QUEUE_NAME]);
-            _connectionWmq.Start();
-            _producer = _sessionWmq.CreateProducer(_destination);
-            _consumer = _sessionWmq.CreateConsumer(_destination);
-        }
-
-        public async Task<string> ReceiveMessageAsync(CancellationToken token)
-        {
-            return await Task.Run(() =>
-            {
-                ITextMessage message = (ITextMessage)_consumer.Receive();
-                _sessionWmq.Commit();
-                return message.Text;
-            }, token);
-        }
-
-        public async Task WriteMessageAsync(string message, CancellationToken token)
-        {
-            await Task.Run(() =>
-            {
-                var textMessage = _sessionWmq.CreateTextMessage();
-                textMessage.Text = message;
-
-                _producer.Send(textMessage);
-                _sessionWmq.Commit();
-            }, token);
         }
 
         private void SetupConnectionProperties()
@@ -76,6 +41,7 @@ namespace XB.IBM.MQ
             _cf.SetStringProperty(XMSC.WMQ_QUEUE_NAME, (string)_properties[XMSC.WMQ_QUEUE_NAME]);
             _cf.SetStringProperty(XMSC.USERID, (string)_properties[XMSC.USERID]);
             _cf.SetStringProperty(XMSC.PASSWORD, (string)_properties[XMSC.PASSWORD]);
+            _cf.SetIntProperty(XMSC.WMQ_CONNECTION_MODE, XMSC.WMQ_CM_CLIENT);
         }
 
         private void SetupProperties()
@@ -89,15 +55,6 @@ namespace XB.IBM.MQ
             _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration["AppSettings:MqQueueNameReader"]);
             _properties.Add(XMSC.USERID, _configuration["AppSettings:MqUserName"]);
             _properties.Add(XMSC.PASSWORD, _configuration["AppSettings:MqPassword"]);
-        }
-
-        public void Dispose()
-        {
-            _destination.Dispose();
-            _connectionWmq.Stop();
-            _sessionWmq.Close();
-            _producer.Close();
-            _consumer.Close();
         }
     }
 }
