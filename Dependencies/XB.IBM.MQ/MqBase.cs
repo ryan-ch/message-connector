@@ -28,6 +28,16 @@ namespace XB.IBM.MQ
 
             SetupProperties();
             SetupConnectionProperties();
+
+            Start();
+        }
+
+        private void Start()
+        {
+            _connectionWmq = _cf.CreateConnection();
+            _sessionWmq = _connectionWmq.CreateSession(false, AcknowledgeMode.AutoAcknowledge);
+            _destination = _sessionWmq.CreateQueue((string)_properties[XMSC.WMQ_QUEUE_NAME]);
+            _connectionWmq.Start();
         }
 
         private void SetupConnectionProperties()
