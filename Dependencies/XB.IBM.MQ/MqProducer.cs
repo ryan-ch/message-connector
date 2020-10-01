@@ -1,6 +1,4 @@
-﻿using System;
-using IBM.XMS;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace XB.IBM.MQ
