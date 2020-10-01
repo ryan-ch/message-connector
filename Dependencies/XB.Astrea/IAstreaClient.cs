@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
+using XB.Astrea.Client;
 
 namespace XB.Astrea
 {
     public interface IAstreaClient
     {
-        Task<bool> Assess(string mt);
+        Task<AstreaResponse> Assess(string mt);
     }
 }

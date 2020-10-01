@@ -5,5 +5,7 @@
         void Start();
 
         string ReceiveMessage();
+
+        void Commit();
     }
 }

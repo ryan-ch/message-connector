@@ -5,5 +5,7 @@
         void Start();
 
         void WriteMessage(string message);
+
+        void Commit();
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using XB.Astrea.Client;
 
 namespace XB.Astrea
 {
@@ -13,13 +15,13 @@ namespace XB.Astrea
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<bool> Assess(string mt)
+        public async Task<AstreaResponse> Assess(string mt)
         {
             var data = new StringContent(mt, Encoding.UTF8, "application/json");
 
             var result = await _httpClientFactory.CreateClient("astrea").PostAsync("/sas/v3/assessOrders/paymentInstruction", data);
 
-            return result.IsSuccessStatusCode;
+            return JsonSerializer.Deserialize<AstreaResponse>(await result.Content.ReadAsStringAsync());
         }
     }
 }

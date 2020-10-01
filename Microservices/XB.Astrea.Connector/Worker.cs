@@ -12,13 +12,15 @@ namespace XB.Astrea.Connector
     {
         private readonly ILogger<Worker> _logger;
         private readonly IMqConsumer _mqConsumer;
+        private readonly IMqProducer _mqProducer;
         private readonly IAstreaClient _astreaClient;
 
-        public Worker(ILogger<Worker> logger, IMqConsumer mqConsumer, IAstreaClient astreaClient)
+        public Worker(ILogger<Worker> logger, IMqConsumer mqConsumer, IAstreaClient astreaClient, IMqProducer mqProducer)
         {
             _logger = logger;
             _mqConsumer = mqConsumer;
             _astreaClient = astreaClient;
+            _mqProducer = mqProducer;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -30,15 +32,27 @@ namespace XB.Astrea.Connector
 
             var counter = 0;
 
-            while (!stoppingToken.IsCancellationRequested && counter < 1000)
+            while (!stoppingToken.IsCancellationRequested && counter < 7000)
             {
                 var message = _mqConsumer.ReceiveMessage();
 
                 if (message != string.Empty)
                 {
-                    await _astreaClient.Assess(message);
+                    //var assess = await _astreaClient.Assess(message);
+
+                    //if (assess.AssessmentStatus == "OK")
+                    //{
+                        _mqProducer.WriteMessage(counter.ToString());
+                    //}
                 }
+
                 counter++;
+
+                if (counter % 10 == 0)
+                {
+                    _mqConsumer.Commit();
+                    _mqProducer.Commit();
+                }
             }
 
             stopwatch.Stop();
