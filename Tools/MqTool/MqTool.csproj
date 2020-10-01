@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Dependencies\XB.Astrea\XB.Astrea.csproj" />
+    <ProjectReference Include="..\..\Dependencies\XB.Astrea\XB.Astrea.Client.csproj" />
     <ProjectReference Include="..\..\Dependencies\XB.IBM.MQ\XB.IBM.MQ.csproj" />
   </ItemGroup>
 

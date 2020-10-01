@@ -5,15 +5,19 @@ using Microsoft.Extensions.Logging;
 
 namespace XB.IBM.MQ
 {
-    public class MqProducer : MqBase<MqProducer>, IMqProducer, IDisposable
+    public class MqProducer : MqBase<MqProducer>, IMqProducer
     {
-
-        private readonly ILogger<MqProducer> _logger;
-
         public MqProducer(ILogger<MqProducer> logger, IConfiguration configuration)
         : base(logger, configuration)
         {
-            _logger = logger;
+        }
+
+        ~MqProducer()
+        {
+            _destination.Dispose();
+            _connectionWmq.Stop();
+            _sessionWmq.Close();
+            _producer.Close();
         }
 
         public void Start()
@@ -27,14 +31,6 @@ namespace XB.IBM.MQ
             textMessage.Text = message;
 
             _producer.Send(textMessage);
-        }
-
-        public void Dispose()
-        {
-            _destination.Dispose();
-            _connectionWmq.Stop();
-            _sessionWmq.Close();
-            _producer.Close();
         }
     }
 }

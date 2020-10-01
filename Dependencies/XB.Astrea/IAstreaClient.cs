@@ -4,6 +4,6 @@ namespace XB.Astrea
 {
     public interface IAstreaClient
     {
-        Task<string> SayHelloAsync();
+        Task<bool> Assess(string mt);
     }
 }

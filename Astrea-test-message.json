@@ -1,0 +1,60 @@
+{
+  "basketIdentity": "27e928c8-b235-4d84-bdc4-c413b73ba32d",
+  "targetState": "accepted",
+  "actor": {
+    "authId": "850000001000978"
+  },
+  "principal": {
+    "authId": "850000001000978"
+  },
+  "paymentInstructions": [
+    {
+      "identity": "732407964565453435735756484AF",
+      "paymentType": "seb.payment.lu.transfer.own",
+      "registeringParty": {
+        "authId": "850000001000978",
+        "sebId": "52041500480009"
+      },
+      "registrationTime": "2019-11-01T15:44:39.532+01:00",
+      "instructedDate": "2019-11-04T19:11:31.302+01:00",
+      "amount": 10.0,
+      "currency": "EUR",
+      "debitAccount": [
+        {
+          "type": "lu.bban",
+          "identity": "850000001000978"
+        }
+      ],
+      "creditAccount": [
+        {
+          "type": "iban",
+          "bankIdentifier": "CITIUS33XXX",
+          "identity": "USIBAN9785278"
+        }
+      ],
+      "remittanceInfo": [
+        {
+          "type": "unstruct.debtor",
+          "info": "foo bar"
+        },
+        {
+          "type": "unstruct.creditor",
+          "info": "dvork"
+        }
+      ],
+      "instructionContext": {
+        "debtors": ["850000001000978"],
+        "debitAccountAvailableAmount": 1850.75,
+        "debitAccountCurrency": "SEK"
+      }
+    }
+  ],
+  "tags": {
+    "cha": "IBF",
+    "cli": "IBF.Main.Release_20191105.2",
+    "com": "Payments.FraudPreventionHelper-1_20191028.1",
+    "env": "prd",
+    "host": "WSP9083A",
+    "sch": "2.13"
+  }
+}

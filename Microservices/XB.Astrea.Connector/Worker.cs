@@ -25,7 +25,7 @@ namespace XB.Astrea.Connector
         {
             _mqConsumer.Start();
 
-            Stopwatch stopwatch = new Stopwatch();
+            var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             var counter = 0;
@@ -34,10 +34,10 @@ namespace XB.Astrea.Connector
             {
                 var message = _mqConsumer.ReceiveMessage();
 
-                //if (message != string.Empty)
-                //{
-                //    string astreaResponse = await _astreaClient.SayHelloAsync();
-                //}
+                if (message != string.Empty)
+                {
+                    await _astreaClient.Assess(message);
+                }
                 counter++;
             }
 

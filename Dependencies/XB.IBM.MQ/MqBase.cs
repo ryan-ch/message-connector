@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using IBM.XMS;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microservices", "Microservi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{C90AA9C8-1AAC-4981-833D-D2C445771687}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.Astrea", "Dependencies\XB.Astrea\XB.Astrea.csproj", "{5A731E9A-EE39-4742-83C9-A595F00656ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.Astrea.Client", "Dependencies\XB.Astrea\XB.Astrea.Client.csproj", "{5A731E9A-EE39-4742-83C9-A595F00656ED}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.IBM.MQ", "Dependencies\XB.IBM.MQ\XB.IBM.MQ.csproj", "{3A5660AE-5849-4FFA-BA8D-EF66AE5A3FDB}"
 EndProject

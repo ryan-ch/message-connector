@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace XB.Astrea
@@ -6,17 +7,19 @@ namespace XB.Astrea
     public class AstreaClient : IAstreaClient
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly HttpClient _httpClient;
 
         public AstreaClient(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
-            _httpClient = _httpClientFactory.CreateClient("astrea");
         }
 
-        public async Task<string> SayHelloAsync()
+        public async Task<bool> Assess(string mt)
         {
-            return await _httpClient.GetStringAsync("/sas/v3/hello");
+            var data = new StringContent(mt, Encoding.UTF8, "application/json");
+
+            var result = await _httpClientFactory.CreateClient("astrea").PostAsync("/sas/v3/assessOrders/paymentInstruction", data);
+
+            return result.IsSuccessStatusCode;
         }
     }
 }

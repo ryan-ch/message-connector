@@ -7,6 +7,7 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["Microservices/XB.Astrea.WebAPI/XB.Astrea.WebAPI.csproj", "Microservices/XB.Astrea.WebAPI/"]
+COPY ["Dependencies/XB.IBM.MQ/XB.IBM.MQ.csproj", "Dependencies/XB.IBM.MQ/"]
 RUN dotnet restore "Microservices/XB.Astrea.WebAPI/XB.Astrea.WebAPI.csproj"
 COPY . .
 WORKDIR "/src/Microservices/XB.Astrea.WebAPI"
