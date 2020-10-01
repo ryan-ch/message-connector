@@ -36,7 +36,7 @@ namespace XB.IBM.MQ
             _sessionWmq.Commit();
         }
 
-        private void Start()
+        public virtual void Start()
         {
             _connectionWmq = _cf.CreateConnection();
             _sessionWmq = _connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);

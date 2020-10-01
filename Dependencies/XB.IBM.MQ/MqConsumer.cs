@@ -20,8 +20,9 @@ namespace XB.IBM.MQ
             _consumer.Close();
         }
 
-        public void Start()
+        public override void Start()
         {
+            base.Start();
             _consumer = _sessionWmq.CreateConsumer(_destination);
             //_consumer.MessageListener = OnReceiveMessage;
         }

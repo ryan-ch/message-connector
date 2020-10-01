@@ -12,14 +12,15 @@ namespace XB.IBM.MQ
 
         ~MqProducer()
         {
-            _destination.Dispose();
-            _connectionWmq.Stop();
-            _sessionWmq.Close();
-            _producer.Close();
+            _destination?.Dispose();
+            _connectionWmq?.Stop();
+            _sessionWmq?.Close();
+            _producer?.Close();
         }
 
-        public void Start()
+        public override void Start()
         {
+            base.Start();
             _producer = _sessionWmq.CreateProducer(_destination);
         }
 

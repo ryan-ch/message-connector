@@ -41,6 +41,11 @@ namespace XB.Astrea.WebAPI.Controllers
                         :71A: SHA
                 -}
                 { S: { MAN: UAKOUAK4600} }");
+
+                if (i % 100 == 0)
+                {
+                    _mqProducer.Commit();
+                }
             }
 
             return Ok(numberOfMessages);
