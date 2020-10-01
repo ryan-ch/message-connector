@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using IBM.XMS;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -60,13 +61,28 @@ namespace XB.IBM.MQ
 
         private void SetupProperties()
         {
-            //_properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherReader"]);
-            //_properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, _configuration["AppSettings:MqSslPathReader"]);
-            _properties.Add(XMSC.WMQ_HOST_NAME, _configuration["AppSettings:MqHostnameReader"]);
-            _properties.Add(XMSC.WMQ_PORT, _configuration["AppSettings:MqPortReader"]);
-            _properties.Add(XMSC.WMQ_CHANNEL, _configuration["AppSettings:MqChannelReader"]);
-            _properties.Add(XMSC.WMQ_QUEUE_MANAGER, _configuration["AppSettings:MqQueueManagerNameReader"]);
-            _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration["AppSettings:MqQueueNameReader"]);
+            if (typeof(IMqConsumer).IsAssignableFrom(typeof(T)))
+            {
+                //_properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherReader"]);
+                //_properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, _configuration["AppSettings:MqSslPathReader"]);
+                _properties.Add(XMSC.WMQ_HOST_NAME, _configuration["AppSettings:MqHostnameReader"]);
+                _properties.Add(XMSC.WMQ_PORT, _configuration["AppSettings:MqPortReader"]);
+                _properties.Add(XMSC.WMQ_CHANNEL, _configuration["AppSettings:MqChannelReader"]);
+                _properties.Add(XMSC.WMQ_QUEUE_MANAGER, _configuration["AppSettings:MqQueueManagerNameReader"]);
+                _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration["AppSettings:MqQueueNameReader"]);
+            }
+
+            if (typeof(IMqProducer).IsAssignableFrom(typeof(T)))
+            {
+                //_properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherWriter"]);
+                //_properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, _configuration["AppSettings:MqSslPatWriter"]);
+                _properties.Add(XMSC.WMQ_HOST_NAME, _configuration["AppSettings:MqHostnameWriter"]);
+                _properties.Add(XMSC.WMQ_PORT, _configuration["AppSettings:MqPortWriter"]);
+                _properties.Add(XMSC.WMQ_CHANNEL, _configuration["AppSettings:MqChannelReaderWriter"]);
+                _properties.Add(XMSC.WMQ_QUEUE_MANAGER, _configuration["AppSettings:MqQueueManagerNameWriter"]);
+                _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration["AppSettings:MqQueueNameWriter"]);
+            }
+
             _properties.Add(XMSC.USERID, _configuration["AppSettings:MqUserName"]);
             _properties.Add(XMSC.PASSWORD, _configuration["AppSettings:MqPassword"]);
         }

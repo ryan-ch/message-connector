@@ -32,7 +32,7 @@ namespace XB.Astrea.Connector
 
             var counter = 0;
 
-            while (!stoppingToken.IsCancellationRequested && counter < 7000)
+            while (!stoppingToken.IsCancellationRequested && counter < 100)
             {
                 var message = _mqConsumer.ReceiveMessage();
 
