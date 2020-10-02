@@ -48,11 +48,10 @@ namespace XB.Astrea.Connector
 
                 counter++;
 
-                if (counter % 10 == 0)
-                {
-                    _mqConsumer.Commit();
-                    _mqProducer.Commit();
-                }
+                if (counter % 10 != 0) continue;
+
+                _mqConsumer.Commit();
+                _mqProducer.Commit();
             }
 
             stopwatch.Stop();
