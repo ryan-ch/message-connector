@@ -58,13 +58,5 @@ namespace XB.Astrea.Connector
 
             _logger.LogInformation($"Time elapsed: {stopwatch.Elapsed / counter} {stopwatch.Elapsed}");
         }
-
-        private async Task Log(string message)
-        {
-            await Task.Run(() =>
-            {
-                _logger.LogInformation(message);
-            });
-        }
     }
 }

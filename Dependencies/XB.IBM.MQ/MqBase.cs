@@ -38,10 +38,17 @@ namespace XB.IBM.MQ
 
         public virtual void Start()
         {
-            _connectionWmq = _cf.CreateConnection();
-            _sessionWmq = _connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
-            _destination = _sessionWmq.CreateQueue((string)_properties[XMSC.WMQ_QUEUE_NAME]);
-            _connectionWmq.Start();
+            try
+            {
+                _connectionWmq = _cf.CreateConnection();
+                _sessionWmq = _connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
+                _destination = _sessionWmq.CreateQueue((string) _properties[XMSC.WMQ_QUEUE_NAME]);
+                _connectionWmq.Start();
+            }
+            catch (XMSException ex)
+            {
+
+            }
         }
 
         private void SetupConnectionProperties()
