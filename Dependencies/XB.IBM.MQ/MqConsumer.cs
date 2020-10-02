@@ -1,5 +1,4 @@
-﻿using System;
-using IBM.XMS;
+﻿using IBM.XMS;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 

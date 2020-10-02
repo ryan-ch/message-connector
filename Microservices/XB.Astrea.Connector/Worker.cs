@@ -25,6 +25,8 @@ namespace XB.Astrea.Connector
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation($"XB.Astrea.Connector started - {DateTime.Now:yyyy-MM-ddTHH:mm:ssZ}");
+
             _mqConsumer.Start();
 
             var stopwatch = new Stopwatch();
@@ -32,7 +34,7 @@ namespace XB.Astrea.Connector
 
             var counter = 0;
 
-            while (!stoppingToken.IsCancellationRequested && counter < 100)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 var message = _mqConsumer.ReceiveMessage();
 
@@ -45,8 +47,6 @@ namespace XB.Astrea.Connector
                         _mqProducer.WriteMessage(counter.ToString());
                     //}
                 }
-
-                counter++;
 
                 if (counter % 10 != 0) continue;
 
