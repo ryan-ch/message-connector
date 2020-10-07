@@ -17,9 +17,9 @@ namespace XB.Astrea
 
         public async Task<AstreaResponse> Assess(string mt)
         {
-            var data = new StringContent(mt, Encoding.UTF8, "application/json");
+            var data = new StringContent(mt, Encoding.UTF8, "text/plain");
 
-            var result = await _httpClientFactory.CreateClient("astrea").PostAsync("/sas/v3/assessOrders/paymentInstruction", data);
+            var result = await _httpClientFactory.CreateClient("astrea").PostAsync("/swift", data);
 
             return JsonSerializer.Deserialize<AstreaResponse>(await result.Content.ReadAsStringAsync());
         }

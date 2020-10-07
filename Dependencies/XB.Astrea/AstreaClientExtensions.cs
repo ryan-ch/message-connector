@@ -9,7 +9,7 @@ namespace XB.Astrea
         {
             services.AddHttpClient("astrea", c =>
             {
-                c.BaseAddress = new Uri("https://assess-service-fcp-astrea-dev.cumulus.sebank.se");
+                c.BaseAddress = new Uri("http://astrea-swift-fcp-sys.k8-nifi.sebank.se");
                 c.DefaultRequestHeaders.Add("Accept", "text/plain");
             });
 
