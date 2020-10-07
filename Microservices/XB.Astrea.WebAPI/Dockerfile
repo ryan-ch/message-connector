@@ -17,6 +17,8 @@ FROM build AS publish
 RUN dotnet publish "XB.Astrea.WebAPI.csproj" -c Release -o /app/publish
 
 FROM base AS final
-WORKDIR /app
+RUN useradd -ms /bin/bash d827720345
+USER d827720345
+WORKDIR /home/d827720345
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "XB.Astrea.WebAPI.dll"]
