@@ -47,14 +47,16 @@ namespace XB.IBM.MQ
             }
             catch (XMSException ex)
             {
-
+                throw new InitiateMqClientException(ex.Message + ". Could not setup client");
             }
         }
 
         private void SetupConnectionProperties()
         {
-            //_cf.SetStringProperty(XMSC.WMQ_SSL_CIPHER_SPEC, (string)_properties[XMSC.WMQ_SSL_CIPHER_SPEC]);
-            //_cf.SetStringProperty(XMSC.WMQ_SSL_KEY_REPOSITORY, (string)_properties[XMSC.WMQ_SSL_KEY_REPOSITORY]);
+            _cf.SetStringProperty(XMSC.WMQ_SSL_CIPHER_SPEC, (string)_properties[XMSC.WMQ_SSL_CIPHER_SPEC]);
+            _cf.SetStringProperty(XMSC.WMQ_SSL_KEY_REPOSITORY, (string)_properties[XMSC.WMQ_SSL_KEY_REPOSITORY]);
+            _cf.SetStringProperty(XMSC.WMQ_SSL_CERT_STORES, (string)_properties[XMSC.WMQ_SSL_CERT_STORES]);
+            _cf.SetStringProperty(XMSC.WMQ_SSL_PEER_NAME, (string) _properties[XMSC.WMQ_SSL_PEER_NAME]);
             _cf.SetStringProperty(XMSC.WMQ_HOST_NAME, (string)_properties[XMSC.WMQ_HOST_NAME]);
             _cf.SetIntProperty(XMSC.WMQ_PORT, Convert.ToInt32(_properties[XMSC.WMQ_PORT]));
             _cf.SetStringProperty(XMSC.WMQ_CHANNEL, (string)_properties[XMSC.WMQ_CHANNEL]);
@@ -69,8 +71,8 @@ namespace XB.IBM.MQ
         {
             if (typeof(IMqConsumer).IsAssignableFrom(typeof(T)))
             {
-                //_properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherReader"]);
-                //_properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, _configuration["AppSettings:MqSslPathReader"]);
+                _properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherReader"]);
+                _properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, _configuration["AppSettings:MqSslPathReader"]);
                 _properties.Add(XMSC.WMQ_HOST_NAME, _configuration["AppSettings:MqHostnameReader"]);
                 _properties.Add(XMSC.WMQ_PORT, _configuration["AppSettings:MqPortReader"]);
                 _properties.Add(XMSC.WMQ_CHANNEL, _configuration["AppSettings:MqChannelReader"]);
@@ -78,14 +80,17 @@ namespace XB.IBM.MQ
                 _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration["AppSettings:MqQueueNameReader"]);
             } else if (typeof(IMqProducer).IsAssignableFrom(typeof(T)))
             {
-                //_properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherWriter"]);
-                //_properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, _configuration["AppSettings:MqSslPatWriter"]);
+                _properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherWriter"]);
+                _properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, _configuration["AppSettings:MqSslPathWriter"]);
                 _properties.Add(XMSC.WMQ_HOST_NAME, _configuration["AppSettings:MqHostnameWriter"]);
                 _properties.Add(XMSC.WMQ_PORT, _configuration["AppSettings:MqPortWriter"]);
                 _properties.Add(XMSC.WMQ_CHANNEL, _configuration["AppSettings:MqChannelWriter"]);
                 _properties.Add(XMSC.WMQ_QUEUE_MANAGER, _configuration["AppSettings:MqQueueManagerNameWriter"]);
                 _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration["AppSettings:MqQueueNameWriter"]);
             }
+
+            _properties.Add(XMSC.WMQ_SSL_CERT_STORES, "*USER");
+            _properties.Add(XMSC.WMQ_SSL_PEER_NAME, _configuration["AppSettings:MqPeerNameWriter"]);
 
             _properties.Add(XMSC.USERID, _configuration["AppSettings:MqUserName"]);
             _properties.Add(XMSC.PASSWORD, _configuration["AppSettings:MqPassword"]);
