@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using IBM.XMS;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -27,8 +28,6 @@ namespace XB.IBM.MQ
 
             SetupProperties();
             SetupConnectionProperties();
-
-            Start();
         }
 
         public void Commit()
@@ -55,16 +54,15 @@ namespace XB.IBM.MQ
         {
             _cf.SetStringProperty(XMSC.WMQ_SSL_CIPHER_SPEC, (string)_properties[XMSC.WMQ_SSL_CIPHER_SPEC]);
             _cf.SetStringProperty(XMSC.WMQ_SSL_KEY_REPOSITORY, (string)_properties[XMSC.WMQ_SSL_KEY_REPOSITORY]);
-            _cf.SetStringProperty(XMSC.WMQ_SSL_CERT_STORES, (string)_properties[XMSC.WMQ_SSL_CERT_STORES]);
             _cf.SetStringProperty(XMSC.WMQ_SSL_PEER_NAME, (string) _properties[XMSC.WMQ_SSL_PEER_NAME]);
             _cf.SetStringProperty(XMSC.WMQ_HOST_NAME, (string)_properties[XMSC.WMQ_HOST_NAME]);
             _cf.SetIntProperty(XMSC.WMQ_PORT, Convert.ToInt32(_properties[XMSC.WMQ_PORT]));
             _cf.SetStringProperty(XMSC.WMQ_CHANNEL, (string)_properties[XMSC.WMQ_CHANNEL]);
             _cf.SetStringProperty(XMSC.WMQ_QUEUE_MANAGER, (string)_properties[XMSC.WMQ_QUEUE_MANAGER]);
             _cf.SetStringProperty(XMSC.WMQ_QUEUE_NAME, (string)_properties[XMSC.WMQ_QUEUE_NAME]);
-            _cf.SetStringProperty(XMSC.USERID, (string)_properties[XMSC.USERID]);
-            _cf.SetStringProperty(XMSC.PASSWORD, (string)_properties[XMSC.PASSWORD]);
             _cf.SetIntProperty(XMSC.WMQ_CONNECTION_MODE, XMSC.WMQ_CM_CLIENT);
+
+            _logger.LogInformation(_cf.GetStringProperty(XMSC.WMQ_QUEUE_MANAGER));
         }
 
         private void SetupProperties()
@@ -81,7 +79,7 @@ namespace XB.IBM.MQ
             } else if (typeof(IMqProducer).IsAssignableFrom(typeof(T)))
             {
                 _properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherWriter"]);
-                _properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, _configuration["AppSettings:MqSslPathWriter"]);
+                _properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, "*USER");
                 _properties.Add(XMSC.WMQ_HOST_NAME, _configuration["AppSettings:MqHostnameWriter"]);
                 _properties.Add(XMSC.WMQ_PORT, _configuration["AppSettings:MqPortWriter"]);
                 _properties.Add(XMSC.WMQ_CHANNEL, _configuration["AppSettings:MqChannelWriter"]);
@@ -89,11 +87,26 @@ namespace XB.IBM.MQ
                 _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration["AppSettings:MqQueueNameWriter"]);
             }
 
-            _properties.Add(XMSC.WMQ_SSL_CERT_STORES, "*USER");
-            _properties.Add(XMSC.WMQ_SSL_PEER_NAME, _configuration["AppSettings:MqPeerNameWriter"]);
+            AddCertToCertStore(_configuration["AppSettings:MqSslPathWriter"], _configuration["AppSettings:MqPassword"]);
 
-            _properties.Add(XMSC.USERID, _configuration["AppSettings:MqUserName"]);
-            _properties.Add(XMSC.PASSWORD, _configuration["AppSettings:MqPassword"]);
+            _properties.Add(XMSC.WMQ_SSL_PEER_NAME, _configuration["AppSettings:MqPeerNameWriter"]);
+        }
+
+        private void AddCertToCertStore(string certPath, string password)
+        {
+            X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadWrite);
+
+            X509Certificate2 cert = new X509Certificate2(certPath, password, X509KeyStorageFlags.UserKeySet);
+
+            _logger.LogInformation(certPath + " " + password);
+
+            if (cert == null)
+            {
+                throw new ArgumentNullException("Unable to create certificate from provided arguments.");
+            }
+
+            store.Add(cert);
         }
     }
 }

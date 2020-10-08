@@ -24,7 +24,7 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.Astrea.Connector", "Microservices\XB.Astrea.Connector\XB.Astrea.Connector.csproj", "{EE60FCAF-792E-408E-938D-38F3E60786F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XB.Astrea.WebAPI", "Microservices\XB.Astrea.WebAPI\XB.Astrea.WebAPI.csproj", "{C7F00439-8087-46C7-9864-579A51AA9E83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.Astrea.WebAPI", "Microservices\XB.Astrea.WebAPI\XB.Astrea.WebAPI.csproj", "{C7F00439-8087-46C7-9864-579A51AA9E83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
