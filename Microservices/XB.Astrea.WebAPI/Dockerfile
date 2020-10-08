@@ -50,10 +50,12 @@ RUN usermod -a -G gpp d827720345
 RUN chown -R d827720345:gpp ./
 RUN chmod -R g+w runtime-assets
 
+#Test apps to be installed, remove this for production
 RUN apt-get update && apt-get install -y telnet iputils-ping nano
 
 USER d827720345
 
+#Remove this for production, enables log.
 ENV XMS_TRACE_ON 2
 
 ENTRYPOINT ["dotnet", "XB.Astrea.WebAPI.dll"]
