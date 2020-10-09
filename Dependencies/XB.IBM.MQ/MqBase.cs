@@ -96,8 +96,6 @@ namespace XB.IBM.MQ
 
             X509Certificate2 cert = new X509Certificate2(certPath, password, X509KeyStorageFlags.UserKeySet);
 
-            _logger.LogInformation(certPath + " " + password);
-
             if (cert == null)
             {
                 throw new ArgumentNullException("Unable to create certificate from provided arguments.");
