@@ -41,7 +41,7 @@ namespace XB.IBM.MQ
             {
                 _connectionWmq = _cf.CreateConnection();
                 _sessionWmq = _connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
-                _destination = _sessionWmq.CreateQueue((string) _properties[XMSC.WMQ_QUEUE_NAME]);
+                _destination = _sessionWmq.CreateQueue((string)_properties[XMSC.WMQ_QUEUE_NAME]);
                 _connectionWmq.Start();
             }
             catch (XMSException ex)
@@ -54,42 +54,39 @@ namespace XB.IBM.MQ
         {
             _cf.SetStringProperty(XMSC.WMQ_SSL_CIPHER_SPEC, (string)_properties[XMSC.WMQ_SSL_CIPHER_SPEC]);
             _cf.SetStringProperty(XMSC.WMQ_SSL_KEY_REPOSITORY, (string)_properties[XMSC.WMQ_SSL_KEY_REPOSITORY]);
-            _cf.SetStringProperty(XMSC.WMQ_SSL_PEER_NAME, (string) _properties[XMSC.WMQ_SSL_PEER_NAME]);
+            _cf.SetStringProperty(XMSC.WMQ_SSL_PEER_NAME, (string)_properties[XMSC.WMQ_SSL_PEER_NAME]);
             _cf.SetStringProperty(XMSC.WMQ_HOST_NAME, (string)_properties[XMSC.WMQ_HOST_NAME]);
             _cf.SetIntProperty(XMSC.WMQ_PORT, Convert.ToInt32(_properties[XMSC.WMQ_PORT]));
             _cf.SetStringProperty(XMSC.WMQ_CHANNEL, (string)_properties[XMSC.WMQ_CHANNEL]);
             _cf.SetStringProperty(XMSC.WMQ_QUEUE_MANAGER, (string)_properties[XMSC.WMQ_QUEUE_MANAGER]);
             _cf.SetStringProperty(XMSC.WMQ_QUEUE_NAME, (string)_properties[XMSC.WMQ_QUEUE_NAME]);
             _cf.SetIntProperty(XMSC.WMQ_CONNECTION_MODE, XMSC.WMQ_CM_CLIENT);
-
-            _logger.LogInformation(_cf.GetStringProperty(XMSC.WMQ_QUEUE_MANAGER));
         }
 
         private void SetupProperties()
         {
+            string section = string.Empty;
+
             if (typeof(IMqConsumer).IsAssignableFrom(typeof(T)))
             {
-                _properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherReader"]);
-                _properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, _configuration["AppSettings:MqSslPathReader"]);
-                _properties.Add(XMSC.WMQ_HOST_NAME, _configuration["AppSettings:MqHostnameReader"]);
-                _properties.Add(XMSC.WMQ_PORT, _configuration["AppSettings:MqPortReader"]);
-                _properties.Add(XMSC.WMQ_CHANNEL, _configuration["AppSettings:MqChannelReader"]);
-                _properties.Add(XMSC.WMQ_QUEUE_MANAGER, _configuration["AppSettings:MqQueueManagerNameReader"]);
-                _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration["AppSettings:MqQueueNameReader"]);
-            } else if (typeof(IMqProducer).IsAssignableFrom(typeof(T)))
+                section = "AppSettings:Reader:";
+            }
+            else if (typeof(IMqProducer).IsAssignableFrom(typeof(T)))
             {
-                _properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration["AppSettings:MqSslCipherWriter"]);
-                _properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, "*USER");
-                _properties.Add(XMSC.WMQ_HOST_NAME, _configuration["AppSettings:MqHostnameWriter"]);
-                _properties.Add(XMSC.WMQ_PORT, _configuration["AppSettings:MqPortWriter"]);
-                _properties.Add(XMSC.WMQ_CHANNEL, _configuration["AppSettings:MqChannelWriter"]);
-                _properties.Add(XMSC.WMQ_QUEUE_MANAGER, _configuration["AppSettings:MqQueueManagerNameWriter"]);
-                _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration["AppSettings:MqQueueNameWriter"]);
+                section = "AppSettings:Writer:";
             }
 
-            AddCertToCertStore(_configuration["AppSettings:MqSslPathWriter"], _configuration["AppSettings:MqPassword"]);
+            _properties.Add(XMSC.WMQ_HOST_NAME, _configuration[section + "MqHostname"]);
+            _properties.Add(XMSC.WMQ_PORT, _configuration[section + "MqPort"]);
+            _properties.Add(XMSC.WMQ_CHANNEL, _configuration[section + "MqChannel"]);
+            _properties.Add(XMSC.WMQ_QUEUE_MANAGER, _configuration[section + "MqQueueManagerName"]);
+            _properties.Add(XMSC.WMQ_QUEUE_NAME, _configuration[section + "MqQueueName"]);
 
-            _properties.Add(XMSC.WMQ_SSL_PEER_NAME, _configuration["AppSettings:MqPeerNameWriter"]);
+            AddCertToCertStore(_configuration[section + "MqSslPath"], _configuration[section + "MqPassword"]);
+
+            _properties.Add(XMSC.WMQ_SSL_CIPHER_SPEC, _configuration[section + "MqSslCipher"]);
+            _properties.Add(XMSC.WMQ_SSL_KEY_REPOSITORY, "*USER");
+            _properties.Add(XMSC.WMQ_SSL_PEER_NAME, _configuration[section + "MqPeerName"]);
         }
 
         private void AddCertToCertStore(string certPath, string password)
