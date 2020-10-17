@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XB.IBM.MQ
+namespace XB.IBM.MQ.Exceptions
 {
     public class InitiateMqClientException : Exception
     {

@@ -1,11 +1,11 @@
-﻿namespace XB.IBM.MQ
+﻿namespace XB.IBM.MQ.Interfaces
 {
     public interface IMqProducer
     {
-        void Start();
-
         void WriteMessage(string message);
 
         void Commit();
+
+        void Rollback();
     }
 }

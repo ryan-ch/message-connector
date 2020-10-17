@@ -1,11 +1,9 @@
-﻿namespace XB.IBM.MQ
+﻿namespace XB.IBM.MQ.Interfaces
 {
     public interface IMqConsumer
     {
-        void Start();
-
         string ReceiveMessage();
-
         void Commit();
+        void Rollback();
     }
 }
