@@ -15,7 +15,7 @@ namespace XB.Astrea
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<AstreaResponse> Assess(string mt)
+        public async Task<AstreaResponse> AssessAsync(string mt)
         {
             var data = new StringContent(mt, Encoding.UTF8, "text/plain");
 

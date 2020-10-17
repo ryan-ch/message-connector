@@ -4,59 +4,56 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using XB.IBM.MQ;
+using XB.IBM.MQ.Interfaces;
 
 namespace XB.Astrea.Connector
 {
     public class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
-        private readonly IMqConsumer _mqConsumer;
-        private readonly IMqProducer _mqProducer;
-        private readonly IAstreaClient _astreaClient;
+        public ILogger<Worker> Logger { get; }
+        public IMqConsumer MqConsumer { get; }
+        public IMqProducer MqProducer { get; }
+        public IAstreaClient AstreaClient { get; }
 
         public Worker(ILogger<Worker> logger, IMqConsumer mqConsumer, IAstreaClient astreaClient, IMqProducer mqProducer)
         {
-            _logger = logger;
-            _mqConsumer = mqConsumer;
-            _astreaClient = astreaClient;
-            _mqProducer = mqProducer;
+            Logger = logger;
+            MqConsumer = mqConsumer;
+            AstreaClient = astreaClient;
+            MqProducer = mqProducer;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation($"XB.Astrea.Connector started - {DateTime.Now:yyyy-MM-ddTHH:mm:ssZ}");
-
-            _mqConsumer.Start();
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            var counter = 0;
-
             while (!stoppingToken.IsCancellationRequested)
             {
-                var message = _mqConsumer.ReceiveMessage();
-
-                if (message != string.Empty)
+                var message = string.Empty;
+                try
                 {
-                    //var assess = await _astreaClient.Assess(message);
+                    message = MqConsumer.ReceiveMessage();
 
-                    //if (assess.AssessmentStatus == "OK")
-                    //{
-                        _mqProducer.WriteMessage(counter.ToString());
-                    //}
+                    if (message != string.Empty)
+                    {
+                        var assess = await AstreaClient.AssessAsync(message);
+
+                        if (assess.AssessmentStatus == "OK")
+                        {
+                            //process message and place it back to MQ
+                            MqProducer.WriteMessage(message + " " + assess.AssessmentStatus);
+                        }
+                    }
+
+                    MqConsumer.Commit();
+                    MqProducer.Commit();
                 }
-
-                if (counter % 10 != 0) continue;
-
-                _mqConsumer.Commit();
-                _mqProducer.Commit();
+                catch (Exception ex)
+                {
+                    MqConsumer.Rollback();
+                    MqProducer.Rollback();
+                    MqProducer.WriteMessage(message + " " + ex.Message);
+                    MqProducer.Commit();
+                }
             }
-
-            stopwatch.Stop();
-
-            _logger.LogInformation($"Time elapsed: {stopwatch.Elapsed / counter} {stopwatch.Elapsed}");
         }
     }
 }
