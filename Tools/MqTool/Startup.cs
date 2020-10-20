@@ -10,7 +10,6 @@ namespace MqTool
     public class Startup
     {
         private readonly IConfiguration _configuration;
-        private readonly IServiceProvider _provider;
 
         public Startup()
         {
@@ -24,17 +23,14 @@ namespace MqTool
 
             // add necessary services
             services.AddLogging(configure => configure.AddConsole());
-            services.AddSingleton<IConfiguration>(_configuration);
+            services.AddSingleton(_configuration);
             services.AddMqProducer();
 
             // build the pipeline
-            _provider = services.BuildServiceProvider();
+            Provider = services.BuildServiceProvider();
         }
 
         // access the built service pipeline
-        public IServiceProvider Provider => _provider;
-
-        // access the built _configuration
-        public IConfiguration Configuration => _configuration;
+        public IServiceProvider Provider { get; }
     }
 }

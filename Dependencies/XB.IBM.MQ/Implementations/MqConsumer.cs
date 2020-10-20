@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using IBM.XMS;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using XB.IBM.MQ.Interfaces;
 
 namespace XB.IBM.MQ.Implementations
@@ -11,10 +12,10 @@ namespace XB.IBM.MQ.Implementations
         public MqBase MqBase { get; }
         public Dictionary<string, object> ConnectionProperties { get; }
 
-        public MqConsumer(IConfiguration configuration)
+        public MqConsumer(IConfiguration configuration, ILoggerFactory factory)
         {
             ConnectionProperties = SetupProperties(configuration);
-            MqBase = new MqBase(configuration, ConnectionProperties);
+            MqBase = new MqBase(configuration, ConnectionProperties, factory.CreateLogger<MqBase>());
             Consumer = MqBase.SessionWmq.CreateConsumer(MqBase.Destination);
         }
 

@@ -36,22 +36,20 @@ namespace XB.Astrea.Connector
                     {
                         var assess = await AstreaClient.AssessAsync(message);
 
-                        if (assess.AssessmentStatus == "OK")
-                        {
-                            //process message and place it back to MQ
-                            MqProducer.WriteMessage(message + " " + assess.AssessmentStatus);
-                        }
-                    }
+                        //var assess = new { AssessmentStatus = "OK" };
 
-                    MqConsumer.Commit();
-                    MqProducer.Commit();
+                        await MqProducer.WriteMessage(message + " " + assess.AssessmentStatus);
+
+                        MqConsumer.Commit();
+                        MqProducer.Commit();
+                    }
                 }
                 catch (Exception ex)
                 {
                     MqConsumer.Rollback();
                     MqProducer.Rollback();
-                    MqProducer.WriteMessage(message + " " + ex.Message);
-                    MqProducer.Commit();
+                    //MqProducer.WriteMessage(message + " " + ex.Message);
+                    //MqProducer.Commit();
                 }
             }
         }

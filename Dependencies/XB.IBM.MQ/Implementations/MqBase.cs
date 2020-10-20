@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using IBM.XMS;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace XB.IBM.MQ.Implementations
 {
@@ -13,10 +14,12 @@ namespace XB.IBM.MQ.Implementations
         public ISession SessionWmq { get; }
         public IDestination Destination { get; }
         protected IConfiguration Configuration { get; }
+        private ILogger<MqBase> Logger { get; }
 
-        public MqBase(IConfiguration configuration, IReadOnlyDictionary<string, object> properties)
+        public MqBase(IConfiguration configuration, IReadOnlyDictionary<string, object> properties, ILogger<MqBase> logger)
         {
             Configuration = configuration;
+            Logger = logger;
             var factoryFactory = XMSFactoryFactory.GetInstance(XMSC.CT_WMQ);
             Cf = factoryFactory.CreateConnectionFactory();
 
@@ -30,6 +33,7 @@ namespace XB.IBM.MQ.Implementations
             ConnectionWmq = Cf.CreateConnection();
             SessionWmq = ConnectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
             Destination = SessionWmq.CreateQueue((string)properties[XMSC.WMQ_QUEUE_NAME]);
+            Logger.LogInformation("Starting Mq Connection");
             ConnectionWmq.Start();
         }
 
