@@ -38,7 +38,7 @@ namespace XB.Astrea.Connector
 
                         //var assess = new { AssessmentStatus = "OK" };
 
-                        await MqProducer.WriteMessage(message + " " + assess.AssessmentStatus);
+                        MqProducer.WriteMessage(message + " " + assess.AssessmentStatus);
 
                         MqConsumer.Commit();
                         MqProducer.Commit();
