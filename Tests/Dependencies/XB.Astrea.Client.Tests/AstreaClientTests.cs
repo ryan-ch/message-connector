@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using XB.Astrea.Client.Assessment;
+using XB.Astrea.Client.Messages.Assessment;
 using Xunit;
 
 namespace XB.Astrea.Client.Tests
@@ -26,7 +26,7 @@ $
         [Fact]
         public void Parse_MtToAstreaRequest_ShouldReturnRequest()
         {
-            var request = RequestHelper.ParseMtToAstreaRequest(Mt103);
+            var request = AssessmentFactory.GetAssessmentRequest(Mt103);
 
             var requestJson = request.ToJson();
 

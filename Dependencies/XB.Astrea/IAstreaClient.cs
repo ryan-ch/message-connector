@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using XB.Astrea.Client.Assessment;
+using XB.Astrea.Client.Messages.Assessment;
 
 namespace XB.Astrea.Client
 {

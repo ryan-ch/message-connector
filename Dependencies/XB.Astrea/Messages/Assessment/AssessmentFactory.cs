@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace XB.Astrea.Client.Assessment
+namespace XB.Astrea.Client.Messages.Assessment
 {
-    public static class RequestHelper
+    public static class AssessmentFactory
     {
-        public static Request ParseMtToAstreaRequest(string mt)
+        public static Request GetAssessmentRequest(string mt)
         {
             var request = new Request
             {
+                OrderIdentity = "cd7z1Lja3",
+                BasketIdentity = Guid.NewGuid(),
                 Mt = mt,
                 PaymentInstructions = new List<PaymentInstruction>(),
                 Actor = new Actor(),
@@ -28,7 +30,8 @@ namespace XB.Astrea.Client.Assessment
         {
             requestPaymentInstructions.Add(new PaymentInstruction()
             {
-                Identity = Guid.NewGuid().ToString(),
+                //TODO: Should map to Mt103->{4:->:20:
+                Identity = "cd7z1Lja3",
                 PaymentType = "seb.payment.se.swift",
                 RegisteringParty = new RegisteringParty()
                 {

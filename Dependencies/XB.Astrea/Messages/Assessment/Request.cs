@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace XB.Astrea.Client.Assessment
+namespace XB.Astrea.Client.Messages.Assessment
 {
     public class Request
     {
+        public string OrderIdentity { get; set; }
         public Guid BasketIdentity { get; set; } = Guid.NewGuid();
         public List<PaymentInstruction> PaymentInstructions { get; set; } = new List<PaymentInstruction>();
         public Actor Actor { get; set; }
@@ -47,6 +48,7 @@ namespace XB.Astrea.Client.Assessment
     public class PaymentInstruction
     {
         public string Identity { get; set; }
+        //TODO: Check if PaymentType is "se.seb.payment.foreign.swift." + Mt103.{4:->:23B:
         public string PaymentType { get; set; }
         public RegisteringParty RegisteringParty { get; set; }
         public DateTime RegistrationTime { get; set; }

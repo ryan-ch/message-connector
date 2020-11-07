@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using XB.Astrea.Client.Messages.Assessment;
 
-namespace XB.Astrea.Client.ProcessTrail
+namespace XB.Astrea.Client.Messages.ProcessTrail
 {
 
     public class Request
@@ -11,7 +12,7 @@ namespace XB.Astrea.Client.ProcessTrail
         public string System { get; set; }
         public Context Context { get; set; }
         public General General { get; set; }
-        public List<Payload> Payloads { get; set; }
+        public List<Payloads> Payloads { get; set; }
     }
 
     public class General
@@ -45,7 +46,7 @@ namespace XB.Astrea.Client.ProcessTrail
     public class Ref
     {
         public string Type { get; set; } = "bo";
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string IdType { get; set; } = "ses.fcp.payment.order.swift";
     }
 
@@ -55,11 +56,34 @@ namespace XB.Astrea.Client.ProcessTrail
         public string Env { get; set; }
     }
 
-    public class Payload
+    public class Payloads
     {
         public string Encoding { get; set; } = "plain/json";
         public string Store { get; set; } = "ses-fcp-payment-orders";
+        public EnvelopPayload Payload { get; set; }
+    }
+
+    public class EnvelopPayload
+    {
         public Payment Payment { get; set; }
+        public Extras Extras { get; set; }
+        public Assess Assess { get; set; }
+    }
+
+    public class Assess
+    {
+        public Guid Id { get; set; }
+        public int RiskLevel { get; set; }
+        public List<Hint> Hints { get; set; }
+    }
+
+    public class Extras
+    {
+        public string SwiftBeneficiaryCustomerAccount { get; set; }
+        public string SwiftBeneficiaryCustomerName { get; set; }
+        public string SwiftBeneficiaryCustomerAddress { get; set; }
+        public string SwiftBeneficiaryBankBIC { get; set; }
+        public string SwiftRawMessage { get; set; }
     }
 
     public class Payment

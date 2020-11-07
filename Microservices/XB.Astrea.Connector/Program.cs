@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using XB.Astrea.Client;
 using XB.IBM.MQ;
 
 namespace XB.Astrea.Connector

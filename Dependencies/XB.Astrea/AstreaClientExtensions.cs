@@ -24,7 +24,7 @@ namespace XB.Astrea.Client
             return services;
         }
 
-        public static string ToJson(this Astrea.Client.Assessment.Request request)
+        public static string ToJson(this Messages.Assessment.Request request)
         {
             if (request == null) return Null;
 
@@ -39,7 +39,7 @@ namespace XB.Astrea.Client
             }
         }
 
-        public static string ToJson(this Astrea.Client.ProcessTrail.Request request)
+        public static string ToJson(this Messages.ProcessTrail.Request request)
         {
             if (request == null) return Null;
 
