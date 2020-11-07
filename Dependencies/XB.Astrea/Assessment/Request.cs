@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace XB.Astrea
+namespace XB.Astrea.Client.Assessment
 {
-    public class AstreaRequest
+    public class Request
     {
         public Guid BasketIdentity { get; set; } = Guid.NewGuid();
-        public List<PaymentInstruction> PaymentInstructions { get; set; }
+        public List<PaymentInstruction> PaymentInstructions { get; set; } = new List<PaymentInstruction>();
         public Actor Actor { get; set; }
         public Principal Principal { get; set; }
         [JsonProperty(Required = Required.Always)]
@@ -24,14 +24,7 @@ namespace XB.Astrea
         public string SebId { get; set; }
     }
 
-    public class DebitAccount
-    {
-        public string Type { get; set; }
-        public string BankIdentity { get; set; }
-        public string Identity { get; set; }
-    }
-
-    public class CreditAccount
+    public class Account
     {
         public string Type { get; set; }
         public string BankIdentity { get; set; }
@@ -58,10 +51,10 @@ namespace XB.Astrea
         public RegisteringParty RegisteringParty { get; set; }
         public DateTime RegistrationTime { get; set; }
         public DateTime InstructedDate { get; set; }
-        public int Amount { get; set; }
+        public float Amount { get; set; }
         public string Currency { get; set; }
-        public List<DebitAccount> DebitAccount { get; set; }
-        public List<CreditAccount> CreditAccount { get; set; }
+        public List<Account> DebitAccount { get; set; }
+        public List<Account> CreditAccount { get; set; }
         public List<RemittanceInfo> RemittanceInfo { get; set; }
         public InstructionContext InstructionContext { get; set; }
     }

@@ -3,9 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using XB.Astrea.Client;
 
-namespace XB.Astrea
+namespace XB.Astrea.Client
 {
     public static class AstreaClientExtensions
     {
@@ -25,7 +24,7 @@ namespace XB.Astrea
             return services;
         }
 
-        public static string ToJson(this AstreaRequest request)
+        public static string ToJson(this Astrea.Client.Assessment.Request request)
         {
             if (request == null) return Null;
 
@@ -40,7 +39,7 @@ namespace XB.Astrea
             }
         }
 
-        public static string ToJson(this AstreaProcessTrailRequest request)
+        public static string ToJson(this Astrea.Client.ProcessTrail.Request request)
         {
             if (request == null) return Null;
 

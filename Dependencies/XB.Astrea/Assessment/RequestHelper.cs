@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace XB.Astrea.Client
+namespace XB.Astrea.Client.Assessment
 {
-    public static class AstreaRequestHelper
+    public static class RequestHelper
     {
-        public static AstreaRequest ParseMtToAstreaRequest(string mt)
+        public static Request ParseMtToAstreaRequest(string mt)
         {
-            var request = new AstreaRequest
+            var request = new Request
             {
                 Mt = mt,
                 PaymentInstructions = new List<PaymentInstruction>(),
@@ -40,16 +39,16 @@ namespace XB.Astrea.Client
                 InstructedDate = DateTime.Now,
                 Amount = 199,
                 Currency = "SEK",
-                DebitAccount = new List<DebitAccount>()
+                DebitAccount = new List<Account>()
                 {
-                    new DebitAccount()
+                    new Account()
                     {
                         Type = "iban",
                         BankIdentity = "ESSESESS",
                         Identity = "SE2750000000056970162486"
                     }
                 },
-                CreditAccount = new List<CreditAccount>()
+                CreditAccount = new List<Account>()
                 {
 
                 },

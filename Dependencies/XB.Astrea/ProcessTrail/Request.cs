@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace XB.Astrea.Client
+namespace XB.Astrea.Client.ProcessTrail
 {
 
-    public class AstreaProcessTrailRequest
+    public class Request
     {
-        public DateTime Time { get; set; } = DateTime.Now;
-        public General General { get; set; }
         public Guid Id { get; set; } = Guid.NewGuid();
-        public Payload[] Payloads { get; set; }
+        public DateTime Time { get; set; } = DateTime.Now;
+        public string System { get; set; }
         public Context Context { get; set; }
+        public General General { get; set; }
+        public List<Payload> Payloads { get; set; }
     }
 
     public class General
     {
         public Bo Bo { get; set; }
         public DateTime Time { get; set; }
-        public Ref[] Refs { get; set; }
+        public List<Ref> Refs { get; set; }
         public Event Event { get; set; }
         public Location Location { get; set; }
     }
@@ -52,32 +52,28 @@ namespace XB.Astrea.Client
     public class Context
     {
         public string Cli { get; set; }
-    }
-
-    public class Payloads
-    {
-        public string Encoding { get; set; } = "plain/json";
-        public string Store { get; set; } = "ses-fcp-payment-orders";
-        public Payload Payload { get; set; }
+        public string Env { get; set; }
     }
 
     public class Payload
     {
+        public string Encoding { get; set; } = "plain/json";
+        public string Store { get; set; } = "ses-fcp-payment-orders";
         public Payment Payment { get; set; }
     }
 
     public class Payment
     {
         public DateTime InstructedDate { get; set; }
-        public Debitaccount[] DebitAccount { get; set; }
-        public References[] References { get; set; }
-        public Creditaccount[] CreditAccount { get; set; }
+        public List<Account> DebitAccount { get; set; }
+        public List<References> References { get; set; }
+        public List<Account> CreditAccount { get; set; }
         public string InstructedCurrency { get; set; }
         public float InstructedAmount { get; set; }
         public string ExecutionDate { get; set; }
     }
 
-    public class Debitaccount
+    public class Account
     {
         public string Id { get; set; }
         public string IdType { get; set; } = "iban";
@@ -87,11 +83,5 @@ namespace XB.Astrea.Client
     {
         public string Type { get; set; }
         public string Reference { get; set; }
-    }
-
-    public class Creditaccount
-    {
-        public string Id { get; set; }
-        public string IdType { get; set; }
     }
 }

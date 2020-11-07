@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace XB.Astrea.Client
+namespace XB.Astrea.Client.Assessment
 {
-    public class AstreaResponse
+    public class Response
     {
         [JsonPropertyName("requestIdentity")]
         public string RequestIdentity { get; set; }
