@@ -1,0 +1,40 @@
+{
+  "orderIdentity": "TiM y",
+  "basketIdentity": "7bc997ab-bf94-48c8-bb19-696f05fd17fd",
+  "paymentInstructions": [
+    {
+      "identity": "TiM y",
+      "currency": "SEK",
+      "instructedDate": "2020-08-25T00:00:00+0200",
+      "debitAccount": [
+        {
+          "identity": "SE2880000832790000012345",
+          "type": "iban",
+          "bankIdentity": "V\u00e5rg\u00e5rda Kromverk"
+        }
+      ],
+      "creditAccount": [
+        {
+          "identity": "SE3550000000054910000003",
+          "type": "iban",
+          "bankIdentity": "SE3550000000054910000003"
+        }
+      ],
+      "amount": 17500.0,
+      "paymentType": "se.seb.payment.foreign.swift.CRED",
+      "instructionContext": {
+        "debtors": [
+          "/SE2880000832790000012345; V\u00e5rg\u00e5rda Kromverk; Lilla Korsgatan 3"
+        ],
+        "beneficiary": "Volvo Personvagnar Ab",
+        "debitAccountAvailableAmount": 0.0
+      }
+    }
+  ],
+  "registrationTime": "2020-11-04T10:14:23.9237983Z",
+  "targetState": "requested",
+  "tags": {
+    "cli": "Swift",
+    "env": "local"
+  }
+}

@@ -1,60 +1,56 @@
 {
-  "basketIdentity": "27e928c8-b235-4d84-bdc4-c413b73ba32d",
-  "targetState": "accepted",
-  "actor": {
-    "authId": "850000001000978"
-  },
-  "principal": {
-    "authId": "850000001000978"
-  },
+  "basketIdentity": "3fa68d60-aabc-44b3-94a4-422084f94275",
   "paymentInstructions": [
     {
-      "identity": "732407964565453435735756484AF",
-      "paymentType": "seb.payment.lu.transfer.own",
+      "identity": "b986a894-8f53-42d5-9136-09ab5fcac490",
+      "paymentType": "seb.payment.se.sepa",
       "registeringParty": {
-        "authId": "850000001000978",
+        "authId": "52041500480009",
         "sebId": "52041500480009"
       },
-      "registrationTime": "2019-11-01T15:44:39.532+01:00",
-      "instructedDate": "2019-11-04T19:11:31.302+01:00",
-      "amount": 10.0,
-      "currency": "EUR",
+      "registrationTime": "2020-07-02T10:00:00.000Z",
+      "instructedDate": "2020-07-02T10:00:00.000Z",
+      "amount": 199,
+      "currency": "SEK",
       "debitAccount": [
         {
-          "type": "lu.bban",
-          "identity": "850000001000978"
+          "type": "iban",
+          "bankIdentity": "ESSESESS",
+          "identity": "SE2750000000056970162486"
         }
       ],
       "creditAccount": [
         {
           "type": "iban",
-          "bankIdentifier": "CITIUS33XXX",
-          "identity": "USIBAN9785278"
+          "bankIdentity": "ESSESESS",
+          "identity": "SE6150000000056970146936"
         }
       ],
       "remittanceInfo": [
         {
-          "type": "unstruct.debtor",
-          "info": "foo bar"
+          "info": "some remittance info text related to debtor",
+          "type": "unstruct.debtor"
         },
         {
-          "type": "unstruct.creditor",
-          "info": "dvork"
+          "info": "some remittance info text related to creditor",
+          "type": "unstruct.creditor"
         }
       ],
       "instructionContext": {
-        "debtors": ["850000001000978"],
+        "debtors": ["70010112340001"],
         "debitAccountAvailableAmount": 1850.75,
-        "debitAccountCurrency": "SEK"
+        "debitAccountCurrency": "sek"
       }
     }
   ],
-  "tags": {
-    "cha": "IBF",
-    "cli": "IBF.Main.Release_20191105.2",
-    "com": "Payments.FraudPreventionHelper-1_20191028.1",
-    "env": "prd",
-    "host": "WSP9083A",
-    "sch": "2.13"
-  }
+  "actor": {
+    "sebId": "70010112340009",
+    "authId": "197001011234"
+  },
+  "principal": {
+    "authId": "70010112340009",
+    "sebId": "197001011234"
+  },
+  "targetState": "requested",
+  "tags": {}
 }

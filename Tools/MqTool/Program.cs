@@ -35,7 +35,7 @@ namespace MqTool
                         int iterations = Int32.Parse((Console.ReadLine()));
                         for (int i = 0; i < iterations; i++)
                         {
-                            await mqClient.WriteMessage(@"{1:F01NKCCXH2NBXXX9712267472}{2:I103CD7BNS1A22WCN}{3:{103:YYG}{108:5V0OP4RFA66}{119:}{111:}{121:7de11583-e6e8-48b2-b8cd-771a839b7fda}}{4:
+                            mqClient.WriteMessage(@"{1:F01NKCCXH2NBXXX9712267472}{2:I103CD7BNS1A22WCN}{3:{103:YYG}{108:5V0OP4RFA66}{119:}{111:}{121:7de11583-e6e8-48b2-b8cd-771a839b7fda}}{4:
 :20:cd7z1Lja3
 :23B:CRED
 :32A:200825SEK17500,00

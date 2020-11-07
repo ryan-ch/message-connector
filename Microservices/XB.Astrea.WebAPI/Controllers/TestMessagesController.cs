@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using XB.IBM.MQ;
+using XB.IBM.MQ.Interfaces;
 
 namespace XB.Astrea.WebAPI.Controllers
 {
@@ -12,7 +12,6 @@ namespace XB.Astrea.WebAPI.Controllers
         public TestMessagesController(IMqProducer mqProducer)
         {
             _mqProducer = mqProducer;
-            _mqProducer.Start();
         }
 
         [HttpPost]

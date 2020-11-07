@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using XB.Astrea.Client;
 
 namespace XB.Astrea
@@ -17,11 +17,14 @@ namespace XB.Astrea
 
         public async Task<AstreaResponse> AssessAsync(string mt)
         {
-            var data = new StringContent(mt, Encoding.UTF8, "text/plain");
+            var request = AstreaRequestHelper.ParseMtToAstreaRequest(mt);
+
+            var data = new StringContent(request.Mt, Encoding.UTF8, "text/plain");
 
             var result = await _httpClientFactory.CreateClient("astrea").PostAsync("/swift", data);
+            //var result = await _httpClientFactory.CreateClient("astrea").PostAsync("/sas/v3/assessOrders/paymentInstruction", data);
 
-            return JsonSerializer.Deserialize<AstreaResponse>(await result.Content.ReadAsStringAsync());
+            return JsonConvert.DeserializeObject<AstreaResponse>(await result.Content.ReadAsStringAsync());
         }
     }
 }

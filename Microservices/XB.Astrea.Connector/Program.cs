@@ -15,7 +15,7 @@ namespace XB.Astrea.Connector
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddAstreaClient();
+                    services.AddAstreaClient(hostContext.Configuration);
                     services.AddMqFactory();
 
                     services.AddHostedService<Worker>();
