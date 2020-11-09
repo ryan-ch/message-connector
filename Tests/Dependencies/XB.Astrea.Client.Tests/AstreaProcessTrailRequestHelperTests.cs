@@ -22,8 +22,8 @@ namespace XB.Astrea.Client.Tests
             SetupAssessmentRequest();
             SetupAssessmentResponse();
 
-            RequestedProcessTrail = Messages.ProcessTrail.RequestHelper.GetRequestedProcessTrail(AssessmentRequest);
-            OfferedProcessTrail = Messages.ProcessTrail.RequestHelper.GetOfferedProcessTrail(AssessmentResponse);
+            RequestedProcessTrail = Messages.ProcessTrail.ProcessTrailFactory.GetRequestedProcessTrail(AssessmentRequest);
+            OfferedProcessTrail = Messages.ProcessTrail.ProcessTrailFactory.GetOfferedProcessTrail(AssessmentResponse);
         }
 
         [Fact]
@@ -59,19 +59,19 @@ namespace XB.Astrea.Client.Tests
 
         private void SetupAssessmentRequest()
         {
-            AssessmentRequest.BasketIdentity = Guid.NewGuid();
+            AssessmentRequest.BasketIdentity = Guid.NewGuid(); //Mt103->{3:->:121: ???
             AssessmentRequest.PaymentInstructions.Add(new PaymentInstruction()
             {
-                InstructedDate = DateTime.Now,
-                Amount = 100,
+                InstructedDate = DateTime.Now, //Possible Mt103->{4:->32A->Date..
+                Amount = 3.14, //Mt103->{4:->:32A:->Date..Currency..Amount
                 Currency = "SEK",
-                Identity = "cd7z1Lja3", //Mt103->{4:->:20:
+                Identity = "cd7z1Lja3", //Mt103->{4:->:20: Senders reference
                 DebitAccount = new List<Account>()
                 {
                     new Account()
                     {
-                        BankIdentity = "BANKIDENTITY-DEBIT",
-                        Identity = "IDENTITY-DEBIT",
+                        BankIdentity = "Vårgårda Kromverk", //Mt103->{4:->:50K:->rad2
+                        Identity = "SE2880000832790000012345", //Mt103->{4:->:50K:->rad1
                         Type = "seb.payment.se.swift"
                     }
                 },
@@ -79,8 +79,8 @@ namespace XB.Astrea.Client.Tests
                 {
                     new Account()
                     {
-                        BankIdentity = "BANKIDENTITY-CREDIT",
-                        Identity = "IDENTITY-CREDIT",
+                        BankIdentity = "Volvo Personvagnar Ab", //Mt103->{4:->:59:->rad2
+                        Identity = "SE3550000000054910000003", //Mt103->{4:->:59:rad1
                         Type = "seb.payment.se.swift"
                     }
                 }

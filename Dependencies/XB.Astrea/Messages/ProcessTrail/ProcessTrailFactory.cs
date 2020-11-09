@@ -5,7 +5,7 @@ using XB.Astrea.Client.Messages.Assessment;
 
 namespace XB.Astrea.Client.Messages.ProcessTrail
 {
-    public static class RequestHelper
+    public static class ProcessTrailFactory
     {
         public static Requested GetRequestedProcessTrail(Astrea.Client.Messages.Assessment.Request assessment)
         {
@@ -60,7 +60,10 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                     Store = "ses-fcp-payment-orders",
                     Payload = new EnvelopPayload()
                     {
-
+                        Extras = new Extras()
+                        {
+                            S
+                        }
                     }
                 })
             );

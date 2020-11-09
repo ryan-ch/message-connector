@@ -30,7 +30,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{15DCC31D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{C69FA523-13CA-425E-B598-F208A0B0B7D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XB.Astrea.Client.Tests", "Tests\Dependencies\XB.Astrea.Client.Tests\XB.Astrea.Client.Tests.csproj", "{4A0F3739-523B-4558-BAB6-6DD94C2F6607}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.Astrea.Client.Tests", "Tests\Dependencies\XB.Astrea.Client.Tests\XB.Astrea.Client.Tests.csproj", "{4A0F3739-523B-4558-BAB6-6DD94C2F6607}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XB.Kafka", "Dependencies\XB.Kafka\XB.Kafka.csproj", "{999DF195-65AC-4456-AD24-48F1CA996FA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +68,10 @@ Global
 		{4A0F3739-523B-4558-BAB6-6DD94C2F6607}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A0F3739-523B-4558-BAB6-6DD94C2F6607}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A0F3739-523B-4558-BAB6-6DD94C2F6607}.Release|Any CPU.Build.0 = Release|Any CPU
+		{999DF195-65AC-4456-AD24-48F1CA996FA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{999DF195-65AC-4456-AD24-48F1CA996FA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{999DF195-65AC-4456-AD24-48F1CA996FA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{999DF195-65AC-4456-AD24-48F1CA996FA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +84,7 @@ Global
 		{C7F00439-8087-46C7-9864-579A51AA9E83} = {83EE2955-B60F-402F-A896-3F10D58CEEDA}
 		{C69FA523-13CA-425E-B598-F208A0B0B7D4} = {15DCC31D-386C-4EF2-9B98-EA39A43E143D}
 		{4A0F3739-523B-4558-BAB6-6DD94C2F6607} = {C69FA523-13CA-425E-B598-F208A0B0B7D4}
+		{999DF195-65AC-4456-AD24-48F1CA996FA5} = {C90AA9C8-1AAC-4981-833D-D2C445771687}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7419513B-B6C5-4BAA-B4E3-7DA935561B70}

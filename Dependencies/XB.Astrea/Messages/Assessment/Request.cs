@@ -53,7 +53,7 @@ namespace XB.Astrea.Client.Messages.Assessment
         public RegisteringParty RegisteringParty { get; set; }
         public DateTime RegistrationTime { get; set; }
         public DateTime InstructedDate { get; set; }
-        public float Amount { get; set; }
+        public double Amount { get; set; }
         public string Currency { get; set; }
         public List<Account> DebitAccount { get; set; }
         public List<Account> CreditAccount { get; set; }

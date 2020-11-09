@@ -53,7 +53,12 @@ namespace XB.Astrea.Client.Messages.Assessment
                 },
                 CreditAccount = new List<Account>()
                 {
-
+                    new Account()
+                    {
+                        Type = "iban",
+                        BankIdentity = "ESSESESS",
+                        Identity = "SE3550000000054910000003"
+                    }
                 },
                 RemittanceInfo = new List<RemittanceInfo>()
 

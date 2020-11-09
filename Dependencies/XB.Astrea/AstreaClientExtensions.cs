@@ -15,7 +15,7 @@ namespace XB.Astrea.Client
         {
             services.AddHttpClient("astrea", c =>
             {
-                c.BaseAddress = new Uri(configuration["AppSettings:AstreaUrl"]);
+                c.BaseAddress = new Uri(configuration["AppSettings:Astrea:Url"]);
                 c.DefaultRequestHeaders.Add("Accept", "text/plain");
             });
 

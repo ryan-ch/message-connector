@@ -1,37 +1,84 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using XB.Astrea.Client.Messages.Assessment;
+using Moq;
+using Moq.Protected;
+using XB.Kafka;
 using Xunit;
 
 namespace XB.Astrea.Client.Tests
 {
     public class AstreaClientTests
     {
-        public string Mt103 =>
-            @"{1:F01NKCCXH2NBXXX9712267472}{2:I103CD7BNS1A22WCN}{3:{103:YYG}{108:5V0OP4RFA66}{119:}{111:}{121:7de11583-e6e8-48b2-b8cd-771a839b7fda}}{4:
-:20:cd7z1Lja3
-:23B:CRED
-:32A:200825SEK3,14
-:50K:/SE2880000832790000012345
-Vårgårda Kromverk
-Lilla Korsgatan 3
-:59:/SE3550000000054910000003
-Volvo Personvagnar Ab
-Bernhards Gränd 3, 418 42 Göteborg
-:71A:SHA
--}{5:}
-$
-";
 
         [Fact]
         public void Parse_MtToAstreaRequest_ShouldReturnRequest()
         {
-            var request = AssessmentFactory.GetAssessmentRequest(Mt103);
+            var request = AssessmentFactory.GetAssessmentRequest(AstreaClientTestConstants.Mt103);
 
             var requestJson = request.ToJson();
 
             Assert.True(request.Mt != string.Empty);
             Assert.True(requestJson != string.Empty);
+        }        
+        
+        [Fact]
+        public async Task Execute_AstreaAssessmentProcess_ShouldDoAssessment()
+        {
+            var httpClientFactoryMock = HttpTestHelper.GetHttpClientFactoryMock();
+
+            var producerMock = new Mock<IProducer>();
+            producerMock.Setup(producer => 
+                producer.Execute(It.IsAny<string>())).Returns(Task.CompletedTask);
+
+            var astreaClient = new AstreaClient(httpClientFactoryMock.Object, producerMock.Object);
+
+            await astreaClient.AssessAsync(AstreaClientTestConstants.Mt103);
+
+            producerMock.Verify(mock => 
+                mock.Execute(It.IsAny<string>()), Times.Once());
+        }
+    }
+
+    public static class HttpTestHelper
+    {
+        public static Mock<IHttpClientFactory> GetHttpClientFactoryMock()
+        {
+            var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+            httpClientFactoryMock.Setup(mock => 
+                mock.CreateClient(It.IsAny<string>())).Returns(GetHttpClientMock());
+            return httpClientFactoryMock;
+        }
+
+        private static HttpClient GetHttpClientMock()
+        {
+            var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            handlerMock
+                .Protected()
+                // Setup the PROTECTED method to mock
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                // prepare the expected response of the mocked http call
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(AstreaClientTestConstants.AstreaResponseAsString),
+                })
+                .Verifiable();
+
+            // use real http client with mocked handler here
+            var httpClient = new HttpClient(handlerMock.Object)
+            {
+                BaseAddress = new Uri("http://test.com/"),
+            };
+
+            return httpClient;
         }
     }
 }
