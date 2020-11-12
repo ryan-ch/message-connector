@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace XB.Astrea.Client.Messages.Assessment
 {
-    public static class AssessmentFactory
+    public static class Factory
     {
         public static Request GetAssessmentRequest(string mt)
         {

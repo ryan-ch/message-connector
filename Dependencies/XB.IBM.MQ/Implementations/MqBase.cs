@@ -33,7 +33,6 @@ namespace XB.IBM.MQ.Implementations
             ConnectionWmq = Cf.CreateConnection();
             SessionWmq = ConnectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
             Destination = SessionWmq.CreateQueue((string)properties[XMSC.WMQ_QUEUE_NAME]);
-            Logger.LogInformation("Starting Mq Connection");
             ConnectionWmq.Start();
         }
 

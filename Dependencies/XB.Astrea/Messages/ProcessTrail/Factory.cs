@@ -5,29 +5,29 @@ using XB.Astrea.Client.Messages.Assessment;
 
 namespace XB.Astrea.Client.Messages.ProcessTrail
 {
-    public static class ProcessTrailFactory
+    public static class Factory
     {
         public static Requested GetRequestedProcessTrail(Astrea.Client.Messages.Assessment.Request assessment)
         {
             //TODO: Look over how the ids are set and they are referring to correct ids
-            var id = Guid.NewGuid();
+            var processTrailId = Guid.NewGuid();
             var timeNow = DateTime.Now;
 
             var processTrailRequest = new Requested()
             {
-                Id = id,
+                Id = processTrailId,
                 Time = timeNow,
                 //TODO: System: Get this from configuration or something else! Need to be flexible if another system will use this lib
                 System = "Hubert",
                 Context = SetupContext(),
-                General = SetupGeneral("requested", timeNow, id, assessment),
-                Payloads = SetupPayloadsForRequested(assessment)
+                General = SetupGeneral("requested", timeNow, processTrailId, assessment),
+                Payloads = SetupPayloadsForRequested(assessment, processTrailId)
             };
 
             return processTrailRequest;
         }
 
-        public static Offered GetOfferedProcessTrail(Astrea.Client.Messages.Assessment.Response assessment)
+        public static Offered GetOfferedProcessTrail(Response assessment)
         {
             //TODO: Look over how the ids are set and they are referring to correct ids
             var id = Guid.NewGuid();
@@ -41,19 +41,25 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                 System = "Hubert",
                 Context = SetupContext(),
                 General = SetupGeneralForOffered("offered", timeNow, id, assessment),
-                Payloads = SetupPayloadsForOffered(assessment)
+                Payloads = SetupPayloadsForOffered(assessment, id)
             };
 
             return processTrailRequest;
         }
 
-        private static List<Payloads> SetupPayloadsForOffered(Response assessment)
+        public static Rejected GetRejectedProcessTrail(Astrea.Client.Messages.Assessment.Request assessment)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static List<Payloads> SetupPayloadsForOffered(Response assessment, Guid eventId)
         {
             var payloads = new List<Payloads>();
 
             assessment.Results.ForEach(pi =>
                 payloads.Add(new Payloads()
                 {
+                    Id = eventId.ToString() + "-1",
                     //TODO: Make dynamic so we can change this or automatically detect this
                     Encoding = "plain/json",
                     //TODO: Make dynamic so we can change this
@@ -62,7 +68,6 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                     {
                         Extras = new Extras()
                         {
-                            S
                         }
                     }
                 })
@@ -71,13 +76,14 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             return payloads;
         }
 
-        private static List<Payloads> SetupPayloadsForRequested(Astrea.Client.Messages.Assessment.Request request)
+        private static List<Payloads> SetupPayloadsForRequested(Astrea.Client.Messages.Assessment.Request request, Guid eventId)
         {
             var payloads = new List<Payloads>();
 
             request.PaymentInstructions.ForEach(pi =>
                 payloads.Add(new Payloads()
                 {
+                    Id = eventId + "-1",
                     //TODO: Make dynamic so we can change this or automatically detect this
                     Encoding = "plain/json",
                     //TODO: Make dynamic so we can change this
@@ -126,14 +132,14 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                 Time = timeNow,
                 Event = new Event()
                 {
-                    Id = id,
+                    Id = Guid.NewGuid(),
                     Type = type
                 },
                 Bo = new Bo()
                 {
                     Id = id,
-                    Type = "other",
-                    IdType = "ses.fcp.payment.order.swift"
+                    Type = "seb.payments.se.incoming.xb",
+                    IdType = "swift.block3.tag121"
                 },
                 Refs = new List<Ref>() {
                     new Ref()
@@ -178,7 +184,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         {
             return new Context()
             {
-                //TODO: Cli: is this the application id of the system that generates the process trail?
+                //TODO: Cli: is this the application eventId of the system that generates the process trail?
                 Cli = "Astrea Connector 1.0",
                 Env = "tst"
             };

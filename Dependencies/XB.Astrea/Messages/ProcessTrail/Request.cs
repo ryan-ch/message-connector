@@ -58,6 +58,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
     public class Payloads
     {
+        public string Id { get; set; }
         public string Encoding { get; set; } = "plain/json";
         public string Store { get; set; } = "ses-fcp-payment-orders";
         public EnvelopPayload Payload { get; set; }
@@ -93,7 +94,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         public List<References> References { get; set; }
         public List<Account> CreditAccount { get; set; }
         public string InstructedCurrency { get; set; }
-        public float InstructedAmount { get; set; }
+        public double InstructedAmount { get; set; }
         public string ExecutionDate { get; set; }
     }
 

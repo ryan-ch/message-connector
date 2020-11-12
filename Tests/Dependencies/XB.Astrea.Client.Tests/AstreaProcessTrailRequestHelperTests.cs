@@ -22,8 +22,8 @@ namespace XB.Astrea.Client.Tests
             SetupAssessmentRequest();
             SetupAssessmentResponse();
 
-            RequestedProcessTrail = Messages.ProcessTrail.ProcessTrailFactory.GetRequestedProcessTrail(AssessmentRequest);
-            OfferedProcessTrail = Messages.ProcessTrail.ProcessTrailFactory.GetOfferedProcessTrail(AssessmentResponse);
+            RequestedProcessTrail = Messages.ProcessTrail.Factory.GetRequestedProcessTrail(AssessmentRequest);
+            OfferedProcessTrail = Messages.ProcessTrail.Factory.GetOfferedProcessTrail(AssessmentResponse);
         }
 
         [Fact]

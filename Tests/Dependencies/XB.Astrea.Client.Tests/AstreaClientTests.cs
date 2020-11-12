@@ -17,7 +17,7 @@ namespace XB.Astrea.Client.Tests
         [Fact]
         public void Parse_MtToAstreaRequest_ShouldReturnRequest()
         {
-            var request = AssessmentFactory.GetAssessmentRequest(AstreaClientTestConstants.Mt103);
+            var request = Factory.GetAssessmentRequest(AstreaClientTestConstants.Mt103);
 
             var requestJson = request.ToJson();
 

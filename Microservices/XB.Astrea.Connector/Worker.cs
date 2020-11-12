@@ -39,18 +39,12 @@ namespace XB.Astrea.Connector
 
                         //var assess = new { AssessmentStatus = "OK" };
 
-                        MqProducer.WriteMessage(message + " " + assess.AssessmentStatus);
-
                         MqConsumer.Commit();
-                        MqProducer.Commit();
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     MqConsumer.Rollback();
-                    MqProducer.Rollback();
-                    //MqProducer.WriteMessage(message + " " + ex.Message);
-                    //MqProducer.Commit();
                 }
             }
         }
