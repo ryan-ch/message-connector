@@ -1,0 +1,126 @@
+{
+  "id": "STOEQU90200916123316000001000001",
+  "time": "2020-09-16T12:33:28.000687+02:00",
+  "system": "APR",
+  "context": {
+    "com": "STOB39BS",
+    "cli": "APR030 Build version 1.0.0",
+    "sch": "v3_3",
+    "host": "APR",
+    "env": "sys"
+  },
+  "general": {
+    "event": {
+      "id": "STOEQU90200916123316000001000001",
+      "type": "offered"
+    },
+    "bo": {
+      "id": "STOEQU90200916123316000001000001",
+      "idType": "seb.suti",
+      "type": "seb.payment.se.sepa"
+    },
+    "time": "2020-09-16T12:33:28.000687+02:00",
+    "location": {
+      "id": "APR",
+      "type": "channel"
+    },
+    "tags": [
+      {
+        "k": "topic",
+        "v": "ses-fcp-payment-orders"
+      }
+    ]
+  },
+  "payloads": [
+    {
+      "store": "ses-fcp-payment-orders",
+      "id": "STOEQU90200916123316000001000001",
+      "encoding": "plain/json",
+      "schemaVersion": "v3_3",
+      "payload": {
+        "payment": {
+          "instructedDate": "2020-09-16T12:33:28",
+          "executionDate": "2020-09-16T12:33:28",
+          "valueDate": "2020-09-16T12:33:28",
+          "instructedAmount": 3.14,
+          "instructedCurrency": "EUR",
+          "debitAccount": {
+            "id": "FI3358410220189940",
+            "idType": "IBAN"
+          },
+          "creditAccount": {
+            "id": "FI1933010005123450",
+            "idType": "IBAN"
+          },
+          "references": [
+            {
+              "reference": "STOEQU99200916123328000456000001",
+              "type": "SEBMsgId"
+            },
+            {
+              "reference": "STOEQU90200916123316000001000001",
+              "type": "SEBCMIRef"
+            },
+            {
+              "reference": "20200914593619011163",
+              "type": "InstrId"
+            },
+            {
+              "reference": "NOTPROVIDED",
+              "type": "EndToEndId"
+            },
+            {
+              "reference": "20200916MPA16-20200914593619011163",
+              "type": "TxId"
+            }
+          ],
+          "remittanceInfos": [
+            {
+              "type": "se.ocr",
+              "info": "RF943473734735"
+            }
+          ],
+          "creditorAgent": [
+            {
+              "intermediaryAgentBic": "ESSEFIH0",
+              "memberId": "NA",
+              "clearingSystemId": "NA"
+            }
+          ],
+          "regulatoryReporting": [
+            {
+              "categoryPurpose": "NA"
+            }
+          ]
+        },
+        "reason": {
+          "code": "??",
+          "text": "??"
+        },
+        "act": {
+          "action": "passThrough",
+          "actExecution": "simulated"
+        },
+        "assess": {
+          "id": "acc76904-93af-45d0-9c4c-20363aa20cd0",
+          "hints": [
+            {
+              "name": "reason",
+              "values": [""]
+            }
+          ],
+          "riskLevel": "0",
+          "extras": {
+            "OrderingCustomerAddress": "NA",
+            "OrderingCustomerAccount": "FI3358410220189940",
+            "OrderingCustomerName": "NA",
+            "FullName": "NA",
+            "OrderingBankBIC": "OKOYFIH0",
+            "AccountHolderID": "NA",
+            "AccountNumber": "NA"
+          }
+        }
+      }
+    }
+  ]
+}

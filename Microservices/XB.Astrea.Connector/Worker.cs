@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using XB.Astrea.Client;
 using XB.IBM.MQ.Interfaces;
 
 namespace XB.Astrea.Connector
@@ -31,25 +32,19 @@ namespace XB.Astrea.Connector
                 try
                 {
                     message = MqConsumer.ReceiveMessage();
+                    Logger.LogInformation(message);
+                    //if (message != string.Empty)
+                    //{
+                    //    var assess = await AstreaClient.AssessAsync(message);
 
-                    if (message != string.Empty)
-                    {
-                        var assess = await AstreaClient.AssessAsync(message);
+                    //    //var assess = new { AssessmentStatus = "OK" };
 
-                        //var assess = new { AssessmentStatus = "OK" };
-
-                        MqProducer.WriteMessage(message + " " + assess.AssessmentStatus);
-
-                        MqConsumer.Commit();
-                        MqProducer.Commit();
-                    }
+                    //    MqConsumer.Commit();
+                    //}
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    MqConsumer.Rollback();
-                    MqProducer.Rollback();
-                    //MqProducer.WriteMessage(message + " " + ex.Message);
-                    //MqProducer.Commit();
+                    //MqConsumer.Rollback();
                 }
             }
         }

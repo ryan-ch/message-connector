@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using XB.Astrea.Client;
+using XB.Astrea.Client.Messages.Assessment;
 
-namespace XB.Astrea
+namespace XB.Astrea.Client
 {
     public interface IAstreaClient
     {
-        Task<AstreaResponse> AssessAsync(string mt);
+        Task<Response> AssessAsync(string mt);
     }
 }

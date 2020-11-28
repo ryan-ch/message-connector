@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using XB.Astrea.Client;
+using XB.Hubert;
 using XB.IBM.MQ;
 
 namespace XB.Astrea.Connector
@@ -15,8 +17,9 @@ namespace XB.Astrea.Connector
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddAstreaClient();
+                    services.AddAstreaClient(hostContext.Configuration);
                     services.AddMqFactory();
+                    services.AddHubert();
 
                     services.AddHostedService<Worker>();
 
