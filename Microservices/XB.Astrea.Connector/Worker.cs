@@ -32,19 +32,19 @@ namespace XB.Astrea.Connector
                 try
                 {
                     message = MqConsumer.ReceiveMessage();
+                    Logger.LogInformation(message);
+                    //if (message != string.Empty)
+                    //{
+                    //    var assess = await AstreaClient.AssessAsync(message);
 
-                    if (message != string.Empty)
-                    {
-                        var assess = await AstreaClient.AssessAsync(message);
+                    //    //var assess = new { AssessmentStatus = "OK" };
 
-                        //var assess = new { AssessmentStatus = "OK" };
-
-                        MqConsumer.Commit();
-                    }
+                    //    MqConsumer.Commit();
+                    //}
                 }
                 catch (Exception)
                 {
-                    MqConsumer.Rollback();
+                    //MqConsumer.Rollback();
                 }
             }
         }

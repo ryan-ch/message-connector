@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using MTParser.Model;
 
 namespace XB.Astrea.Client.Messages.Assessment
 {
     public static class Factory
     {
-        public static Request GetAssessmentRequest(string mt)
+        public static Request GetAssessmentRequest(MT103SingleCustomerCreditTransferModel mt)
         {
             var request = new Request
             {
                 OrderIdentity = "cd7z1Lja3",
                 BasketIdentity = Guid.NewGuid(),
-                Mt = mt,
                 PaymentInstructions = new List<PaymentInstruction>(),
                 Actor = new Actor(),
                 Principal = new Principal(),

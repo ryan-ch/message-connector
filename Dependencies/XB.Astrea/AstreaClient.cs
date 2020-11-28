@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using MTParser.Parsers;
 using Newtonsoft.Json;
 using XB.Astrea.Client.Exceptions;
 using XB.Astrea.Client.Messages.Assessment;
@@ -24,7 +25,9 @@ namespace XB.Astrea.Client
         {
             try
             {
-                var request = MessageFactory.GetAssessmentRequest(mt);
+                var mt103 = MT103SingleCustomerCreditTransferParser.ParseMessage(mt);   
+
+                var request = MessageFactory.GetAssessmentRequest(mt103);
 
                 var data = new StringContent(request.Mt, Encoding.UTF8, "text/plain");
 
@@ -36,6 +39,7 @@ namespace XB.Astrea.Client
                     throw new AssessmentErrorException("Request to Astrea API could not be completed");
 
                 await SendRequestedProcessTrail(request);
+
                 var apiResponse = await result.Content.ReadAsStringAsync();
                 var assessmentResponse = JsonConvert.DeserializeObject<Response>(apiResponse);
 

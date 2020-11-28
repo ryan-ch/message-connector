@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\mt-library\MT103Parser\XB.MT.Parser.csproj" />
     <ProjectReference Include="..\XB.Kafka\XB.Kafka.csproj" />
   </ItemGroup>
 

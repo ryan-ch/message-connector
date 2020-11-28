@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using XB.Kafka;
 
 namespace XB.Astrea.Client
 {
@@ -20,6 +21,7 @@ namespace XB.Astrea.Client
             });
 
             services.AddTransient<IAstreaClient, AstreaClient>();
+            services.AddTransient<IProducer, Producer>();
 
             return services;
         }

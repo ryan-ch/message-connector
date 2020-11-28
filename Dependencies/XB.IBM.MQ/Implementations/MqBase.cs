@@ -25,10 +25,10 @@ namespace XB.IBM.MQ.Implementations
 
             SetupConnectionProperties(properties);
 
-            if (Configuration[properties["section"] + "MqSslPath"] != "" && Configuration[properties["section"] + "MqPassword"] != "")
-            {
-                AddCertToCertStore(Configuration[properties["section"] + "MqSslPath"], Configuration[properties["section"] + "MqPassword"]);
-            }
+            //if (Configuration[properties["section"] + "MqSslPath"] != "" && Configuration[properties["section"] + "MqPassword"] != "")
+            //{
+            //    AddCertToCertStore(Configuration[properties["section"] + "MqSslPath"], Configuration[properties["section"] + "MqPassword"]);
+            //}
 
             ConnectionWmq = Cf.CreateConnection();
             SessionWmq = ConnectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);

@@ -1,10 +1,12 @@
-﻿namespace XB.Astrea.Client
+﻿using MTParser.Model;
+
+namespace XB.Astrea.Client
 {
     public static class MessageFactory
     {
-        public static Messages.Assessment.Request GetAssessmentRequest(string mt)
+        public static Messages.Assessment.Request GetAssessmentRequest(MT103SingleCustomerCreditTransferModel mt103)
         {
-            return Messages.Assessment.Factory.GetAssessmentRequest(mt);
+            return Messages.Assessment.Factory.GetAssessmentRequest(mt103);
         }
 
         public static Messages.ProcessTrail.Requested GetRequestedProcessTrail(Messages.Assessment.Request assessment)

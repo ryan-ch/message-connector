@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using XB.Astrea.Client.Messages.Assessment;
 using Moq;
 using Moq.Protected;
+using MTParser.Parsers;
 using XB.Kafka;
 using Xunit;
 
@@ -17,7 +18,9 @@ namespace XB.Astrea.Client.Tests
         [Fact]
         public void Parse_MtToAstreaRequest_ShouldReturnRequest()
         {
-            var request = Factory.GetAssessmentRequest(AstreaClientTestConstants.Mt103);
+            var mt = MT103SingleCustomerCreditTransferParser.ParseMessage(AstreaClientTestConstants.Mt103);
+
+            var request = Factory.GetAssessmentRequest(mt);
 
             var requestJson = request.ToJson();
 
