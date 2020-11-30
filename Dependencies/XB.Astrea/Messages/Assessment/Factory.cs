@@ -10,7 +10,7 @@ namespace XB.Astrea.Client.Messages.Assessment
         {
             var request = new Request
             {
-                OrderIdentity = "cd7z1Lja3",
+                OrderIdentity = mt.MT103SingleCustomerCreditTransferBlockText.Field20.SenderReference,
                 BasketIdentity = Guid.NewGuid(),
                 PaymentInstructions = new List<PaymentInstruction>(),
                 Actor = new Actor(),
@@ -19,19 +19,19 @@ namespace XB.Astrea.Client.Messages.Assessment
                 Tags = new Tags()
             };
 
-            SetupPaymentInstruction(request.PaymentInstructions);
-            SetupActor(request.Actor);
-            SetupPrincipal(request.Principal);
+            SetupPaymentInstruction(request.PaymentInstructions, mt);
+            SetupActor(request.Actor, mt);
+            SetupPrincipal(request.Principal, mt);
 
             return request;
         }
 
-        private static void SetupPaymentInstruction(List<PaymentInstruction> requestPaymentInstructions)
+        private static void SetupPaymentInstruction(List<PaymentInstruction> requestPaymentInstructions, 
+            MT103SingleCustomerCreditTransferModel mt)
         {
             requestPaymentInstructions.Add(new PaymentInstruction()
             {
-                //TODO: Should map to Mt103->{4:->:20:
-                Identity = "cd7z1Lja3",
+                Identity = mt.MT103SingleCustomerCreditTransferBlockText.Field20.SenderReference,
                 PaymentType = "seb.payment.se.swift",
                 RegisteringParty = new RegisteringParty()
                 {
@@ -39,9 +39,9 @@ namespace XB.Astrea.Client.Messages.Assessment
                     SebId = "52041500480009"
                 },
                 RegistrationTime = DateTime.Now,
-                InstructedDate = DateTime.Now,
-                Amount = 199,
-                Currency = "SEK",
+                InstructedDate = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.Date,
+                Amount = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.InterbankSettledAmount,
+                Currency = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.Currency,
                 DebitAccount = new List<Account>()
                 {
                     new Account()
@@ -72,12 +72,14 @@ namespace XB.Astrea.Client.Messages.Assessment
             });
         }
 
-        private static void SetupActor(Actor requestActor)
+        private static void SetupActor(Actor requestActor,
+            MT103SingleCustomerCreditTransferModel mt)
         {
 
         }
 
-        private static void SetupPrincipal(Principal requestPrincipal)
+        private static void SetupPrincipal(Principal requestPrincipal,
+            MT103SingleCustomerCreditTransferModel mt)
         {
 
         }
