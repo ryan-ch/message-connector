@@ -59,7 +59,7 @@ namespace XB.Astrea.Client.Tests
 
         private void SetupAssessmentRequest()
         {
-            AssessmentRequest.BasketIdentity = Guid.NewGuid(); //Mt103->{3:->:121: ???
+            AssessmentRequest.BasketIdentity = Guid.NewGuid().ToString(); //Mt103->{3:->:121: ???
             AssessmentRequest.PaymentInstructions.Add(new PaymentInstruction()
             {
                 InstructedDate = DateTime.Now, //Possible Mt103->{4:->32A->Date..

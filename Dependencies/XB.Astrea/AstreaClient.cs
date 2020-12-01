@@ -2,11 +2,11 @@
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using MTParser.Parsers;
 using Newtonsoft.Json;
 using XB.Astrea.Client.Exceptions;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.Kafka;
+using XB.MT.Parser.Parsers;
 
 namespace XB.Astrea.Client
 {

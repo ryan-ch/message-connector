@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using XB.Astrea.Client.Messages.Assessment;
 using Moq;
 using Moq.Protected;
-using MTParser.Parsers;
 using XB.Kafka;
 using Xunit;
+using XB.MT.Parser.Parsers;
 
 namespace XB.Astrea.Client.Tests
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MTParser.Model;
+using XB.MT.Parser.Model;
 
 namespace XB.Astrea.Client.Messages.Assessment
 {

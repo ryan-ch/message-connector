@@ -1,4 +1,4 @@
-﻿using MTParser.Model;
+﻿using XB.MT.Parser.Model;
 
 namespace XB.Astrea.Client
 {
