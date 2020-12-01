@@ -10,8 +10,8 @@ namespace XB.Astrea.Client.Messages.Assessment
         {
             var request = new Request
             {
-                OrderIdentity = mt.MT103SingleCustomerCreditTransferBlockText.Field20.SenderReference,
-                BasketIdentity = Guid.NewGuid(),
+                OrderIdentity = Guid.NewGuid().ToString(),
+                BasketIdentity = mt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
                 PaymentInstructions = new List<PaymentInstruction>(),
                 Actor = new Actor(),
                 Principal = new Principal(),
@@ -31,13 +31,8 @@ namespace XB.Astrea.Client.Messages.Assessment
         {
             requestPaymentInstructions.Add(new PaymentInstruction()
             {
-                Identity = mt.MT103SingleCustomerCreditTransferBlockText.Field20.SenderReference,
-                PaymentType = "seb.payment.se.swift",
-                RegisteringParty = new RegisteringParty()
-                {
-                    AuthId = "52041500480009",
-                    SebId = "52041500480009"
-                },
+                Identity = mt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
+                PaymentType = "seb.payment.se.swift." + mt.MT103SingleCustomerCreditTransferBlockText.Field23B,
                 RegistrationTime = DateTime.Now,
                 InstructedDate = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.Date,
                 Amount = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.InterbankSettledAmount,
@@ -46,8 +41,8 @@ namespace XB.Astrea.Client.Messages.Assessment
                 {
                     new Account()
                     {
+                        //TODO: check if length is greater then 11 and if first two are alphabetic
                         Type = "iban",
-                        BankIdentity = "ESSESESS",
                         Identity = "SE2750000000056970162486"
                     }
                 },
@@ -55,20 +50,20 @@ namespace XB.Astrea.Client.Messages.Assessment
                 {
                     new Account()
                     {
+                        //TODO: check if length is greater then 11 and if first two are alphabetic
                         Type = "iban",
-                        BankIdentity = "ESSESESS",
                         Identity = "SE3550000000054910000003"
                     }
                 },
                 RemittanceInfo = new List<RemittanceInfo>()
-
                 {
-
                 },
                 InstructionContext = new InstructionContext()
                 {
-
-                }
+                },
+                RegisteringParty = new RegisteringParty()
+                {
+                },
             });
         }
 

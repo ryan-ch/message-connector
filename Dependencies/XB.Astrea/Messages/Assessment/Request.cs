@@ -7,7 +7,7 @@ namespace XB.Astrea.Client.Messages.Assessment
     public class Request
     {
         public string OrderIdentity { get; set; }
-        public Guid BasketIdentity { get; set; } = Guid.NewGuid();
+        public string BasketIdentity { get; set; }
         public List<PaymentInstruction> PaymentInstructions { get; set; } = new List<PaymentInstruction>();
         public Actor Actor { get; set; }
         public Principal Principal { get; set; }

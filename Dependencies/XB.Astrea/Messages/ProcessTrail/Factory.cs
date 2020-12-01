@@ -100,23 +100,23 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
                             },
                             DebitAccount = new List<Account>()
-                        {
-                            new Account()
                             {
-                                Id = pi.DebitAccount.First().Identity,
-                                //TODO: What types are there?
-                                IdType = "iban"
-                            }
-                        },
+                                new Account()
+                                {
+                                    Id = pi.DebitAccount.First().Identity,
+                                    //TODO: What types are there?
+                                    IdType = "iban"
+                                }
+                            },
                             CreditAccount = new List<Account>()
-                        {
-                            new Account()
                             {
-                                Id = pi.CreditAccount.First().Identity,
-                                //TODO: What types are there?
-                                IdType = "iban"
+                                new Account()
+                                {
+                                    Id = pi.CreditAccount.First().Identity,
+                                    //TODO: What types are there?
+                                    IdType = "iban"
+                                }
                             }
-                        }
                         }
                     }
                 })
