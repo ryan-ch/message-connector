@@ -1,39 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using IBM.XMS;
+﻿using IBM.XMS;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 
 namespace XB.IBM.MQ.Implementations
 {
     public class MqBase
     {
-        public IConnectionFactory Cf { get; }
-        public IConnection ConnectionWmq { get; }
         public ISession SessionWmq { get; }
         public IDestination Destination { get; }
-        protected IConfiguration Configuration { get; }
         private ILogger<MqBase> Logger { get; }
 
-        public MqBase(IConfiguration configuration, IReadOnlyDictionary<string, object> properties, ILogger<MqBase> logger)
+        public MqBase(IConfiguration configuration, string configurationSection, ILoggerFactory loggerFactory)
         {
-            Configuration = configuration;
-            Logger = logger;
-            var factoryFactory = XMSFactoryFactory.GetInstance(XMSC.CT_WMQ);
-            Cf = factoryFactory.CreateConnectionFactory();
+            Logger = loggerFactory.CreateLogger<MqBase>();
 
-            SetupConnectionProperties(properties);
+            var properties = SetupProperties(configuration, configurationSection);
 
-            //if (Configuration[properties["section"] + "MqSslPath"] != "" && Configuration[properties["section"] + "MqPassword"] != "")
+            //if (configuration[properties["section"] + "MqSslPath"] != "" && configuration[properties["section"] + "MqPassword"] != "")
             //{
-            //    AddCertToCertStore(Configuration[properties["section"] + "MqSslPath"], Configuration[properties["section"] + "MqPassword"]);
+            //    AddCertToCertStore(configuration[properties["section"] + "MqSslPath"], configuration[properties["section"] + "MqPassword"]);
             //}
 
-            ConnectionWmq = Cf.CreateConnection();
-            SessionWmq = ConnectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
-            Destination = SessionWmq.CreateQueue((string)properties[XMSC.WMQ_QUEUE_NAME]);
-            ConnectionWmq.Start();
+            var connectionFactory = CreateAndConfigureConnectionFactory(properties);
+            var connectionWmq = connectionFactory.CreateConnection();
+            SessionWmq = connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
+            Destination = SessionWmq.CreateQueue(properties[XMSC.WMQ_QUEUE_NAME]);
+            connectionWmq.Start();
         }
 
         public void Commit()
@@ -46,45 +40,65 @@ namespace XB.IBM.MQ.Implementations
             SessionWmq.Rollback();
         }
 
-        private void SetupConnectionProperties(IReadOnlyDictionary<string, object> properties)
+        private IConnectionFactory CreateAndConfigureConnectionFactory(IReadOnlyDictionary<string, string> properties)
         {
-            if ((string)properties[XMSC.WMQ_SSL_CIPHER_SPEC] != "")
+            var connectionFactory = XMSFactoryFactory.GetInstance(XMSC.CT_WMQ).CreateConnectionFactory();
+
+            if (string.IsNullOrWhiteSpace(properties[XMSC.WMQ_SSL_CIPHER_SPEC]))
             {
-                Cf.SetStringProperty(XMSC.WMQ_SSL_CIPHER_SPEC, (string)properties[XMSC.WMQ_SSL_CIPHER_SPEC]);
+                connectionFactory.SetStringProperty(XMSC.WMQ_SSL_CIPHER_SPEC, properties[XMSC.WMQ_SSL_CIPHER_SPEC]);
             }
-            if ((string)properties[XMSC.WMQ_SSL_KEY_REPOSITORY] != "")
+            if (string.IsNullOrWhiteSpace(properties[XMSC.WMQ_SSL_KEY_REPOSITORY]))
             {
-                Cf.SetStringProperty(XMSC.WMQ_SSL_KEY_REPOSITORY, (string)properties[XMSC.WMQ_SSL_KEY_REPOSITORY]);
+                connectionFactory.SetStringProperty(XMSC.WMQ_SSL_KEY_REPOSITORY, properties[XMSC.WMQ_SSL_KEY_REPOSITORY]);
             }
-            if ((string)properties[XMSC.WMQ_SSL_PEER_NAME] != "") {
-                Cf.SetStringProperty(XMSC.WMQ_SSL_PEER_NAME, (string)properties[XMSC.WMQ_SSL_PEER_NAME]);
-            }
-            if ((string)properties[XMSC.USERID] != "" && (string)properties[XMSC.PASSWORD] != "")
+            if (string.IsNullOrWhiteSpace(properties[XMSC.WMQ_SSL_PEER_NAME]))
             {
-                Cf.SetStringProperty(XMSC.USERID, (string)properties[XMSC.USERID]);
-                Cf.SetStringProperty(XMSC.PASSWORD, (string)properties[XMSC.PASSWORD]);
+                connectionFactory.SetStringProperty(XMSC.WMQ_SSL_PEER_NAME, properties[XMSC.WMQ_SSL_PEER_NAME]);
             }
-            Cf.SetStringProperty(XMSC.WMQ_HOST_NAME, (string)properties[XMSC.WMQ_HOST_NAME]);
-            Cf.SetIntProperty(XMSC.WMQ_PORT, Convert.ToInt32(properties[XMSC.WMQ_PORT]));
-            Cf.SetStringProperty(XMSC.WMQ_CHANNEL, (string)properties[XMSC.WMQ_CHANNEL]);
-            Cf.SetStringProperty(XMSC.WMQ_QUEUE_MANAGER, (string)properties[XMSC.WMQ_QUEUE_MANAGER]);
-            Cf.SetStringProperty(XMSC.WMQ_QUEUE_NAME, (string)properties[XMSC.WMQ_QUEUE_NAME]);
-            Cf.SetIntProperty(XMSC.WMQ_CONNECTION_MODE, XMSC.WMQ_CM_CLIENT);
+            if (string.IsNullOrWhiteSpace(properties[XMSC.USERID]) && string.IsNullOrWhiteSpace(properties[XMSC.PASSWORD]))
+            {
+                connectionFactory.SetStringProperty(XMSC.USERID, properties[XMSC.USERID]);
+                connectionFactory.SetStringProperty(XMSC.PASSWORD, properties[XMSC.PASSWORD]);
+            }
+            connectionFactory.SetStringProperty(XMSC.WMQ_HOST_NAME, properties[XMSC.WMQ_HOST_NAME]);
+            connectionFactory.SetIntProperty(XMSC.WMQ_PORT, Convert.ToInt32(properties[XMSC.WMQ_PORT]));
+            connectionFactory.SetStringProperty(XMSC.WMQ_CHANNEL, properties[XMSC.WMQ_CHANNEL]);
+            connectionFactory.SetStringProperty(XMSC.WMQ_QUEUE_MANAGER, properties[XMSC.WMQ_QUEUE_MANAGER]);
+            connectionFactory.SetStringProperty(XMSC.WMQ_QUEUE_NAME, properties[XMSC.WMQ_QUEUE_NAME]);
+            connectionFactory.SetIntProperty(XMSC.WMQ_CONNECTION_MODE, XMSC.WMQ_CM_CLIENT);
+
+            return connectionFactory;
         }
 
-        private void AddCertToCertStore(string certPath, string password)
-        {
-            X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadWrite);
-
-            X509Certificate2 cert = new X509Certificate2(certPath, password, X509KeyStorageFlags.UserKeySet);
-
-            if (cert == null)
+        private Dictionary<string, string> SetupProperties(IConfiguration configuration, string section) => new Dictionary<string, string>
             {
-                throw new ArgumentNullException("Unable to create certificate from provided arguments.");
-            }
+                {"section", section},
+                {XMSC.WMQ_HOST_NAME, configuration[section + "MqHostname"]},
+                {XMSC.WMQ_PORT, configuration[section + "MqPort"]},
+                {XMSC.WMQ_CHANNEL, configuration[section + "MqChannel"]},
+                {XMSC.WMQ_QUEUE_MANAGER, configuration[section + "MqQueueManagerName"]},
+                {XMSC.WMQ_QUEUE_NAME, configuration[section + "MqQueueName"]},
+                {XMSC.WMQ_SSL_CIPHER_SPEC, configuration[section + "MqSslCipher"]},
+                {XMSC.WMQ_SSL_KEY_REPOSITORY, "*USER"},
+                {XMSC.WMQ_SSL_PEER_NAME, configuration[section + "MqPeerName"]},
+                {XMSC.USERID, configuration[section + "MqUserName"]},
+                {XMSC.PASSWORD, configuration[section + "MqPassword"]}
+            };
 
-            store.Add(cert);
-        }
+        //private void AddCertToCertStore(string certPath, string password)
+        //{
+        //    X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+        //    store.Open(OpenFlags.ReadWrite);
+
+        //    X509Certificate2 cert = new X509Certificate2(certPath, password, X509KeyStorageFlags.UserKeySet);
+
+        //    if (cert == null)
+        //    {
+        //        throw new ArgumentNullException("Unable to create certificate from provided arguments.");
+        //    }
+
+        //    store.Add(cert);
+        //}
     }
 }
