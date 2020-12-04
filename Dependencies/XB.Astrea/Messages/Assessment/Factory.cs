@@ -34,7 +34,7 @@ namespace XB.Astrea.Client.Messages.Assessment
                 Identity = mt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
                 PaymentType = "seb.payment.se.swift." + mt.MT103SingleCustomerCreditTransferBlockText.Field23B,
                 RegistrationTime = DateTime.Now,
-                InstructedDate = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.Date,
+                InstructedDate = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.ValueDate,
                 Amount = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.InterbankSettledAmount,
                 Currency = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.Currency,
                 DebitAccount = new List<Account>()
