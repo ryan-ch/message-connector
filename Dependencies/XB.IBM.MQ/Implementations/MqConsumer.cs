@@ -1,57 +1,27 @@
-﻿using System.Collections.Generic;
-using IBM.XMS;
+﻿using IBM.XMS;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using XB.IBM.MQ.Interfaces;
 
 namespace XB.IBM.MQ.Implementations
 {
-    public class MqConsumer : IMqConsumer
+    public class MqConsumer : MqBase, IMqConsumer
     {
-        public IMessageConsumer Consumer { get; }
-        public MqBase MqBase { get; }
-        public Dictionary<string, object> ConnectionProperties { get; }
+        //Todo: add MQ identifier to the section
+        private const string section = "AppSettings:Reader:";
 
-        public MqConsumer(IConfiguration configuration, ILoggerFactory factory)
+        public IMessageConsumer Consumer { get; }
+
+        public MqConsumer(IConfiguration configuration, ILoggerFactory loggerFactory)
+            : base(configuration, section, loggerFactory)
         {
-            ConnectionProperties = SetupProperties(configuration);
-            MqBase = new MqBase(configuration, ConnectionProperties, factory.CreateLogger<MqBase>());
-            Consumer = MqBase.SessionWmq.CreateConsumer(MqBase.Destination);
+            Consumer = SessionWmq.CreateConsumer(Destination);
         }
 
         public string ReceiveMessage()
         {
             var message = Consumer.Receive() as ITextMessage;
             return message?.Text;
-        }
-
-        public void Commit()
-        {
-            MqBase.Commit();
-        }
-
-        public void Rollback()
-        {
-            MqBase.Rollback();
-        }
-
-        private Dictionary<string, object> SetupProperties(IConfiguration configuration)
-        {
-            const string section = "AppSettings:Reader:";
-            return new Dictionary<string, object>
-            {
-                {"section", section},
-                {XMSC.WMQ_HOST_NAME, configuration[section + "MqHostname"]},
-                {XMSC.WMQ_PORT, configuration[section + "MqPort"]},
-                {XMSC.WMQ_CHANNEL, configuration[section + "MqChannel"]},
-                {XMSC.WMQ_QUEUE_MANAGER, configuration[section + "MqQueueManagerName"]},
-                {XMSC.WMQ_QUEUE_NAME, configuration[section + "MqQueueName"]},
-                {XMSC.WMQ_SSL_CIPHER_SPEC, configuration[section + "MqSslCipher"]},
-                {XMSC.WMQ_SSL_KEY_REPOSITORY, "*USER"},
-                {XMSC.WMQ_SSL_PEER_NAME, configuration[section + "MqPeerName"]},
-                {XMSC.USERID, configuration[section + "MqUserName"]},
-                {XMSC.PASSWORD, configuration[section + "MqPassword"]}
-            };
         }
     }
 }

@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\mt-library\MT103Parser\XB.MT.Parser.csproj" />
     <ProjectReference Include="..\..\..\Dependencies\XB.Astrea\XB.Astrea.Client.csproj" />
   </ItemGroup>
 
