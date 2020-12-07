@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using XB.Astrea.Client.Messages.Assessment;
 using Xunit;
 
@@ -10,10 +10,10 @@ namespace XB.Astrea.Client.Tests
 
     public class AstreaProcessTrailRequestHelperTests
     {
-        public Request AssessmentRequest { get; set; } = new Request();
-        public Response AssessmentResponse { get; set; } = new Response();
-        public Astrea.Client.Messages.ProcessTrail.Requested RequestedProcessTrail { get; set; }
-        public Astrea.Client.Messages.ProcessTrail.Offered OfferedProcessTrail { get; set; }
+        public AssessmentRequest AssessmentRequest { get; set; } = new AssessmentRequest();
+        public AssessmentResponse AssessmentResponse { get; set; } = new AssessmentResponse();
+        public Astrea.Client.Messages.ProcessTrail.RequestedProcessTrail RequestedProcessTrail { get; set; }
+        public Astrea.Client.Messages.ProcessTrail.OfferedProcessTrail OfferedProcessTrail { get; set; }
 
 
 
@@ -22,8 +22,8 @@ namespace XB.Astrea.Client.Tests
             SetupAssessmentRequest();
             SetupAssessmentResponse();
 
-            RequestedProcessTrail = Messages.ProcessTrail.Factory.GetRequestedProcessTrail(AssessmentRequest);
-            OfferedProcessTrail = Messages.ProcessTrail.Factory.GetOfferedProcessTrail(AssessmentResponse);
+            RequestedProcessTrail = Messages.ProcessTrail.ProcessTrailGenerator.GetRequestedProcessTrail(AssessmentRequest);
+            OfferedProcessTrail = Messages.ProcessTrail.ProcessTrailGenerator.GetOfferedProcessTrail(AssessmentResponse);
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace XB.Astrea.Client.Tests
 
         private void SetupAssessmentResponse()
         {
-            AssessmentResponse.Results.Add(new Result()
+            AssessmentResponse.Results.Add(new AssessmentResult()
             {
                 
             });

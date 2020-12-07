@@ -1,0 +1,7 @@
+﻿namespace XB.Astrea.Client.Messages.ProcessTrail
+{
+    public class OfferedProcessTrail : ProcessTrailRequest
+    {
+
+    }
+}

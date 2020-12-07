@@ -1,19 +1,18 @@
 ﻿using Confluent.Kafka;
-using System;
+using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 namespace XB.Kafka
 {
-    public class Producer : IProducer
+    public class KafkaProducer : IKafkaProducer
     {
         public IConfiguration Configuration { get; set; }
         public ProducerConfig Config { get; }
-        public IProducer<int, string> KafkaProducer { get; set; }
+        public IProducer<int, string> kafkaProducer { get; set; }
         public string Topic { get; }
 
-        public Producer(IConfiguration configuration)
+        public KafkaProducer(IConfiguration configuration)
         {
             Configuration = configuration;
             Config = new ProducerConfig
@@ -32,7 +31,7 @@ namespace XB.Kafka
                 ClientId = Dns.GetHostName()
             };
             Topic = Configuration["AppSettings:Kafka:Topic"];
-            KafkaProducer = new ProducerBuilder<int, string>(Config).Build();
+            kafkaProducer = new ProducerBuilder<int, string>(Config).Build();
         }
 
         public async Task Execute(string message)
@@ -47,7 +46,7 @@ namespace XB.Kafka
                 Value = message
             };
 
-            await KafkaProducer.ProduceAsync(kafkaTopic, kafkaMessage);
+            await kafkaProducer.ProduceAsync(kafkaTopic, kafkaMessage);
         }
     }
 }

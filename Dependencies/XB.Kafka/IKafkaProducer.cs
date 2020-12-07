@@ -2,7 +2,7 @@
 
 namespace XB.Kafka
 {
-    public interface IProducer
+    public interface IKafkaProducer
     {
         Task Execute(string message);
     }

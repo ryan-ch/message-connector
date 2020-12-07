@@ -4,19 +4,19 @@ namespace XB.Astrea.Client
 {
     public static class MessageFactory
     {
-        public static Messages.Assessment.Request GetAssessmentRequest(MT103SingleCustomerCreditTransferModel mt103)
+        public static Messages.Assessment.AssessmentRequest GetAssessmentRequest(MT103SingleCustomerCreditTransferModel mt103)
         {
-            return Messages.Assessment.Factory.GetAssessmentRequest(mt103);
+            return Messages.Assessment.AssessmentGenerator.GetAssessmentRequest(mt103);
         }
 
-        public static Messages.ProcessTrail.Requested GetRequestedProcessTrail(Messages.Assessment.Request assessment)
+        public static Messages.ProcessTrail.RequestedProcessTrail GetRequestedProcessTrail(Messages.Assessment.AssessmentRequest assessment)
         {
-            return Messages.ProcessTrail.Factory.GetRequestedProcessTrail(assessment);
+            return Messages.ProcessTrail.ProcessTrailGenerator.GetRequestedProcessTrail(assessment);
         }
 
-        public static Messages.ProcessTrail.Offered GetOfferedProcessTrail(Messages.Assessment.Response assessment)
+        public static Messages.ProcessTrail.OfferedProcessTrail GetOfferedProcessTrail(Messages.Assessment.AssessmentResponse assessment)
         {
-            return Messages.ProcessTrail.Factory.GetOfferedProcessTrail(assessment);
+            return Messages.ProcessTrail.ProcessTrailGenerator.GetOfferedProcessTrail(assessment);
         }
     }
 }

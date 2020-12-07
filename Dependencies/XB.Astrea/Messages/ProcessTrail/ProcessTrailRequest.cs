@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using XB.Astrea.Client.Messages.Assessment;
 
 namespace XB.Astrea.Client.Messages.ProcessTrail
 {
-
-    public class Request
+    public class ProcessTrailRequest
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public DateTime Time { get; set; } = DateTime.Now;
         public string System { get; set; }
         public Context Context { get; set; }
         public General General { get; set; }
-        public List<Payloads> Payloads { get; set; }
+        public List<ProcessTrailPayload> Payloads { get; set; }
     }
 
     public class General
@@ -56,7 +54,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         public string Env { get; set; }
     }
 
-    public class Payloads
+    public class ProcessTrailPayload
     {
         public string Id { get; set; }
         public string Encoding { get; set; } = "plain/json";

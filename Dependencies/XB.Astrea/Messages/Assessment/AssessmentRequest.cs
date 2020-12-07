@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace XB.Astrea.Client.Messages.Assessment
 {
-    public class Request
+    public class AssessmentRequest
     {
         public string OrderIdentity { get; set; }
         public string BasketIdentity { get; set; }

@@ -5,6 +5,6 @@ namespace XB.Astrea.Client
 {
     public interface IAstreaClient
     {
-        Task<Response> AssessAsync(string mt);
+        Task<AssessmentResponse> AssessAsync(string mt);
     }
 }

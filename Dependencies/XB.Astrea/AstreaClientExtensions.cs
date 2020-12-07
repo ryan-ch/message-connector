@@ -1,17 +1,12 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System;
 using XB.Kafka;
 
 namespace XB.Astrea.Client
 {
     public static class AstreaClientExtensions
     {
-        private static readonly string Null = "null";
-        private static readonly string Exception = "Exception";
-
         public static IServiceCollection AddAstreaClient(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddHttpClient("astrea", c =>
@@ -21,53 +16,10 @@ namespace XB.Astrea.Client
             });
 
             services.AddTransient<IAstreaClient, AstreaClient>();
-            services.AddTransient<IProducer, Producer>();
+            //Todo: the Kafka injection shouldn't be here, or we move the kafka stuff to this project
+            services.AddTransient<IKafkaProducer, KafkaProducer>();
 
             return services;
-        }
-
-        public static string ToJson(this Messages.Assessment.Request request)
-        {
-            if (request == null) return Null;
-
-            try
-            {
-                return SerializeToJson(request);
-            }
-            catch (Exception exception)
-            {
-                //log exception but dont throw one
-                return Exception;
-            }
-        }
-
-        public static string ToJson(this Messages.ProcessTrail.Request request)
-        {
-            if (request == null) return Null;
-
-            try
-            {
-                return SerializeToJson(request);
-            }
-            catch (Exception exception)
-            {
-                //log exception but dont throw one
-                return Exception;
-            }
-        }
-
-        private static string SerializeToJson(object value)
-        {
-            var contractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy()
-            };
-
-            return JsonConvert.SerializeObject(value, new JsonSerializerSettings
-            {
-                ContractResolver = contractResolver,
-                Formatting = Formatting.Indented
-            });
         }
     }
 }

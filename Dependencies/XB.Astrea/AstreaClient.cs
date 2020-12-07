@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using XB.Astrea.Client.Exceptions;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.Kafka;
@@ -13,19 +13,19 @@ namespace XB.Astrea.Client
     public class AstreaClient : IAstreaClient
     {
         private IHttpClientFactory HttpClientFactory { get; }
-        private IProducer KafkaProducer { get; }
+        private IKafkaProducer KafkaProducer { get; }
 
-        public AstreaClient(IHttpClientFactory httpClientFactory, IProducer kafkaProducer)
+        public AstreaClient(IHttpClientFactory httpClientFactory, IKafkaProducer kafkaProducer)
         {
             HttpClientFactory = httpClientFactory;
             KafkaProducer = kafkaProducer;
         }
 
-        public async Task<Response> AssessAsync(string mt)
+        public async Task<AssessmentResponse> AssessAsync(string mt)
         {
             try
             {
-                var mt103 = MT103SingleCustomerCreditTransferParser.ParseMessage(mt);   
+                var mt103 = MT103SingleCustomerCreditTransferParser.ParseMessage(mt);
 
                 var request = MessageFactory.GetAssessmentRequest(mt103);
 
@@ -41,7 +41,7 @@ namespace XB.Astrea.Client
                 await SendRequestedProcessTrail(request);
 
                 var apiResponse = await result.Content.ReadAsStringAsync();
-                var assessmentResponse = JsonConvert.DeserializeObject<Response>(apiResponse);
+                var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
 
                 //TODO: Here we need to make a decision if this is a offered or rejected assessment
                 SendDecisionProcessTrail(assessmentResponse);
@@ -54,7 +54,7 @@ namespace XB.Astrea.Client
             }
         }
 
-        private async Task SendRequestedProcessTrail(Request request)
+        private async Task SendRequestedProcessTrail(AssessmentRequest request)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace XB.Astrea.Client
             }
         }
 
-        private void SendDecisionProcessTrail(Response assessmentResponse)
+        private void SendDecisionProcessTrail(AssessmentResponse assessmentResponse)
         {
             try
             {

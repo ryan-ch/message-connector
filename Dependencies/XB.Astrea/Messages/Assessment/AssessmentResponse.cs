@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace XB.Astrea.Client.Messages.Assessment
 {
-    public class Response
+    public class AssessmentResponse
     {
         public string RequestIdentity { get; set; }
         public string Identity { get; set; }
@@ -11,10 +10,10 @@ namespace XB.Astrea.Client.Messages.Assessment
         public List<Hint> Hints { get; set; }
         public string AssessmentStatus { get; set; }
         public List<string> RiskyInstructions { get; set; }
-        public List<Result> Results { get; set; }
+        public List<AssessmentResult> Results { get; set; }
     }
 
-    public class Extras
+    public class ExtraAssessmentInfo
     {
         public string PhysicalNonPhysical { get; set; }
         public string OrderingCustomerAddress { get; set; }
@@ -27,11 +26,11 @@ namespace XB.Astrea.Client.Messages.Assessment
         public string AccountNumber { get; set; }
     }
 
-    public class Result
+    public class AssessmentResult
     {
         public string OrderIdentity { get; set; }
         public string RiskLevel { get; set; }
         public List<Hint> Hints { get; set; }
-        public Extras Extras { get; set; }
+        public ExtraAssessmentInfo Extras { get; set; }
     }
 }

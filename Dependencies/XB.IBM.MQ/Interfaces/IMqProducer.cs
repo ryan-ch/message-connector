@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace XB.IBM.MQ.Interfaces
+﻿namespace XB.IBM.MQ.Interfaces
 {
     public interface IMqProducer
     {
