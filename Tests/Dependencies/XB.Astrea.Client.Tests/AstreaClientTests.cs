@@ -22,7 +22,7 @@ namespace XB.Astrea.Client.Tests
         {
             var mt = MT103SingleCustomerCreditTransferParser.ParseMessage(AstreaClientTestConstants.Mt103);
 
-            var request = AssessmentGenerator.GetAssessmentRequest(mt);
+            var request =new AssessmentRequest(mt);
 
             var requestJson = TestHelper.SerializeToCamelCaseJson(request);
 

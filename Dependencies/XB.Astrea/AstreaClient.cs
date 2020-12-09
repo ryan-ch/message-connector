@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XB.Astrea.Client.Exceptions;
 using XB.Astrea.Client.Messages.Assessment;
+using XB.Astrea.Client.Messages.ProcessTrail;
 using XB.Kafka;
 using XB.MT.Parser.Parsers;
 
@@ -27,7 +28,7 @@ namespace XB.Astrea.Client
             {
                 var mt103 = MT103SingleCustomerCreditTransferParser.ParseMessage(mt);
 
-                var request = MessageFactory.GetAssessmentRequest(mt103);
+                var request = new AssessmentRequest(mt103);
 
                 var data = new StringContent(request.Mt, Encoding.UTF8, "text/plain");
 
@@ -58,7 +59,8 @@ namespace XB.Astrea.Client
         {
             try
             {
-                var requestedProcessTrail = MessageFactory.GetRequestedProcessTrail(request);
+                //Todo: is this ProcessTrailRequest or RequestedProcessTrail ?
+                var requestedProcessTrail = new RequestedProcessTrail(request);
                 await KafkaProducer.Execute(JsonConvert.SerializeObject(requestedProcessTrail));
             }
             catch (Exception e)

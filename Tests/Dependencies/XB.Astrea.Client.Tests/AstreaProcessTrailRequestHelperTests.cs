@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using XB.Astrea.Client.Messages.Assessment;
+using XB.Astrea.Client.Messages.ProcessTrail;
 using Xunit;
 
 namespace XB.Astrea.Client.Tests
@@ -10,8 +11,8 @@ namespace XB.Astrea.Client.Tests
 
     public class AstreaProcessTrailRequestHelperTests
     {
-        public AssessmentRequest AssessmentRequest { get; set; } = new AssessmentRequest();
-        public AssessmentResponse AssessmentResponse { get; set; } = new AssessmentResponse();
+        public AssessmentRequest AssessmentRequest { get; set; }
+        public AssessmentResponse AssessmentResponse { get; set; }
         public Astrea.Client.Messages.ProcessTrail.RequestedProcessTrail RequestedProcessTrail { get; set; }
         public Astrea.Client.Messages.ProcessTrail.OfferedProcessTrail OfferedProcessTrail { get; set; }
 
@@ -22,16 +23,16 @@ namespace XB.Astrea.Client.Tests
             SetupAssessmentRequest();
             SetupAssessmentResponse();
 
-            RequestedProcessTrail = Messages.ProcessTrail.ProcessTrailGenerator.GetRequestedProcessTrail(AssessmentRequest);
-            OfferedProcessTrail = Messages.ProcessTrail.ProcessTrailGenerator.GetOfferedProcessTrail(AssessmentResponse);
+            RequestedProcessTrail = new RequestedProcessTrail(AssessmentRequest);
+            OfferedProcessTrail = new OfferedProcessTrail(AssessmentResponse);
         }
 
         [Fact]
         public void ProcessTrails_ParseAssessmentPaymentInstruction_ShouldMapToRequestedProcessTrailPayloads()
         {
-            Assert.Equal(AssessmentRequest.PaymentInstructions.First().InstructedDate, 
+            Assert.Equal(AssessmentRequest.PaymentInstructions.First().InstructedDate,
                 RequestedProcessTrail.Payloads.First().Payload.Payment.InstructedDate);
-            Assert.Equal(AssessmentRequest.PaymentInstructions.First().Amount, 
+            Assert.Equal(AssessmentRequest.PaymentInstructions.First().Amount,
                 RequestedProcessTrail.Payloads.First().Payload.Payment.InstructedAmount);
             Assert.Equal(AssessmentRequest.PaymentInstructions.First().Currency,
                 RequestedProcessTrail.Payloads.First().Payload.Payment.InstructedCurrency);
@@ -66,23 +67,17 @@ namespace XB.Astrea.Client.Tests
                 Amount = 3.14, //Mt103->{4:->:32A:->Date..Currency..Amount
                 Currency = "SEK",
                 Identity = "cd7z1Lja3", //Mt103->{4:->:20: Senders reference
-                DebitAccount = new List<Account>()
+                DebitAccount = new List<Messages.Assessment.Account>()
                 {
-                    new Account()
-                    {
-                        BankIdentity = "Vårgårda Kromverk", //Mt103->{4:->:50K:->rad2
-                        Identity = "SE2880000832790000012345", //Mt103->{4:->:50K:->rad1
-                        Type = "seb.payment.se.swift"
-                    }
+                    //Mt103->{4:->:50K:->rad2
+                    //Mt103->{4:->:50K:->rad1
+                    new Messages.Assessment.Account("seb.payment.se.swift","Vårgårda Kromverk","SE2880000832790000012345")
                 },
-                CreditAccount = new List<Account>()
+                CreditAccount = new List<Messages.Assessment.Account>()
                 {
-                    new Account()
-                    {
-                        BankIdentity = "Volvo Personvagnar Ab", //Mt103->{4:->:59:->rad2
-                        Identity = "SE3550000000054910000003", //Mt103->{4:->:59:rad1
-                        Type = "seb.payment.se.swift"
-                    }
+                    //Mt103->{4:->:59:->rad2
+                     //Mt103->{4:->:59:rad1
+                    new Messages.Assessment.Account("seb.payment.se.swift","Volvo Personvagnar Ab","SE3550000000054910000003")
                 }
             });
         }
@@ -91,7 +86,7 @@ namespace XB.Astrea.Client.Tests
         {
             AssessmentResponse.Results.Add(new AssessmentResult()
             {
-                
+
             });
         }
     }

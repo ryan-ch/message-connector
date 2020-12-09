@@ -1,11 +1,23 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using XB.MT.Parser.Model;
 
 namespace XB.Astrea.Client.Messages.Assessment
 {
     public class AssessmentRequest
     {
+        public AssessmentRequest(MT103SingleCustomerCreditTransferModel mt)
+        {
+            OrderIdentity = Guid.NewGuid().ToString();
+            BasketIdentity = mt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference;
+            PaymentInstructions = SetupPaymentInstruction(mt);
+            Actor = new Actor("", "");// Todo:implement
+            Principal = new Principal("", "");// Todo:implement
+            TargetState = Constants.EventType_Requested;
+            Tags = new Tags();
+        }
+
         public string OrderIdentity { get; set; }
         public string BasketIdentity { get; set; }
         public List<PaymentInstruction> PaymentInstructions { get; set; } = new List<PaymentInstruction>();
@@ -14,36 +26,41 @@ namespace XB.Astrea.Client.Messages.Assessment
         [JsonProperty(Required = Required.Always)]
         public string TargetState { get; set; }
         public Tags Tags { get; set; }
-
         [JsonIgnore]
         public string Mt { get; set; }
+
+        private static List<PaymentInstruction> SetupPaymentInstruction(MT103SingleCustomerCreditTransferModel mt)
+        {
+            var paymentInstructionList = new List<PaymentInstruction>
+            {
+                new PaymentInstruction()
+                {
+                    Identity = mt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
+                    PaymentType = "seb.payment.se.swift." + mt.MT103SingleCustomerCreditTransferBlockText.Field23B,
+                    RegistrationTime = DateTime.Now,
+                    InstructedDate = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.ValueDate,
+                    Amount = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.InterbankSettledAmount,
+                    Currency = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.Currency,
+                    //TODO: check if length is greater then 11 and if first two are alphabetic
+                    DebitAccount = new List<Account>() { new Account(Constants.Iban,"","SE2750000000056970162486") },
+                    //TODO: check if length is greater then 11 and if first two are alphabetic
+                    CreditAccount = new List<Account> { new Account(Constants.Iban,"","SE3550000000054910000003") },
+                    RemittanceInfo = new List<RemittanceInfo>(),
+                    InstructionContext = new InstructionContext(new List<string>{"","" },"",""),
+                    RegisteringParty = new RegisteringParty("","")
+                }
+            };
+            return paymentInstructionList;
+        }
     }
 
-    public class RegisteringParty
-    {
-        public string AuthId { get; set; }
-        public string SebId { get; set; }
-    }
-
-    public class Account
-    {
-        public string Type { get; set; }
-        public string BankIdentity { get; set; }
-        public string Identity { get; set; }
-    }
-
-    public class RemittanceInfo
-    {
-        public string Info { get; set; }
-        public string Type { get; set; }
-    }
-
-    public class InstructionContext
-    {
-        public List<string> Debtors { get; set; }
-        public double DebitAccountAvailableAmount { get; set; }
-        public string DebitAccountCurrency { get; set; }
-    }
+    public record RegisteringParty(string AuthId, string SebId);
+    public record Account(string Type, string BankIdentity, string Identity);
+    public record RemittanceInfo(string Info, string Type);
+    public record InstructionContext(List<string> Debtors, string DebitAccountAvailableAmount, string DebitAccountCurrency);
+    public record Actor(string SebId, string AuthId);
+    public record Principal(string SebId, string AuthId);
+    public record Tags();
 
     public class PaymentInstruction
     {
@@ -59,21 +76,5 @@ namespace XB.Astrea.Client.Messages.Assessment
         public List<Account> CreditAccount { get; set; }
         public List<RemittanceInfo> RemittanceInfo { get; set; }
         public InstructionContext InstructionContext { get; set; }
-    }
-
-    public class Actor
-    {
-        public string SebId { get; set; }
-        public string AuthId { get; set; }
-    }
-
-    public class Principal
-    {
-        public string AuthId { get; set; }
-        public string SebId { get; set; }
-    }
-
-    public class Tags
-    {
     }
 }

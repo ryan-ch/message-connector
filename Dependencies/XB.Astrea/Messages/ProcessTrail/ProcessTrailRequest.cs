@@ -1,110 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using XB.Astrea.Client.Messages.Assessment;
 
 namespace XB.Astrea.Client.Messages.ProcessTrail
 {
-    public class ProcessTrailRequest
+    public class ProcessTrailRequest : ProcessTrailBase
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public DateTime Time { get; set; } = DateTime.Now;
-        public string System { get; set; }
-        public Context Context { get; set; }
-        public General General { get; set; }
-        public List<ProcessTrailPayload> Payloads { get; set; }
-    }
+        public ProcessTrailRequest(AssessmentRequest request) : base(request) { }
 
-    public class General
-    {
-        public Bo Bo { get; set; }
-        public DateTime Time { get; set; }
-        public List<Ref> Refs { get; set; }
-        public Event Event { get; set; }
-        public Location Location { get; set; }
-    }
+        protected override List<ProcessTrailPayload> SetupPayloads(AssessmentRequest request)
+        {
+            var payloads = new List<ProcessTrailPayload>();
 
-    public class Bo
-    {
-        public string Type { get; set; } = "seb.payments.se.xb.incoming";
-        public Guid Id { get; set; } //SUTI or GUID,TBD
-        public string IdType { get; set; } = "ses.fcp.payment.order.swift";
-    }
+            request.PaymentInstructions.ForEach(pi =>
+                payloads.Add(new ProcessTrailPayload()
+                {
+                    Id = Id + "-1",
+                    //TODO: Make dynamic so we can change this or automatically detect this
+                    Encoding = "plain/json",
+                    //TODO: Make dynamic so we can change this
+                    Store = "ses-fcp-payment-orders",
+                    Payload = new EnvelopPayload()
+                    {
+                        Payment = new Payment()
+                        {
+                            InstructedDate = pi.InstructedDate,
+                            InstructedAmount = pi.Amount,
+                            InstructedCurrency = pi.Currency,
+                            References = new List<References>()
+                            {
 
-    public class Event
-    {
-        public string Type { get; set; } = "requested";
-        public Guid Id { get; set; } = Guid.NewGuid();
-    }
+                            },
+                            DebitAccount = new List<Account>()
+                            {
+                                new Account(pi.DebitAccount.First().Identity,Constants.Iban)
+                            },
+                            CreditAccount = new List<Account>()
+                            {
+                                //TODO: What types are there?
+                                new Account(pi.CreditAccount.First().Identity,Constants.Iban)
+                            }
+                        }
+                    }
+                })
+            );
 
-    public class Location
-    {
-        public string Type { get; set; }
-        public string Id { get; set; }
-    }
+            return payloads;
+        }
 
-    public class Ref
-    {
-        public string Type { get; set; } = "bo";
-        public string Id { get; set; }
-        public string IdType { get; set; } = "ses.fcp.payment.order.swift";
-    }
+        protected override General SetupGeneral(AssessmentRequest assessment)
+        {
+            return new General
+            {
+                Time = Time,
+                Event = new Event(Constants.EventType_Requested, Guid.NewGuid()),
+                Bo = new Bo
+                {
+                    Id = Id,
+                    Type = "seb.payments.se.incoming.xb",
+                    IdType = "swift.block3.tag121"
+                },
+                Refs = new List<Ref> {
+                    new Ref
+                    {
+                        Id = assessment.PaymentInstructions.First().Identity,
+                        Type = "bo",
+                        IdType = "ses.fcp.payment.order.swift"
+                    }
+                }
+            };
+        }
 
-    public class Context
-    {
-        public string Cli { get; set; }
-        public string Env { get; set; }
-    }
-
-    public class ProcessTrailPayload
-    {
-        public string Id { get; set; }
-        public string Encoding { get; set; } = "plain/json";
-        public string Store { get; set; } = "ses-fcp-payment-orders";
-        public EnvelopPayload Payload { get; set; }
-    }
-
-    public class EnvelopPayload
-    {
-        public Payment Payment { get; set; }
-        public Extras Extras { get; set; }
-        public Assess Assess { get; set; }
-    }
-
-    public class Assess
-    {
-        public Guid Id { get; set; }
-        public int RiskLevel { get; set; }
-        public List<Hint> Hints { get; set; }
-    }
-
-    public class Extras
-    {
-        public string SwiftBeneficiaryCustomerAccount { get; set; }
-        public string SwiftBeneficiaryCustomerName { get; set; }
-        public string SwiftBeneficiaryCustomerAddress { get; set; }
-        public string SwiftBeneficiaryBankBIC { get; set; }
-        public string SwiftRawMessage { get; set; }
-    }
-
-    public class Payment
-    {
-        public DateTime InstructedDate { get; set; }
-        public List<Account> DebitAccount { get; set; }
-        public List<References> References { get; set; }
-        public List<Account> CreditAccount { get; set; }
-        public string InstructedCurrency { get; set; }
-        public double InstructedAmount { get; set; }
-        public string ExecutionDate { get; set; }
-    }
-
-    public class Account
-    {
-        public string Id { get; set; }
-        public string IdType { get; set; } = "iban";
-    }
-
-    public class References
-    {
-        public string Type { get; set; }
-        public string Reference { get; set; }
+        #region Redundant methods
+        protected override List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response)
+        {
+            throw new NotImplementedException();
+        }
+        protected override General SetupGeneral(AssessmentResponse response)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
     }
 }
