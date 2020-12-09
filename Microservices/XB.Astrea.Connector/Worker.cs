@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -11,40 +10,37 @@ namespace XB.Astrea.Connector
 {
     public class Worker : BackgroundService
     {
-        public ILogger<Worker> Logger { get; }
-        public IMqConsumer MqConsumer { get; }
-        public IMqProducer MqProducer { get; }
-        public IAstreaClient AstreaClient { get; }
+        private readonly ILogger<Worker> _logger;
+        private readonly IMqConsumer _mqConsumer;
+        private readonly IMqProducer _mqProducer;
+        private readonly IAstreaClient _astreaClient;
 
         public Worker(ILogger<Worker> logger, IMqConsumer mqConsumer, IAstreaClient astreaClient, IMqProducer mqProducer)
         {
-            Logger = logger;
-            MqConsumer = mqConsumer;
-            AstreaClient = astreaClient;
-            MqProducer = mqProducer;
+            _logger = logger;
+            _mqConsumer = mqConsumer;
+            _astreaClient = astreaClient;
+            _mqProducer = mqProducer;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var message = string.Empty;
                 try
                 {
-                    message = MqConsumer.ReceiveMessage();
-                    Logger.LogInformation(message);
-                    //if (message != string.Empty)
-                    //{
-                    //    var assess = await AstreaClient.AssessAsync(message);
+                    string message = _mqConsumer.ReceiveMessage();
 
-                    //    //var assess = new { AssessmentStatus = "OK" };
-
-                    //    MqConsumer.Commit();
-                    //}
+                    if (!string.IsNullOrEmpty(message))
+                    {
+                        _logger.LogInformation(message);
+                        var assess = await _astreaClient.AssessAsync(message);
+                        _mqConsumer.Commit();
+                    }
                 }
                 catch (Exception)
                 {
-                    //MqConsumer.Rollback();
+                    _mqConsumer.Rollback();
                 }
             }
         }
