@@ -1,18 +1,17 @@
 ﻿using IBM.XMS;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using XB.IBM.MQ.Config;
 using XB.IBM.MQ.Interfaces;
 
 namespace XB.IBM.MQ.Implementations
 {
     public class MqProducer : MqBase, IMqProducer
     {
-        //Todo: add MQ identifier to the section
-        private const string section = "AppSettings:Writer:";
         public IMessageProducer Producer { get; }
 
-        public MqProducer(IConfiguration configuration, ILoggerFactory loggerFactory)
-            : base(configuration, section, loggerFactory)
+        public MqProducer(IOptions<MqOptions> configurations, ILoggerFactory loggerFactory)
+            : base(configurations.Value.WriterConfig, loggerFactory)
         {
             Producer = SessionWmq.CreateProducer(Destination);
         }

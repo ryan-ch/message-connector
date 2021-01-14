@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace XB.Astrea.Client.Tests
+﻿namespace XB.Astrea.Client.Tests
 {
     public static class AstreaClientTestConstants
     {
+        public const string Version = "1.0.0";
         public static string Mt103 =>
             @"{1:F01NKCCXH2NBXXX9712267472}{2:I103CD7BNS1A22WCN}{3:{103:YYG}{108:5V0OP4RFA66}{119:}{111:}{121:7de11583-e6e8-48b2-b8cd-771a839b7fda}}{4:
 :20:cd7z1Lja3

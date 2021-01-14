@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -22,7 +24,7 @@ namespace XB.Astrea.Client.Tests
         {
             var mt = MT103SingleCustomerCreditTransferParser.ParseMessage(AstreaClientTestConstants.Mt103);
 
-            var request =new AssessmentRequest(mt);
+            var request = new AssessmentRequest(mt);
 
             var requestJson = TestHelper.SerializeToCamelCaseJson(request);
 
@@ -39,7 +41,10 @@ namespace XB.Astrea.Client.Tests
             producerMock.Setup(producer =>
                 producer.Execute(It.IsAny<string>())).Returns(Task.CompletedTask);
 
-            var astreaClient = new AstreaClient(httpClientFactoryMock.Object, producerMock.Object);
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock.Setup(config => config["Version"]).Returns(AstreaClientTestConstants.Version);
+
+            var astreaClient = new AstreaClient(httpClientFactoryMock.Object, producerMock.Object, configurationMock.Object, new Mock<ILogger<AstreaClient>>().Object);
 
             await astreaClient.AssessAsync(AstreaClientTestConstants.Mt103);
 

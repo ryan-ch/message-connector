@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace XB.MT.Parser.Model.Text.MT103.Fields
+﻿namespace XB.MT.Parser.Model.Text.MT103.Fields
 {
     public class AccountCrLF
     {
@@ -34,7 +30,7 @@ namespace XB.MT.Parser.Model.Text.MT103.Fields
 
         public override bool Equals(object o)
         {
-            if (o == null || ! this.GetType().Equals(o.GetType()))
+            if (o == null || ! GetType().Equals(o.GetType()))
             {
                 return false;
             }

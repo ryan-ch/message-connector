@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using XB.MT.Parser.Model.MessageHeader;
 using XB.MT.Parser.Model.Text.MT103.Fields;
-using XB.MT.Parser.Model.Common;
-using XB.MT.Parser.Model.MessageHeader;
 
 namespace XB.MT.Parser.Model.Text.MT103
 {

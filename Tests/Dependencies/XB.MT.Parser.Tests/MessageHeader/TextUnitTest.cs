@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using XB.MT.Parser.Model.Common;
 using XB.MT.Parser.Model.Text.MT103.Fields;
 using Xunit;
 
 namespace MT103XUnitTestProject.MessageHeader
 {
-    class TextUnitTest
+    internal class TextUnitTest
     {
 
         internal static void ValidateField13C(Field13C field13C, string timeIndication)

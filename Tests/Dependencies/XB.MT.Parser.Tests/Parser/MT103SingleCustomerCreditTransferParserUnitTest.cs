@@ -1,16 +1,12 @@
-﻿using System;
+﻿using MT103XUnitTestProject.Common;
+using MT103XUnitTestProject.MessageHeader;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using XB.MT.Parser.Model;
 using XB.MT.Parser.Model.Text.MT103;
 using XB.MT.Parser.Model.Text.MT103.Fields;
-using XB.MT.Parser.Model.Common;
-using XB.MT.Parser.Model.MessageHeader;
 using XB.MT.Parser.Parsers;
 using Xunit;
-using System.Globalization;
-using MT103XUnitTestProject.Common;
-using MT103XUnitTestProject.MessageHeader;
 
 namespace MT103XUnitTestProject.Parser
 {

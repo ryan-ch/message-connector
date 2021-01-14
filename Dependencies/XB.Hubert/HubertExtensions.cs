@@ -6,8 +6,7 @@ namespace XB.Hubert
     {
         public static IServiceCollection AddHubert(this IServiceCollection services)
         {
-            services.AddTransient<IHubertClient, HubertClient>();
-            return services;
+           return services.AddScoped<IHubertClient, HubertClient>();
         }
     }
 }

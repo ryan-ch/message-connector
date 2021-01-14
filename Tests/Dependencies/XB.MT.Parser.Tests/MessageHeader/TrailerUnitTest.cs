@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MT103XUnitTestProject.Common;
+﻿using MT103XUnitTestProject.Common;
 using XB.MT.Parser.Model.MessageHeader;
 using Xunit;
 
 namespace MT103XUnitTestProject.MessageHeader
 {
-    class TrailerUnitTest
+    internal class TrailerUnitTest
     {
         internal static void ValidateTrailer(Trailer trailer, string tagChecksum, string tagDelayedMessage, string tagMessageReference,
                                      string tagPossibleDuplicateEmission, string tagPossibleDuplicateMessage,

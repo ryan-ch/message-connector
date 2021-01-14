@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MT103XUnitTestProject.Common;
+﻿using MT103XUnitTestProject.Common;
 using XB.MT.Parser.Model.MessageHeader;
 using Xunit;
 
 namespace MT103XUnitTestProject.MessageHeader
 {
-    class ApplicationHeaderInputMessageUnitTest
+    internal class ApplicationHeaderInputMessageUnitTest
     {
         internal static void ValidateApplicationHeaderInputMessage(ApplicationHeaderInputMessage applicationHeader, string inputOutputID,
                                                            string messageType, string destinationAddress, string priority,

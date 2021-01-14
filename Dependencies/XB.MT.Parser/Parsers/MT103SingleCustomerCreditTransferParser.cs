@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using XB.MT.Parser.Model;
-using XB.MT.Parser.Model.Text.MT103;
-using XB.MT.Parser.Model.Text.MT103.Fields;
 using XB.MT.Parser.Model.Common;
 using XB.MT.Parser.Model.MessageHeader;
+using XB.MT.Parser.Model.Text.MT103;
+using XB.MT.Parser.Model.Text.MT103.Fields;
 using static XB.MT.Parser.Model.MessageHeader.Trailer;
 using static XB.MT.Parser.Model.MessageHeader.UserHeader;
 

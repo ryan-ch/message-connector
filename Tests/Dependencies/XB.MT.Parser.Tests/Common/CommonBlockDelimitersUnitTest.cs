@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using XB.MT.Parser.Model.Common;
+﻿using XB.MT.Parser.Model.Common;
 using Xunit;
 
 namespace MT103XUnitTestProject.Common
 {
-    class CommonBlockDelimitersUnitTest
+    internal class CommonBlockDelimitersUnitTest
     {
         internal static void ValidateCommonBlockDelimiters(CommonBlockDelimiters commonBlockDelimiters, string blockIdentifier)
         {

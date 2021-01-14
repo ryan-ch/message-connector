@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using XB.MT.Parser.Model.Common;
 
 namespace XB.MT.Parser.Model.Text.MT103.Fields

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Xunit;
 
 namespace MT103XUnitTestProject.Diverse
@@ -10,10 +8,14 @@ namespace MT103XUnitTestProject.Diverse
         [Fact]
         public void ListTest()
         {
-            List<string> l1 = new List<string>();
-            l1.Add("a");
-            List<string> l2 = new List<string>();
-            l2.Add("a");
+            List<string> l1 = new List<string>
+            {
+                "a"
+            };
+            List<string> l2 = new List<string>
+            {
+                "a"
+            };
             bool lika = l1.Equals(l2);
         }
     }

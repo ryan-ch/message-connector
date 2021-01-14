@@ -23,14 +23,14 @@ namespace XB.Astrea.Client.Tests
             SetupAssessmentRequest();
             SetupAssessmentResponse();
 
-            RequestedProcessTrail = new RequestedProcessTrail(AssessmentRequest);
-            OfferedProcessTrail = new OfferedProcessTrail(AssessmentResponse);
+            RequestedProcessTrail = new RequestedProcessTrail(AssessmentRequest, AstreaClientTestConstants.Version);
+            OfferedProcessTrail = new OfferedProcessTrail(AssessmentResponse, AstreaClientTestConstants.Version, null);
         }
 
         [Fact]
         public void ProcessTrails_ParseAssessmentPaymentInstruction_ShouldMapToRequestedProcessTrailPayloads()
         {
-            Assert.Equal(AssessmentRequest.PaymentInstructions.First().InstructedDate,
+            Assert.Equal(AssessmentRequest.PaymentInstructions.First().InstructedDate.ToString("YYYY-MM-dd"),
                 RequestedProcessTrail.Payloads.First().Payload.Payment.InstructedDate);
             Assert.Equal(AssessmentRequest.PaymentInstructions.First().Amount,
                 RequestedProcessTrail.Payloads.First().Payload.Payment.InstructedAmount);

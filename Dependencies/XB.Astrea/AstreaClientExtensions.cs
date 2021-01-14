@@ -2,24 +2,29 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using XB.Kafka;
+using XB.Kafka.Config;
 
 namespace XB.Astrea.Client
 {
     public static class AstreaClientExtensions
     {
-        public static IServiceCollection AddAstreaClient(this IServiceCollection services, IConfiguration configuration)
+        internal const string HttpClientName = "astrea";
+
+        public static IServiceCollection AddAstreaClientAndKafka(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
         {
-            services.AddHttpClient("astrea", c =>
+            // Todo: do we need the nuget files inside this project?
+
+            services.Configure<KafkaConfig>(configuration.GetSection(appsettingsPrefix + KafkaConfig.ConfigurationSection));
+
+            services.AddHttpClient(HttpClientName, c =>
             {
                 c.BaseAddress = new Uri(configuration["AppSettings:Astrea:Url"]);
                 c.DefaultRequestHeaders.Add("Accept", "text/plain");
             });
 
-            services.AddTransient<IAstreaClient, AstreaClient>();
-            //Todo: the Kafka injection shouldn't be here, or we move the kafka stuff to this project
-            services.AddTransient<IKafkaProducer, KafkaProducer>();
-
-            return services;
+            return services
+                 .AddScoped<IKafkaProducer, KafkaProducer>()
+                 .AddScoped<IAstreaClient, AstreaClient>();
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using System;
-using System.IO;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
 using XB.IBM.MQ;
 
 namespace MqTool
@@ -24,7 +24,7 @@ namespace MqTool
             // add necessary services
             services.AddLogging(configure => configure.AddConsole());
             services.AddSingleton(_configuration);
-            services.AddMqProducer();
+            services.AddMQ(_configuration, "AppSettings:");
 
             // build the pipeline
             Provider = services.BuildServiceProvider();

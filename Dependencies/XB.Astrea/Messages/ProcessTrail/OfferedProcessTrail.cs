@@ -1,58 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
+using XB.MT.Parser.Model;
 
 namespace XB.Astrea.Client.Messages.ProcessTrail
 {
     public class OfferedProcessTrail : ProcessTrailBase
     {
-        public OfferedProcessTrail(AssessmentResponse response) : base(response)
-        { }
+        public OfferedProcessTrail(AssessmentResponse response, string appVersion, MT103SingleCustomerCreditTransferModel parsedMt) : base(response, appVersion, parsedMt) { }
 
-        protected override General SetupGeneral(AssessmentResponse assessment)
+        protected override General SetupGeneral(AssessmentResponse assessment, MT103SingleCustomerCreditTransferModel parsedMt)
         {
-            return new General
-            {
-                Time = Time,
-                //TODO: Find out what Id should be mapped to here, or is it a new guid?
-                Event = new Event(Constants.EventType_Offered, Guid.NewGuid()),
-                Bo = new Bo
-                {
-                    Id = Id,
-                    Type = "other",
-                    IdType = "ses.fcp.payment.order.swift"
-                },
-                Refs = new List<Ref> {
-                    new Ref
-                    {
-                        Id = assessment.Results.First().OrderIdentity,
-                        Type = "bo",
-                        IdType = "ses.fcp.payment.order.swift"
-                    }
-                }
-            };
+            var general = base.SetupGeneral(assessment, parsedMt);
+            general.Event = new Event(AstreaClientConstants.EventType_Offered, $"{parsedMt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference}|{general.Time}");
+            return general;
         }
-        protected override List<ProcessTrailPayload> SetupPayloads(AssessmentResponse assessment)
+        protected override List<ProcessTrailPayload> SetupPayloads(AssessmentResponse assessment, MT103SingleCustomerCreditTransferModel parsedMt)
         {
-            var payloads = new List<ProcessTrailPayload>();
+            var payloads = base.SetupPayloads(assessment, parsedMt);
 
-            assessment.Results.ForEach(pi =>
-                payloads.Add(new ProcessTrailPayload()
-                {
-                    Id = Id + "-1",
-                    //TODO: Make dynamic so we can change this or automatically detect this
-                    Encoding = "plain/json",
-                    //TODO: Make dynamic so we can change this
-                    Store = "ses-fcp-payment-orders",
-                    Payload = new EnvelopPayload()
-                    {
-                        Extras = new Extras()
-                        {
-                        }
-                    }
-                })
-            );
+            payloads.ForEach(pl =>
+            {
+                pl.Payload.Act = new Act(AstreaClientConstants.Action_PassThrough, AstreaClientConstants.Action_PassThrough);
+            });
 
             return payloads;
         }

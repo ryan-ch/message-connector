@@ -3,28 +3,32 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using XB.IBM.MQ;
+using XB.Astrea.WebAPI.Extensions;
+using XGalaxy.Common.Logging.Contracts;
+using XGalaxy.Common.Logging.Helpers;
 
 namespace XB.Astrea.WebAPI
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            new LoggingHelper("Astrea-Connector").ConfigureLogging();
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMqProducer();
+            services.ConfigureDependencies(Configuration);
+            services.ConfigureServices();
             services.AddControllers();
+            //Todo: does this actually start the service or should we start it manually?
+            services.AddHostedService<Worker>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggingService loggingService)
         {
             if (env.IsDevelopment())
             {
@@ -32,6 +36,8 @@ namespace XB.Astrea.WebAPI
             }
 
             app.UseRouting();
+
+            app.ConfigureCustomExceptionHandler(loggingService);
 
             app.UseAuthorization();
 

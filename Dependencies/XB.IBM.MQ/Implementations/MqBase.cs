@@ -1,8 +1,6 @@
 ﻿using IBM.XMS;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
+using XB.IBM.MQ.Config;
 
 namespace XB.IBM.MQ.Implementations
 {
@@ -12,21 +10,19 @@ namespace XB.IBM.MQ.Implementations
         public IDestination Destination { get; }
         private ILogger<MqBase> Logger { get; }
 
-        public MqBase(IConfiguration configuration, string configurationSection, ILoggerFactory loggerFactory)
+        public MqBase(MqConfigurations configurations, ILoggerFactory loggerFactory)
         {
             Logger = loggerFactory.CreateLogger<MqBase>();
 
-            var properties = SetupProperties(configuration, configurationSection);
-
-            //if (configuration[properties["section"] + "MqSslPath"] != "" && configuration[properties["section"] + "MqPassword"] != "")
+            //if (configurations.MqSslPath != "" && configurations.MqPassword != "")
             //{
-            //    AddCertToCertStore(configuration[properties["section"] + "MqSslPath"], configuration[properties["section"] + "MqPassword"]);
+            //    AddCertToCertStore(configurations.MqSslPath, configurations.MqPassword);
             //}
 
-            var connectionFactory = CreateAndConfigureConnectionFactory(properties);
+            var connectionFactory = CreateAndConfigureConnectionFactory(configurations);
             var connectionWmq = connectionFactory.CreateConnection();
             SessionWmq = connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
-            Destination = SessionWmq.CreateQueue(properties[XMSC.WMQ_QUEUE_NAME]);
+            Destination = SessionWmq.CreateQueue(configurations.MqQueueName);
             connectionWmq.Start();
         }
 
@@ -40,51 +36,40 @@ namespace XB.IBM.MQ.Implementations
             SessionWmq.Rollback();
         }
 
-        private IConnectionFactory CreateAndConfigureConnectionFactory(IReadOnlyDictionary<string, string> properties)
+        private IConnectionFactory CreateAndConfigureConnectionFactory(MqConfigurations config)
         {
             var connectionFactory = XMSFactoryFactory.GetInstance(XMSC.CT_WMQ).CreateConnectionFactory();
 
-            if (string.IsNullOrWhiteSpace(properties[XMSC.WMQ_SSL_CIPHER_SPEC]))
+            if (!string.IsNullOrWhiteSpace(config.MqSslCipher))
             {
-                connectionFactory.SetStringProperty(XMSC.WMQ_SSL_CIPHER_SPEC, properties[XMSC.WMQ_SSL_CIPHER_SPEC]);
+                connectionFactory.SetStringProperty(XMSC.WMQ_SSL_CIPHER_SPEC, config.MqSslCipher);
             }
-            if (string.IsNullOrWhiteSpace(properties[XMSC.WMQ_SSL_KEY_REPOSITORY]))
+
+            // Todo: should this be assigned to SslPath?
+            if (!string.IsNullOrWhiteSpace("*USER"))
             {
-                connectionFactory.SetStringProperty(XMSC.WMQ_SSL_KEY_REPOSITORY, properties[XMSC.WMQ_SSL_KEY_REPOSITORY]);
+                connectionFactory.SetStringProperty(XMSC.WMQ_SSL_KEY_REPOSITORY, "*USER");
             }
-            if (string.IsNullOrWhiteSpace(properties[XMSC.WMQ_SSL_PEER_NAME]))
+
+            if (!string.IsNullOrWhiteSpace(config.MqPeerName))
             {
-                connectionFactory.SetStringProperty(XMSC.WMQ_SSL_PEER_NAME, properties[XMSC.WMQ_SSL_PEER_NAME]);
+                connectionFactory.SetStringProperty(XMSC.WMQ_SSL_PEER_NAME, config.MqPeerName);
             }
-            if (string.IsNullOrWhiteSpace(properties[XMSC.USERID]) && string.IsNullOrWhiteSpace(properties[XMSC.PASSWORD]))
+
+            if (!string.IsNullOrWhiteSpace(config.MqUserName) && !string.IsNullOrWhiteSpace(config.MqPassword))
             {
-                connectionFactory.SetStringProperty(XMSC.USERID, properties[XMSC.USERID]);
-                connectionFactory.SetStringProperty(XMSC.PASSWORD, properties[XMSC.PASSWORD]);
+                connectionFactory.SetStringProperty(XMSC.USERID, config.MqUserName);
+                connectionFactory.SetStringProperty(XMSC.PASSWORD, config.MqPassword);
             }
-            connectionFactory.SetStringProperty(XMSC.WMQ_HOST_NAME, properties[XMSC.WMQ_HOST_NAME]);
-            connectionFactory.SetIntProperty(XMSC.WMQ_PORT, Convert.ToInt32(properties[XMSC.WMQ_PORT]));
-            connectionFactory.SetStringProperty(XMSC.WMQ_CHANNEL, properties[XMSC.WMQ_CHANNEL]);
-            connectionFactory.SetStringProperty(XMSC.WMQ_QUEUE_MANAGER, properties[XMSC.WMQ_QUEUE_MANAGER]);
-            connectionFactory.SetStringProperty(XMSC.WMQ_QUEUE_NAME, properties[XMSC.WMQ_QUEUE_NAME]);
+            connectionFactory.SetStringProperty(XMSC.WMQ_HOST_NAME, config.MqHostname);
+            connectionFactory.SetIntProperty(XMSC.WMQ_PORT, config.MqPort);
+            connectionFactory.SetStringProperty(XMSC.WMQ_CHANNEL, config.MqChannel);
+            connectionFactory.SetStringProperty(XMSC.WMQ_QUEUE_MANAGER, config.MqQueueManagerName);
+            connectionFactory.SetStringProperty(XMSC.WMQ_QUEUE_NAME, config.MqQueueName);
             connectionFactory.SetIntProperty(XMSC.WMQ_CONNECTION_MODE, XMSC.WMQ_CM_CLIENT);
 
             return connectionFactory;
         }
-
-        private Dictionary<string, string> SetupProperties(IConfiguration configuration, string section) => new Dictionary<string, string>
-            {
-                {"section", section},
-                {XMSC.WMQ_HOST_NAME, configuration[section + "MqHostname"]},
-                {XMSC.WMQ_PORT, configuration[section + "MqPort"]},
-                {XMSC.WMQ_CHANNEL, configuration[section + "MqChannel"]},
-                {XMSC.WMQ_QUEUE_MANAGER, configuration[section + "MqQueueManagerName"]},
-                {XMSC.WMQ_QUEUE_NAME, configuration[section + "MqQueueName"]},
-                {XMSC.WMQ_SSL_CIPHER_SPEC, configuration[section + "MqSslCipher"]},
-                {XMSC.WMQ_SSL_KEY_REPOSITORY, "*USER"},
-                {XMSC.WMQ_SSL_PEER_NAME, configuration[section + "MqPeerName"]},
-                {XMSC.USERID, configuration[section + "MqUserName"]},
-                {XMSC.PASSWORD, configuration[section + "MqPassword"]}
-            };
 
         //private void AddCertToCertStore(string certPath, string password)
         //{

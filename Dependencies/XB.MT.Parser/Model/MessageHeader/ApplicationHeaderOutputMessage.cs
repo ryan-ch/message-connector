@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace XB.MT.Parser.Model.MessageHeader
+﻿namespace XB.MT.Parser.Model.MessageHeader
 {
     public class ApplicationHeaderOutputMessage : ApplicationHeader
     {

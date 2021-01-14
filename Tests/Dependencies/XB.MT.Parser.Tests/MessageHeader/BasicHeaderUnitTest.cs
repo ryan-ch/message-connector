@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MT103XUnitTestProject.Common;
+﻿using MT103XUnitTestProject.Common;
 using XB.MT.Parser.Model.MessageHeader;
 using Xunit;
 
 namespace MT103XUnitTestProject.MessageHeader
 {
-    class BasicHeaderUnitTest
+    internal class BasicHeaderUnitTest
     {
         internal static void ValidateBasicHeader(BasicHeader basicHeader, string appID, string serviceID, string ltAdress,
                                          string sessionNumber, string sequenceNumber)

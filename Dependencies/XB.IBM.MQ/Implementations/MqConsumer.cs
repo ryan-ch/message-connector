@@ -1,19 +1,17 @@
 ﻿using IBM.XMS;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using XB.IBM.MQ.Config;
 using XB.IBM.MQ.Interfaces;
 
 namespace XB.IBM.MQ.Implementations
 {
     public class MqConsumer : MqBase, IMqConsumer
     {
-        //Todo: add MQ identifier to the section
-        private const string section = "AppSettings:Reader:";
-
         public IMessageConsumer Consumer { get; }
 
-        public MqConsumer(IConfiguration configuration, ILoggerFactory loggerFactory)
-            : base(configuration, section, loggerFactory)
+        public MqConsumer(IOptions<MqOptions> configurations, ILoggerFactory loggerFactory)
+            : base(configurations.Value.ReaderConfig, loggerFactory)
         {
             Consumer = SessionWmq.CreateConsumer(Destination);
         }

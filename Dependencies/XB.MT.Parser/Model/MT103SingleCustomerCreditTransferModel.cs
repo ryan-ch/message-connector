@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using XB.MT.Parser.Model.Text.MT103;
+﻿using XB.MT.Parser.Model.Text.MT103;
 
 namespace XB.MT.Parser.Model
 {

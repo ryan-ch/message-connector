@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using XB.Astrea.Client.Constants;
 using XB.MT.Parser.Model;
 
 namespace XB.Astrea.Client.Messages.Assessment
@@ -14,10 +15,11 @@ namespace XB.Astrea.Client.Messages.Assessment
             PaymentInstructions = SetupPaymentInstruction(mt);
             Actor = new Actor("", "");// Todo:implement
             Principal = new Principal("", "");// Todo:implement
-            TargetState = Constants.EventType_Requested;
+            TargetState = AstreaClientConstants.EventType_Requested;
             Tags = new Tags();
+            MtModel = mt;
         }
-
+        [JsonIgnore]
         public string OrderIdentity { get; set; }
         public string BasketIdentity { get; set; }
         public List<PaymentInstruction> PaymentInstructions { get; set; } = new List<PaymentInstruction>();
@@ -28,6 +30,9 @@ namespace XB.Astrea.Client.Messages.Assessment
         public Tags Tags { get; set; }
         [JsonIgnore]
         public string Mt { get; set; }
+        //TODO: As there are many fields that are unconfirmed, we will use this for data transfer for fields that have not been classified
+        [JsonIgnore]
+        public MT103SingleCustomerCreditTransferModel MtModel { get; set; }
 
         private static List<PaymentInstruction> SetupPaymentInstruction(MT103SingleCustomerCreditTransferModel mt)
         {
@@ -42,9 +47,9 @@ namespace XB.Astrea.Client.Messages.Assessment
                     Amount = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.InterbankSettledAmount,
                     Currency = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.Currency,
                     //TODO: check if length is greater then 11 and if first two are alphabetic
-                    DebitAccount = new List<Account>() { new Account(Constants.Iban,"","SE2750000000056970162486") },
+                    DebitAccount = new List<Account>() { new Account(AstreaClientConstants.Iban,"","SE2750000000056970162486") },
                     //TODO: check if length is greater then 11 and if first two are alphabetic
-                    CreditAccount = new List<Account> { new Account(Constants.Iban,"","SE3550000000054910000003") },
+                    CreditAccount = new List<Account> { new Account(AstreaClientConstants.Iban,"","SE3550000000054910000003") },
                     RemittanceInfo = new List<RemittanceInfo>(),
                     InstructionContext = new InstructionContext(new List<string>{"","" },"",""),
                     RegisteringParty = new RegisteringParty("","")

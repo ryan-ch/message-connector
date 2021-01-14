@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using XB.MT.Parser.Model.Common;
-
-namespace XB.MT.Parser.Model.MessageHeader
+﻿namespace XB.MT.Parser.Model.MessageHeader
 {
     public class ApplicationHeader : BlockHeader
     {

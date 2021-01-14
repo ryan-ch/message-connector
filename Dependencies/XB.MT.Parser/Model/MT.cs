@@ -1,5 +1,4 @@
-﻿using System;
-using XB.MT.Parser.Model.MessageHeader;
+﻿using XB.MT.Parser.Model.MessageHeader;
 
 namespace XB.MT.Parser.Model
 {
