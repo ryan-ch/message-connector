@@ -47,10 +47,11 @@ namespace XB.Astrea.WebAPI
         private Task HandleMessage(string message)
         {
             _logger.LogInformation(message);
-
-            using var scope = _services.CreateScope();
-            var scopedAstreaClient = scope.ServiceProvider.GetRequiredService<IAstreaClient>();
-            return scopedAstreaClient.AssessAsync(message);
+            return Task.CompletedTask;
+            //temporarily disable astrea client until its ready
+            //using var scope = _services.CreateScope();
+            //var scopedAstreaClient = scope.ServiceProvider.GetRequiredService<IAstreaClient>();
+            //return scopedAstreaClient.AssessAsync(message);
         }
     }
 }
