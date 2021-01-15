@@ -71,13 +71,13 @@ namespace XB.Astrea.Client.Tests
                 {
                     //Mt103->{4:->:50K:->rad2
                     //Mt103->{4:->:50K:->rad1
-                    new Messages.Assessment.Account("seb.payment.se.swift","Vårgårda Kromverk","SE2880000832790000012345")
+                    new Messages.Assessment.Account("seb.payment.se.swift","SE2880000832790000012345")
                 },
                 CreditAccount = new List<Messages.Assessment.Account>()
                 {
                     //Mt103->{4:->:59:->rad2
                      //Mt103->{4:->:59:rad1
-                    new Messages.Assessment.Account("seb.payment.se.swift","Volvo Personvagnar Ab","SE3550000000054910000003")
+                    new Messages.Assessment.Account("seb.payment.se.swift","SE3550000000054910000003")
                 }
             });
         }

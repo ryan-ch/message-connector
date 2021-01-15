@@ -70,10 +70,10 @@ namespace XB.Astrea.Client
             var request = new AssessmentRequest(mt103);
             var postBody = JsonConvert.SerializeObject(request, new JsonSerializerSettings
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc
             });
-            var data = new StringContent(postBody, Encoding.UTF8, "text/plain");
-
+            var data = new StringContent(postBody, Encoding.UTF8, "application/json");
             var result = await _httpClient.PostAsync("/sas/v3/assessOrders/paymentInstruction", data).ConfigureAwait(false);
 
             if (!result.IsSuccessStatusCode)
@@ -89,7 +89,6 @@ namespace XB.Astrea.Client
             _ = SendDecisionProcessTrail(assessmentResponse, mt103);
 
             //Todo: we need to send the result to Hubert
-
             return assessmentResponse;
         }
 

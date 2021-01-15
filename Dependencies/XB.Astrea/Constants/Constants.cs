@@ -10,8 +10,8 @@
         internal const string PayloadSchemaVersion = "1.0.0";
         internal const string PayloadEncoding = "plain/json";
         internal const string PayloadStore = "ses-fcp-payment-orders";
-        internal const string Iban = "bic-iban";
-        internal const string Bban = "bic-bban";
+        internal const string Iban = "iban";
+        internal const string Bban = "bban";
         internal const string EventType_Requested = "requested";
         internal const string EventType_Offered = "offered";
         internal const string EventType_Rejected = "rejected";
