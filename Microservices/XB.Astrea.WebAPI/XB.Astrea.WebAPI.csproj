@@ -17,5 +17,17 @@
     <ProjectReference Include="..\..\Dependencies\XB.IBM.MQ\XB.IBM.MQ.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="KafkaCerts\SEB_CA.cer">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="KafkaCerts\YourAppName.cer">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="KafkaCerts\YourAppName.pem">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 
 </Project>

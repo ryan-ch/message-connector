@@ -3,13 +3,13 @@ using System.Net;
 
 namespace XB.Kafka.Config
 {
-    public class KafkaConfig : ProducerConfig
+    public class KafkaProducerConfig : ProducerConfig
     {
-        public const string ConfigurationSection = "Kafka";
+        public const string ConfigurationSection = "KafkaProducer";
 
-        public KafkaConfig()
+        public KafkaProducerConfig()
         {
-            Acks = Confluent.Kafka.Acks.None;
+            Acks = Confluent.Kafka.Acks.All;
             ApiVersionRequest = true;
             SecurityProtocol = Confluent.Kafka.SecurityProtocol.Ssl;
             SaslMechanism = Confluent.Kafka.SaslMechanism.ScramSha512;

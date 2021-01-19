@@ -16,7 +16,7 @@ namespace XB.Astrea.WebAPI.Extensions
 
         public static void ConfigureDependencies(this IServiceCollection services, IConfiguration config)
         {
-            services.AddAstreaClientAndKafka(config, appsettingsPrefix);
+            services.AddAstreaClient(config, appsettingsPrefix);
             services.AddMQ(config, appsettingsPrefix);
             services.AddHubert();
         }

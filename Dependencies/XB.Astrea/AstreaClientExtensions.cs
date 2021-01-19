@@ -10,12 +10,8 @@ namespace XB.Astrea.Client
     {
         internal const string HttpClientName = "astrea";
 
-        public static IServiceCollection AddAstreaClientAndKafka(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
+        public static IServiceCollection AddAstreaClient(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
         {
-            // Todo: do we need the nuget files inside this project?
-
-            services.Configure<KafkaConfig>(configuration.GetSection(appsettingsPrefix + KafkaConfig.ConfigurationSection));
-
             services.AddHttpClient(HttpClientName, c =>
             {
                 c.BaseAddress = new Uri(configuration["AppSettings:Astrea:Url"]);
@@ -23,8 +19,10 @@ namespace XB.Astrea.Client
             });
 
             return services
-                 .AddScoped<IKafkaProducer, KafkaProducer>()
-                 .AddScoped<IAstreaClient, AstreaClient>();
+                .AddScoped<IAstreaClient, AstreaClient>()
+                .AddKafkaProducer(configuration, appsettingsPrefix);
+                //.AddKafkaConsumer(configuration, appsettingsPrefix)
         }
+
     }
 }
