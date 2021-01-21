@@ -85,19 +85,19 @@ namespace XB.Astrea.Client
             var apiResponse = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
             var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
 
-            // TODO: Here we need to make a decision if this is an offered or rejected assessment
+            // Todo: do we need to await for this one ?
             _ = SendDecisionProcessTrail(assessmentResponse, mt103);
 
             //Todo: we need to send the result to Hubert
             return assessmentResponse;
         }
 
-        private Task SendRequestedProcessTrail(AssessmentRequest request)
+        private async Task SendRequestedProcessTrail(AssessmentRequest request)
         {
             try
             {
                 var requestedProcessTrail = new RequestedProcessTrail(request, _appVersion);
-                _ = _kafkaProducer.Execute(JsonConvert.SerializeObject(requestedProcessTrail));
+                await _kafkaProducer.Execute(JsonConvert.SerializeObject(requestedProcessTrail)).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -105,10 +105,9 @@ namespace XB.Astrea.Client
                 //throw new ProcessTrailErrorException("Could not send requested process trail", e);
                 _logger.LogError(e, "Couldn't Send Requested ProcessTrail");
             }
-            return Task.CompletedTask;
         }
 
-        private Task SendDecisionProcessTrail(AssessmentResponse assessmentResponse, MT103SingleCustomerCreditTransferModel parsedMt)
+        private async Task SendDecisionProcessTrail(AssessmentResponse assessmentResponse, MT103SingleCustomerCreditTransferModel parsedMt)
         {
             try
             {
@@ -117,7 +116,7 @@ namespace XB.Astrea.Client
                        ? JsonConvert.SerializeObject(new RejectedProcessTrail(assessmentResponse, _appVersion, parsedMt))
                        : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _appVersion, parsedMt));
 
-                _ = _kafkaProducer.Execute(kafkaMessage);
+                await _kafkaProducer.Execute(kafkaMessage).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -125,7 +124,6 @@ namespace XB.Astrea.Client
                 //throw new ProcessTrailErrorException("Could not send decision process trail", e);
                 _logger.LogError(e, "Couldn't Send Decision ProcessTrail");
             }
-            return Task.CompletedTask;
         }
     }
 }

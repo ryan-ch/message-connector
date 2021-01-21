@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using XB.Kafka;
-using XB.Kafka.Config;
 
 namespace XB.Astrea.Client
 {

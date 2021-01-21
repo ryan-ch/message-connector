@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using XB.Astrea.WebAPI.Extensions;
-using XGalaxy.Common.Logging.Contracts;
-using XGalaxy.Common.Logging.Helpers;
+using XGalaxy.Common.Logging;
 
 namespace XB.Astrea.WebAPI
 {
@@ -16,19 +16,18 @@ namespace XB.Astrea.WebAPI
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            new LoggingHelper("Astrea-Connector").ConfigureLogging();
+            _ = bool.TryParse(Environment.GetEnvironmentVariable("Debugging"), out var _debugging);
+            SerilogConfiguration.ConfigureLogging("Astrea-Connector", _debugging);
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureDependencies(Configuration);
-            services.ConfigureServices();
             services.AddControllers();
-            //Todo: does this actually start the service or should we start it manually?
             services.AddHostedService<Worker>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggingService loggingService)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -36,8 +35,6 @@ namespace XB.Astrea.WebAPI
             }
 
             app.UseRouting();
-
-            app.ConfigureCustomExceptionHandler(loggingService);
 
             app.UseAuthorization();
 

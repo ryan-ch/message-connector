@@ -1,9 +1,5 @@
 ﻿using Confluent.Kafka;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using System;
-using System.Diagnostics;
-using System.Net;
 using System.Threading.Tasks;
 using XB.Kafka.Config;
 
@@ -19,7 +15,7 @@ namespace XB.Kafka
             Topic = configuration.Value.Topic;
             kafkaProducer = new ProducerBuilder<int, string>(configuration.Value).Build();
         }
-        
+
         public async Task Execute(string message)
         {
             var partition = new Partition(0);

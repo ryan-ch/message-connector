@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
-using Confluent.Kafka;
-using Microsoft.Extensions.DependencyInjection;
 using XB.Kafka;
 
 namespace KafkaProducerTool
 {
-    class Program
+    internal class Program
     {
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             var _startUp = new Startup();
             var kafkaProducerClient = _startUp.Provider.GetRequiredService<IKafkaProducer>();

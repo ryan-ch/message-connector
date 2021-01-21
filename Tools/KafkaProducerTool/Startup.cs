@@ -1,11 +1,9 @@
-﻿using System;
-using System.IO;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
 using XB.Kafka;
-using XB.Kafka.Config;
 
 namespace KafkaProducerTool
 {
