@@ -1,4 +1,6 @@
-﻿namespace XB.MT.Parser.Model.Text.MT103.Fields
+﻿using XB.MT.Parser.Model.Common;
+
+namespace XB.MT.Parser.Model.Text.MT103.Fields
 {
     public class NameOrAddressCrLf
     {
@@ -11,14 +13,14 @@
             NameOrAddress = nameOrAdress;
             if (setCrLf)
             {
-                CarriageReturn = "\r";
-                LineFeed = "\n";
+                CarriageReturn = Constants.Cr;
+                LineFeed = Constants.Lf;
             }
         }
 
         public override bool Equals(object o)
         {
-            if (o == null || !GetType().Equals(o.GetType()))
+            if (o == null || !this.GetType().Equals(o.GetType()))
             {
                 return false;
             }

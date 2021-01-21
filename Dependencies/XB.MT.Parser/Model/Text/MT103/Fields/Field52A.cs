@@ -2,13 +2,10 @@
 
 namespace XB.MT.Parser.Model.Text.MT103.Fields
 {
-    public class Field52A : Field
+    public class Field52A : Field52
     {
-        public Field52A(CommonFieldDelimiters commonFieldDelimiters, string fieldValue) : base(commonFieldDelimiters)
+        public Field52A(CommonFieldDelimiters commonFieldDelimiters, string fieldValue) : base(commonFieldDelimiters, fieldValue)
         {
-            OrderingInstitution = fieldValue;
         }
-
-        public string OrderingInstitution { get; set; }
     }
 }

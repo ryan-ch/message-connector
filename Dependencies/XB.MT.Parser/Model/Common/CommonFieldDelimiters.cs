@@ -4,16 +4,16 @@ namespace XB.MT.Parser.Model.Common
 {
     public class CommonFieldDelimiters
     {
-        public CommonFieldDelimiters(string fieldId)
-        {
-            SetDefaultStartOfFieldValues(fieldId);
-        }
-
         public string StartOfFieldDelimiter { get; set; }
         public string FieldIdentifier { get; set; }
         public string Separator { get; set; }
         public string CarriageReturn { get; set; }
         public string LineFeed { get; set; }
+
+        public CommonFieldDelimiters(string fieldId)
+        {
+            SetDefaultStartOfFieldValues(fieldId);
+        }
 
         public void SetDefaultStartOfFieldValues(string fieldIdentifier)
         {
@@ -39,10 +39,10 @@ namespace XB.MT.Parser.Model.Common
                     Separator = ":";
                     break;
                 case CommonFieldDelimiter.CarriageReturn:
-                    CarriageReturn = "\r";
+                    CarriageReturn = Constants.Cr;
                     break;
                 case CommonFieldDelimiter.LineFeed:
-                    LineFeed = "\n";
+                    LineFeed = Constants.Lf;
                     break;
                 default:
                     throw new Exception("Not handled CommonFieldDelimiter: " + commonFieldDelimiter);

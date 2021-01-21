@@ -4,18 +4,20 @@ using System.Collections.Generic;
 using XB.Astrea.Client.Constants;
 using XB.MT.Parser.Model;
 
+
 namespace XB.Astrea.Client.Messages.Assessment
 {
     public class AssessmentRequest
     {
-        public AssessmentRequest(MT103SingleCustomerCreditTransferModel mt)
+        public AssessmentRequest(MT103SingleCustomerCreditTransferModel mt103)
         {
             OrderIdentity = Guid.NewGuid().ToString();
-            BasketIdentity = mt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference;
-            PaymentInstructions = SetupPaymentInstruction(mt);
+            BasketIdentity = mt103.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference;
+            PaymentInstructions = SetupPaymentInstruction(mt103);
             TargetState = AstreaClientConstants.EventType_Requested;
             Tags = new Tags();
-            MtModel = mt;
+            Mt103Model = mt103;
+            Mt = mt103.OriginalSWIFTmessage;
         }
 
         public string OrderIdentity { get; set; }
@@ -28,7 +30,7 @@ namespace XB.Astrea.Client.Messages.Assessment
         public string Mt { get; set; }
         //TODO: As there are many fields that are unconfirmed, we will use this for data transfer for fields that have not been classified
         [JsonIgnore]
-        public MT103SingleCustomerCreditTransferModel MtModel { get; set; }
+        public MT103SingleCustomerCreditTransferModel Mt103Model { get; set; }
 
         private static List<PaymentInstruction> SetupPaymentInstruction(MT103SingleCustomerCreditTransferModel mt)
         {

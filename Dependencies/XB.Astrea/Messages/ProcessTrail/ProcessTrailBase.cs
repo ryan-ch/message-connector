@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.MT.Parser.Model;
@@ -36,8 +37,8 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             Payloads = SetupPayloads(assessmentResponse, parsedMt);
         }
 
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public DateTime Time { get; set; } = DateTime.Now;
+        public Guid Id { get; set; }
+        public DateTime Time { get; set; }
         public string System { get; set; }
         public Context Context { get; set; }
         public General General { get; set; }
@@ -105,20 +106,15 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         }
 
         protected virtual General SetupGeneral(AssessmentRequest request) {
-            return new General
+            return new()
             {
-                Time = Time,
-                Bo =
+                Time = DateTime.ParseExact(request.Mt103Model.ApplicationHeaderOutputMessage.OutputDate+ request.Mt103Model.ApplicationHeaderOutputMessage.OutputTime, "yyMMddHHmm", CultureInfo.InvariantCulture),
+                Bo = new Bo()
                 {
-                    Id = request.BasketIdentity,
+                    Id = request.Mt103Model.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
                     IdType = "swift.tag121",
                     Type = GetBOType(request)
-                },
-                Actors = new List<ProcessTrailActor>()
-                {
-                    new ProcessTrailActor(request.MtModel.ApplicationHeaderInputMessage.DestinationAddress, AstreaClientConstants.ActorIdType, new List<string>() { AstreaClientConstants.ActorRole })
-                },
-                Location = new Location()
+                }
             };
         }
 
@@ -126,7 +122,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             return new General
             {
                 Time = Time,
-                Bo =
+                Bo = new Bo()
                 {
                     Id = response.RequestIdentity,
                     IdType = "swift.tag121",
@@ -140,11 +136,6 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                         Type = AstreaClientConstants.ProcessTrailRefType
                     }
                 },
-                Location = new Location(),
-                Actors = new List<ProcessTrailActor>()
-                {
-                    new ProcessTrailActor(parsedMt.ApplicationHeaderInputMessage.DestinationAddress, AstreaClientConstants.ActorIdType, new List<string>() { AstreaClientConstants.ActorRole })
-                }
             };
         }
     }

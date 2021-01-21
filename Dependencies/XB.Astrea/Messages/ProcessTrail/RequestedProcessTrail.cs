@@ -9,7 +9,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 {
     public class RequestedProcessTrail : ProcessTrailBase
     {
-        public RequestedProcessTrail(AssessmentRequest response, string appVersion) : base(response, appVersion) { }
+        public RequestedProcessTrail(AssessmentRequest request, string appVersion) : base(request, appVersion) { }
 
         protected override List<ProcessTrailPayload> SetupPayloads(AssessmentRequest request)
         {
@@ -29,8 +29,8 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                             References = new List<References>()
                             {
                                 new References(request.BasketIdentity, "swift.tag121.uniqueId"),
-                                new References(request.MtModel.MT103SingleCustomerCreditTransferBlockText.Field20.SenderReference, "swift.tag20.sendersRef"),
-                                new References(request.MtModel.MT103SingleCustomerCreditTransferBlockText.Field70.RemittanceInformation, "swift.tag20.remittanceInfo")
+                                new References(request.Mt103Model.MT103SingleCustomerCreditTransferBlockText.Field20.SenderReference, "swift.tag20.sendersRef"),
+                                new References(request.Mt103Model.MT103SingleCustomerCreditTransferBlockText.Field70.RemittanceInformation, "swift.tag20.remittanceInfo")
                             },
                             DebitAccount = new List<Account>()
                             {

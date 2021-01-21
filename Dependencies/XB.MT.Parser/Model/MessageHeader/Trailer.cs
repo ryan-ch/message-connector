@@ -1,9 +1,20 @@
-﻿using XB.MT.Parser.Model.Common;
+﻿using XB.MT.Common.Model.Common;
+using XB.MT.Common.Model.Tags;
+using XB.MT.Parser.Model.Common;
 
 namespace XB.MT.Parser.Model.MessageHeader
 {
     public class Trailer : BlockHeader
     {
+        public const string CHKKey = "CHK";
+        public const string TNGKey = "TNG";
+        public const string PDEKey = "PDE";
+        public const string DLMKey = "DLM";
+        public const string MRFKey = "MRF";
+        public const string PDMKey = "PDM";
+        public const string SYSKey = "SYS";
+
+
         public TagChecksum Tag_Checksum { get; set; }
         public TagTestAndTrainingMessage Tag_TestAndTrainingMessage { get; set; }
         public TagPossibleDuplicateEmission Tag_PossibleDuplicateEmission { get; set; }
@@ -56,7 +67,7 @@ namespace XB.MT.Parser.Model.MessageHeader
 
             public string MessageReference { get; set; }
         }
-        
+
         public class TagPossibleDuplicateMessage : TagHeader
         {
             public TagPossibleDuplicateMessage(CommonBlockDelimiters commonTagDelimiters, string tagValue) : base(commonTagDelimiters)
@@ -66,7 +77,7 @@ namespace XB.MT.Parser.Model.MessageHeader
 
             public string PossibleDuplicateMessage { get; set; }
         }
-        
+
         public class TagSystemOriginatedMessage : TagHeader
         {
             public TagSystemOriginatedMessage(CommonBlockDelimiters commonTagDelimiters, string tagValue) : base(commonTagDelimiters)

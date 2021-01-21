@@ -4,20 +4,18 @@
     {
         public const string Version = "1.0.0";
         public static string Mt103 =>
-            @"{1:F01NKCCXH2NBXXX9712267472}{2:I103CD7BNS1A22WCN}{3:{103:YYG}{108:5V0OP4RFA66}{119:}{111:}{121:7de11583-e6e8-48b2-b8cd-771a839b7fda}}{4:
-:20:cd7z1Lja3
+            @"{1:F01ESSESES0AXXX8000019102}{2:O1030955100518CIBCCATTAXXX76763960792012021544N}{3:{108:78}{111:001}{121:98408af9-695e-4828-9b63-24e63cacb8eb}}{4:
+:20:XMEC-CAD
 :23B:CRED
-:32A:200825SEK3,14
-:50K:/SE2880000832790000012345
-Vårgårda Kromverk
-Lilla Korsgatan 3
-:59:/SE3550000000054910000003
-Volvo Personvagnar Ab
-Bernhards Gränd 3, 418 42 Göteborg
+:32A:200723CAD224,28
+:33B:CAD224,28
+:50K:/9991
+ONE OF OUR CUSTOMERS
+:59:/52801010480
+BENEF
+:70:BETORSAK
 :71A:SHA
--}{5:}
-$
-";
+-}{S:{MAN:UAKOUAK4600}}";
 
         public static string AstreaResponseAsString =>
             @"{

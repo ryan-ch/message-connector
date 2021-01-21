@@ -1,9 +1,26 @@
 ﻿using System;
 
-namespace XB.MT.Parser.Model.Common
+namespace XB.MT.Common.Model.Common
 {
     public class CommonBlockDelimiters
     {
+        /// <summary>
+        /// First character in a block, will be '{'
+        /// </summary>
+        public string StartOfBlockDelimiter { get; set; }
+        /// <summary>
+        /// Defines block contents 
+        /// </summary>
+        public string BlockIdentifier { get; set; }
+        /// <summary>
+        /// Indicates the end of the block identifier, will be ':'
+        /// </summary>
+        public string Separator { get; set; }
+        /// <summary>
+        /// Last character in a block, will be '}'
+        /// </summary>
+        public string EndOfBlockDelimiter { get; set; }
+
         public CommonBlockDelimiters()
         {
         }
@@ -13,10 +30,6 @@ namespace XB.MT.Parser.Model.Common
             SetDefaultStartOfBlockValues(tagId);
         }
 
-        public string StartOfBlockDelimiter { get; set; }
-        public string BlockIdentifier { get; set; }
-        public string Separator { get; set; }
-        public string EndOfBlockDelimiter { get; set; }
 
         public void SetDefaultStartOfBlockValues(string blockIdentifier)
         {

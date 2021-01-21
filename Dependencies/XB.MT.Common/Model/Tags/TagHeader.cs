@@ -1,4 +1,6 @@
-﻿namespace XB.MT.Parser.Model.Common
+﻿using XB.MT.Common.Model.Common;
+
+namespace XB.MT.Common.Model.Tags
 {
     public class TagHeader
     {

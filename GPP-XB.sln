@@ -42,6 +42,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KafkaProducerTool", "Tools\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KafkaConsumerTool", "Tools\KafkaConsumerTool\KafkaConsumerTool.csproj", "{34AF8860-1950-4174-9D1E-47346FC62EAB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.MT.Common", "Dependencies\XB.MT.Common\XB.MT.Common.csproj", "{492BE5BE-60A2-46F2-9E21-053D82E5F01E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,6 +98,10 @@ Global
 		{34AF8860-1950-4174-9D1E-47346FC62EAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34AF8860-1950-4174-9D1E-47346FC62EAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34AF8860-1950-4174-9D1E-47346FC62EAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{492BE5BE-60A2-46F2-9E21-053D82E5F01E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{492BE5BE-60A2-46F2-9E21-053D82E5F01E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{492BE5BE-60A2-46F2-9E21-053D82E5F01E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{492BE5BE-60A2-46F2-9E21-053D82E5F01E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +119,7 @@ Global
 		{CE2B951B-D3DD-487F-BF9B-ABFF11278B46} = {C69FA523-13CA-425E-B598-F208A0B0B7D4}
 		{22593E70-B801-4966-BB7C-34BBD7D18161} = {871733D3-1DFE-4615-80E5-376145B17869}
 		{34AF8860-1950-4174-9D1E-47346FC62EAB} = {871733D3-1DFE-4615-80E5-376145B17869}
+		{492BE5BE-60A2-46F2-9E21-053D82E5F01E} = {C90AA9C8-1AAC-4981-833D-D2C445771687}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7419513B-B6C5-4BAA-B4E3-7DA935561B70}

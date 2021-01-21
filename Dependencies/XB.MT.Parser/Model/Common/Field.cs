@@ -13,7 +13,7 @@ namespace XB.MT.Parser.Model.Common
 
         internal string[] SplitFieldByCrLf(string fieldValue)
         {
-            return SplitField(fieldValue, new string[] { "\r\n" });
+            return SplitField(fieldValue, new string[] { Constants.CrLf });
         }
         internal string[] SplitField(string fieldValue, string[] splitValues)
         {

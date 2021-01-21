@@ -8,7 +8,7 @@ namespace XB.MT.Parser.Model.Text.MT103.Fields
 
         public string BeneficiaryCustomer { get; set; }
         public AccountCrLF AccountCrLf { get; set; }
-        public List<NameOrAddressCrLf> NameAndAddress { get; set; }
+        public List<NameOrAddressCrLf> NameAndAddressList { get; set; }
 
         public Field59(CommonFieldDelimiters commonFieldDelimiters, string fieldValue) : base(commonFieldDelimiters)
         {
@@ -26,11 +26,11 @@ namespace XB.MT.Parser.Model.Text.MT103.Fields
                     }
                     else
                     {
-                        if (NameAndAddress == null)
+                        if (NameAndAddressList == null)
                         {
-                            NameAndAddress = new List<NameOrAddressCrLf>();
+                            NameAndAddressList = new List<NameOrAddressCrLf>();
                         }
-                        NameAndAddress.Add(new NameOrAddressCrLf(part, true));
+                        NameAndAddressList.Add(new NameOrAddressCrLf(part, true));
                     }
                     i++;
                 }

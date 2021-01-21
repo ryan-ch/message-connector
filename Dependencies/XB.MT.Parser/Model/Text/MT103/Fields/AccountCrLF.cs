@@ -1,4 +1,6 @@
-﻿namespace XB.MT.Parser.Model.Text.MT103.Fields
+﻿using XB.MT.Parser.Model.Common;
+
+namespace XB.MT.Parser.Model.Text.MT103.Fields
 {
     public class AccountCrLF
     {
@@ -23,30 +25,30 @@
             }
             if (setCrLf)
             {
-                CarriageReturn = "\r";
-                LineFeed = "\n";
+                CarriageReturn = Constants.Cr;
+                LineFeed = Constants.Lf;
             }
         }
 
         public override bool Equals(object o)
         {
-            if (o == null || ! GetType().Equals(o.GetType()))
+            if (o == null || !this.GetType().Equals(o.GetType()))
             {
                 return false;
             }
             else
             {
                 AccountCrLF other = (AccountCrLF)o;
-                return (Account          == other.Account &&
+                return (Account == other.Account &&
                         AccountIndicator == other.AccountIndicator &&
-                        CarriageReturn   == other.CarriageReturn &&
-                        LineFeed         == other.LineFeed);
+                        CarriageReturn == other.CarriageReturn &&
+                        LineFeed == other.LineFeed);
             }
         }
 
         public override int GetHashCode()
         {
-            return Account.GetHashCode() + AccountIndicator.GetHashCode() + 
+            return Account.GetHashCode() + AccountIndicator.GetHashCode() +
                    CarriageReturn.GetHashCode() + LineFeed.GetHashCode();
         }
     }

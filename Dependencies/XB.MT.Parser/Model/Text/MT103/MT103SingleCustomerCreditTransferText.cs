@@ -1,4 +1,5 @@
-﻿using XB.MT.Parser.Model.MessageHeader;
+﻿using XB.MT.Parser.Model.Common;
+using XB.MT.Parser.Model.MessageHeader;
 using XB.MT.Parser.Model.Text.MT103.Fields;
 
 namespace XB.MT.Parser.Model.Text.MT103
@@ -16,6 +17,7 @@ namespace XB.MT.Parser.Model.Text.MT103
         public Field33B Field33B { get; set; }
         public Field50K Field50K { get; set; }
         public Field52A Field52A { get; set; }
+        public Field52D Field52D { get; set; }
         public Field59 Field59 { get; set; }
         public Field70 Field70 { get; set; }
         public Field71A Field71A { get; set; }
@@ -28,8 +30,8 @@ namespace XB.MT.Parser.Model.Text.MT103
         }
         public void SetDefaultPreFieldCrLf()
         {
-            PreFieldCarriageReturn = "\r";
-            PreFieldLineFeed = "\n";
+            PreFieldCarriageReturn = Constants.Cr;
+            PreFieldLineFeed = Constants.Lf;
         }
     }
 }

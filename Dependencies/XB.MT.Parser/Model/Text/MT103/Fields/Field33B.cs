@@ -13,7 +13,7 @@ namespace XB.MT.Parser.Model.Text.MT103.Fields
             }
             if (Currency_InstructedAmount.Length > 3)
             {
-                InstructedAmount = double.Parse( Currency_InstructedAmount.Substring(3) );
+                InstructedAmount = double.Parse(Currency_InstructedAmount.Substring(3));
             }
         }
 

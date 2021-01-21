@@ -66,7 +66,7 @@ namespace XB.Astrea.Client
 
         private async Task<AssessmentResponse> HandleAssessAsync(string mt)
         {
-            var mt103 = MT103SingleCustomerCreditTransferParser.ParseMessage(mt);
+            var mt103 = GetPaymentInstruction(mt);
             var request = new AssessmentRequest(mt103);
             var postBody = JsonConvert.SerializeObject(request, new JsonSerializerSettings
             {
@@ -90,6 +90,12 @@ namespace XB.Astrea.Client
 
             //Todo: we need to send the result to Hubert
             return assessmentResponse;
+        }
+
+        private MT103SingleCustomerCreditTransferModel GetPaymentInstruction(string mt)
+        {
+            var parser = new MT103SingleCustomerCreditTransferParser();
+            return parser.ParseMessage(mt);
         }
 
         private async Task SendRequestedProcessTrail(AssessmentRequest request)

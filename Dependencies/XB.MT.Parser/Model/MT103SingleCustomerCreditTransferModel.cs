@@ -2,7 +2,7 @@
 
 namespace XB.MT.Parser.Model
 {
-    public class MT103SingleCustomerCreditTransferModel : MT
+    public class MT103SingleCustomerCreditTransferModel : MT103
     {
         public MT103SingleCustomerCreditTransferText MT103SingleCustomerCreditTransferBlockText { get; set; }
     }

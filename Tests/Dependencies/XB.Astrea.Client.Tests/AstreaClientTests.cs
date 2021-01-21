@@ -22,8 +22,9 @@ namespace XB.Astrea.Client.Tests
         [Fact]
         public void Parse_MtToAstreaRequest_ShouldReturnRequest()
         {
-            var mt = MT103SingleCustomerCreditTransferParser.ParseMessage(AstreaClientTestConstants.Mt103);
-
+            //var mt = MT103SingleCustomerCreditTransferParser.ParseMessage(AstreaClientTestConstants.Mt103);
+            var parser = new MT103SingleCustomerCreditTransferParser();
+            var mt = parser.ParseMessage(AstreaClientTestConstants.Mt103);
             var request = new AssessmentRequest(mt);
 
             var requestJson = TestHelper.SerializeToCamelCaseJson(request);

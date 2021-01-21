@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using XB.Astrea.Client;
 using XB.IBM.MQ.Interfaces;
 
 namespace XB.Astrea.WebAPI
@@ -44,22 +46,16 @@ namespace XB.Astrea.WebAPI
 
         private async Task HandleMessage(string message)
         {
-            _logger.LogInformation(message);
-
-            //temporarily disable astrea client until its ready
-            await Task.Delay(2000).ConfigureAwait(false);
-            _logger.LogWarning("Done");
-
-            //try
-            //{
-            //    using var scope = _services.CreateScope();
-            //    var scopedAstreaClient = scope.ServiceProvider.GetRequiredService<IAstreaClient>();
-            //    await scopedAstreaClient.AssessAsync(message).ConfigureAwait(false);
-            //}
-            //catch (Exception e)
-            //{
-            //    _logger.LogError(e, e.Message);
-            //}
+            try
+            {
+                using var scope = _services.CreateScope();
+                var scopedAstreaClient = scope.ServiceProvider.GetRequiredService<IAstreaClient>();
+                await scopedAstreaClient.AssessAsync(message).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+            }
         }
     }
 }

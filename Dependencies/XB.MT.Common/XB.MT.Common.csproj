@@ -4,8 +4,4 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\XB.MT.Common\XB.MT.Common.csproj" />
-  </ItemGroup>
-
 </Project>
