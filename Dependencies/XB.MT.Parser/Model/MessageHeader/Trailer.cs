@@ -1,6 +1,5 @@
 ﻿using XB.MT.Common.Model.Common;
 using XB.MT.Common.Model.Tags;
-using XB.MT.Parser.Model.Common;
 
 namespace XB.MT.Parser.Model.MessageHeader
 {

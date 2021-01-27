@@ -1,7 +1,7 @@
-﻿using System;
-using System.Security.Cryptography.X509Certificates;
-using IBM.XMS;
+﻿using IBM.XMS;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Security.Cryptography.X509Certificates;
 using XB.IBM.MQ.Config;
 
 namespace XB.IBM.MQ.Implementations

@@ -18,14 +18,13 @@ namespace XB.Astrea.Client
     public class AstreaClient : IAstreaClient
     {
         private const int WaitingBeforeRetry = 60000;
-        private readonly DateTime _timeStamp = DateTime.Now;
 
-        private readonly IKafkaProducer _kafkaProducer;
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<AstreaClient> _logger;
         private readonly string _appVersion;
         private readonly byte _retryPeriod;
         private readonly int _riskThreshold;
+        private readonly HttpClient _httpClient;
+        private readonly IKafkaProducer _kafkaProducer;
+        private readonly ILogger<AstreaClient> _logger;
 
         public AstreaClient(IHttpClientFactory httpClientFactory, IKafkaProducer kafkaProducer, IConfiguration configuration,
             ILogger<AstreaClient> logger)
@@ -33,35 +32,29 @@ namespace XB.Astrea.Client
             _kafkaProducer = kafkaProducer;
             _logger = logger;
             _appVersion = configuration.GetValue("Version", string.Empty);
-            _retryPeriod = configuration.GetValue("AppSettings:Astrea:RetryPeriod", (byte)5);
+            _retryPeriod = configuration.GetValue("AppSettings:Astrea:RetryPeriod", (byte)15);
             _httpClient = httpClientFactory.CreateClient(AstreaClientExtensions.HttpClientName);
-            //TODO: Store this in config after issues with processing different messages have been resolved
             _riskThreshold = configuration.GetValue("RiskThreshold", 5);
         }
 
         public async Task<AssessmentResponse> AssessAsync(string mt)
         {
-            try
+            var finishTimestamp = DateTime.Now.AddMinutes(_retryPeriod);
+
+            while (DateTime.Now <= finishTimestamp)
             {
-                return await HandleAssessAsync(mt).ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                while (DateTime.Now <= _timeStamp.AddMinutes(_retryPeriod))
+                try
                 {
-                    try
-                    {
-                        return await HandleAssessAsync(mt).ConfigureAwait(false);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error caught when handling message: " + mt);
-                        await Task.Delay(WaitingBeforeRetry).ConfigureAwait(false);
-                    }
+                    return await HandleAssessAsync(mt).ConfigureAwait(false);
                 }
-                _logger.LogError(e, "Couldn't Handle this transaction message: " + mt);
-                return new AssessmentResponse();
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error caught when handling message: " + mt);
+                    await Task.Delay(WaitingBeforeRetry).ConfigureAwait(false);
+                }
             }
+            _logger.LogError("Couldn't Handle this transaction message: " + mt);
+            return new AssessmentResponse();
         }
 
         private async Task<AssessmentResponse> HandleAssessAsync(string mt)
@@ -79,13 +72,11 @@ namespace XB.Astrea.Client
             if (!result.IsSuccessStatusCode)
                 throw new AssessmentErrorException("Request to Astrea API could not be completed, returned code: " + result.StatusCode);
 
-            // Todo: do we need to await for this one ?
             _ = SendRequestedProcessTrail(request);
 
             var apiResponse = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
             var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
 
-            // Todo: do we need to await for this one ?
             _ = SendDecisionProcessTrail(assessmentResponse, mt103);
 
             //Todo: we need to send the result to Hubert
@@ -103,13 +94,14 @@ namespace XB.Astrea.Client
             try
             {
                 var requestedProcessTrail = new RequestedProcessTrail(request, _appVersion);
-                await _kafkaProducer.Execute(JsonConvert.SerializeObject(requestedProcessTrail)).ConfigureAwait(false);
+                string kafkaMessage = JsonConvert.SerializeObject(requestedProcessTrail);
+
+                _logger.LogInformation("Sending RequestedProcessTrail: " + kafkaMessage);
+                await _kafkaProducer.Execute(kafkaMessage).ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                // Todo: we shouldn't throw if the logging failed we should log it only
-                //throw new ProcessTrailErrorException("Could not send requested process trail", e);
-                _logger.LogError(e, "Couldn't Send Requested ProcessTrail");
+                _logger.LogError(e, "Couldn't Send Requested ProcessTrail for request: " + JsonConvert.SerializeObject(request));
             }
         }
 
@@ -122,13 +114,12 @@ namespace XB.Astrea.Client
                        ? JsonConvert.SerializeObject(new RejectedProcessTrail(assessmentResponse, _appVersion, parsedMt))
                        : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _appVersion, parsedMt));
 
+                _logger.LogInformation("Sending DecisionProcessTrail: " + kafkaMessage);
                 await _kafkaProducer.Execute(kafkaMessage).ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                // Todo: we shouldn't throw if the logging failed we should log it only
-                //throw new ProcessTrailErrorException("Could not send decision process trail", e);
-                _logger.LogError(e, "Couldn't Send Decision ProcessTrail");
+                _logger.LogError(e, "Couldn't Send Decision ProcessTrail for response: " + JsonConvert.SerializeObject(assessmentResponse));
             }
         }
     }

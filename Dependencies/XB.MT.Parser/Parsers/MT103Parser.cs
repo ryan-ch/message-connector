@@ -3,7 +3,6 @@ using XB.MT.Common;
 using XB.MT.Common.Model.Common;
 using XB.MT.Common.Model.Tags.UserHeader;
 using XB.MT.Parser.Model;
-using XB.MT.Parser.Model.Common;
 using XB.MT.Parser.Model.MessageHeader;
 using static XB.MT.Parser.Model.MessageHeader.Trailer;
 
