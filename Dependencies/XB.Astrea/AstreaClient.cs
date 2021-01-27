@@ -68,11 +68,7 @@ namespace XB.Astrea.Client
         {
             var mt103 = GetPaymentInstruction(mt);
             var request = new AssessmentRequest(mt103);
-            var postBody = JsonConvert.SerializeObject(request, new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                DateTimeZoneHandling = DateTimeZoneHandling.Utc
-            });
+            var postBody = JsonConvert.SerializeObject(request, ProcessTrailDefaultJsonSettings.Settings);
             var data = new StringContent(postBody, Encoding.UTF8, "application/json");
             var result = await _httpClient.PostAsync("/sas/v3/assessOrders/paymentInstruction", data).ConfigureAwait(false);
 
@@ -101,8 +97,7 @@ namespace XB.Astrea.Client
             try
             {
                 var requestedProcessTrail = new RequestedProcessTrail(request, _appVersion);
-                string kafkaMessage = JsonConvert.SerializeObject(requestedProcessTrail);
-
+                string kafkaMessage = JsonConvert.SerializeObject(requestedProcessTrail, ProcessTrailDefaultJsonSettings.Settings);
                 _logger.LogInformation("Sending RequestedProcessTrail: " + kafkaMessage);
                 await _kafkaProducer.Execute(kafkaMessage).ConfigureAwait(false);
             }
@@ -118,8 +113,8 @@ namespace XB.Astrea.Client
             {
                 var riskLevel = int.Parse(assessmentResponse.RiskLevel);
                 var kafkaMessage = (riskLevel > _riskThreshold)
-                       ? JsonConvert.SerializeObject(new RejectedProcessTrail(assessmentResponse, _appVersion, parsedMt))
-                       : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _appVersion, parsedMt));
+                       ? JsonConvert.SerializeObject(new RejectedProcessTrail(assessmentResponse, _appVersion, parsedMt), ProcessTrailDefaultJsonSettings.Settings)
+                       : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _appVersion, parsedMt), ProcessTrailDefaultJsonSettings.Settings);
 
                 _logger.LogInformation("Sending DecisionProcessTrail: " + kafkaMessage);
                 await _kafkaProducer.Execute(kafkaMessage).ConfigureAwait(false);
