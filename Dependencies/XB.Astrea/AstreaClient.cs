@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +24,7 @@ namespace XB.Astrea.Client
         private readonly string _appVersion;
         private readonly byte _retryPeriod;
         private readonly int _riskThreshold;
+        private readonly List<string> _acceptableTransactionTypes;
         private readonly HttpClient _httpClient;
         private readonly IKafkaProducer _kafkaProducer;
         private readonly ILogger<AstreaClient> _logger;
@@ -35,6 +38,7 @@ namespace XB.Astrea.Client
             _retryPeriod = configuration.GetValue("AppSettings:Astrea:RetryPeriod", (byte)15);
             _httpClient = httpClientFactory.CreateClient(AstreaClientExtensions.HttpClientName);
             _riskThreshold = configuration.GetValue("RiskThreshold", 5);
+            _acceptableTransactionTypes = configuration.GetListValue<string>("AppSettings:AcceptableTransactionTypes");
         }
 
         public async Task<AssessmentResponse> AssessAsync(string mt)
@@ -45,7 +49,10 @@ namespace XB.Astrea.Client
             {
                 try
                 {
-                    return await HandleAssessAsync(mt).ConfigureAwait(false);
+                    if (_acceptableTransactionTypes.Any(format => mt.Contains("}{2:O" + format)))
+                    {
+                        return await HandleAssessAsync(mt).ConfigureAwait(false);
+                    }
                 }
                 catch (Exception ex)
                 {
