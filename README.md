@@ -1,8 +1,10 @@
-# GPP-XB
+AML Monitoring solution for Hubert
 
-## CrossBorder GPP Repository
+XGalaxy participating developers
 
-Gabriel Tiste, Tech Lead, gabriel.tiste@seb.se  
-Sandra Strzelczak, Software developer, sandra.strzelczak@seb.se  
-Mats Lundahl, Software developer, mats.lundahl@seb.se  
-Rabi Sahdo, Software developer, rabi.sahdo@seb.se
+Chen, Chew Choong
+Falyoun, Mosab
+Granvald, Karolin
+Hong, Chin Choong
+Strzelczak, Sandra
+Tiste, Gabriel
