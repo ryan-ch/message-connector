@@ -9,13 +9,13 @@ namespace XB.Kafka
         public static IServiceCollection AddKafkaProducer(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
         {
             services.Configure<KafkaProducerConfig>(configuration.GetSection(appsettingsPrefix + KafkaProducerConfig.ConfigurationSection));
-            return services.AddScoped<IKafkaProducer, KafkaProducer>();
+            return services.AddSingleton<IKafkaProducer, KafkaProducer>();
         }
 
         public static IServiceCollection AddKafkaConsumer(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
         {
             services.Configure<KafkaConsumerConfig>(configuration.GetSection(appsettingsPrefix + KafkaConsumerConfig.ConfigurationSection));
-            return services.AddScoped<IKafkaConsumer, KafkaConsumer>();
+            return services.AddSingleton<IKafkaConsumer, KafkaConsumer>();
         }
     }
 }
