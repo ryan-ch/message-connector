@@ -31,6 +31,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="KafkaCerts\DevAstreaConnector.sebank.se.cer">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="KafkaCerts\DevAstreaConnector.sebank.se.pem">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="KafkaCerts\SEB_CA.cer">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
