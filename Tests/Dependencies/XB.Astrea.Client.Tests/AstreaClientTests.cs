@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using XB.Astrea.Client.Config;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.Kafka;
 using XB.MT.Parser.Parsers;
@@ -42,8 +43,8 @@ namespace XB.Astrea.Client.Tests
             producerMock.Setup(producer =>
                 producer.Execute(It.IsAny<string>())).Returns(Task.CompletedTask);
 
-            var configurationMock = new Mock<IConfiguration>();
-            configurationMock.Setup(config => config["Version"]).Returns(AstreaClientTestConstants.Version);
+            var configurationMock = new Mock<IOptions<AtreaClientOptions>>();
+            configurationMock.Setup(config => config.Value).Returns(new AtreaClientOptions { Version = AstreaClientTestConstants.Version });
 
             var astreaClient = new AstreaClient(httpClientFactoryMock.Object, producerMock.Object, configurationMock.Object, new Mock<ILogger<AstreaClient>>().Object);
 
