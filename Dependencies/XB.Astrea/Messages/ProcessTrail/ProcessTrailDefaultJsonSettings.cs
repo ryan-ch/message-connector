@@ -3,7 +3,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace XB.Astrea.Client.Messages.ProcessTrail
 {
-    class ProcessTrailDefaultJsonSettings
+    internal class ProcessTrailDefaultJsonSettings
     {
         public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
         {

@@ -20,28 +20,35 @@ namespace XB.Astrea.WebAPI
             _logger = logger;
             _mqConsumer = mqConsumer;
             _services = services;
+
+            using var scope = _services.CreateScope();
+            var backgroundServiceController = scope.ServiceProvider.GetRequiredService<BackgroundServicesManager>();
+            backgroundServiceController.RegisterBackgroundService(this);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            return Task.Run(() =>
             {
-                try
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    string message = _mqConsumer.ReceiveMessage();
-                    if (!string.IsNullOrEmpty(message))
-                        _ = HandleMessage(message);
+                    try
+                    {
+                        string message = _mqConsumer.ReceiveMessage();
+                        if (!string.IsNullOrEmpty(message))
+                            _ = HandleMessage(message);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e, e.Message);
+                    }
+                    finally
+                    {
+                        _mqConsumer.Commit();
+                    }
                 }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, e.Message);
-                }
-                finally
-                {
-                    _mqConsumer.Commit();
-                }
-            }
-            return Task.CompletedTask;
+                return Task.CompletedTask;
+            }, stoppingToken);
         }
 
         private async Task HandleMessage(string message)

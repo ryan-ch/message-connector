@@ -36,7 +36,8 @@ namespace XB.IBM.MQ.Implementations
         {
             var connectionFactory = XMSFactoryFactory.GetInstance(XMSC.CT_WMQ).CreateConnectionFactory();
 
-            if (!string.IsNullOrWhiteSpace(config.MqSslPath) && !string.IsNullOrWhiteSpace(config.MqPassword)) { 
+            if (!string.IsNullOrWhiteSpace(config.MqSslPath) && !string.IsNullOrWhiteSpace(config.MqPassword))
+            {
                 AddCertificate(config.MqSslPath, config.MqPassword);
             }
 
