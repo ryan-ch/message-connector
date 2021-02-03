@@ -15,7 +15,7 @@ namespace KafkaProducerTool
             {
                 Console.Write("Enter message: ");
                 string input = Console.ReadLine();
-                await kafkaProducerClient.Execute(input);
+                await kafkaProducerClient.Produce(input);
             }
             
         }

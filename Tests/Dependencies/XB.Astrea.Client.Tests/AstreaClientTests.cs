@@ -41,7 +41,7 @@ namespace XB.Astrea.Client.Tests
 
             var producerMock = new Mock<IKafkaProducer>();
             producerMock.Setup(producer =>
-                producer.Execute(It.IsAny<string>())).Returns(Task.CompletedTask);
+                producer.Produce(It.IsAny<string>())).Returns(Task.CompletedTask);
 
             var configurationMock = new Mock<IOptions<AtreaClientOptions>>();
             configurationMock.Setup(config => config.Value).Returns(new AtreaClientOptions { Version = AstreaClientTestConstants.Version });
@@ -51,7 +51,7 @@ namespace XB.Astrea.Client.Tests
             await astreaClient.AssessAsync(AstreaClientTestConstants.Mt103);
 
             producerMock.Verify(mock =>
-                mock.Execute(It.IsAny<string>()), Times.Once());
+                mock.Produce(It.IsAny<string>()), Times.Once());
         }
 
 

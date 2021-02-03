@@ -9,24 +9,23 @@ namespace XB.Kafka
 {
     public class KafkaProducer : IKafkaProducer
     {
+        private readonly string _topic;
         private readonly ILogger<KafkaProducer> _logger;
-        public IProducer<int, string> kafkaProducer { get; set; }
-        public string Topic { get; }
+        private readonly IProducer<int, string> _kafkaProducer;
 
-
-        public KafkaProducer(IOptions<KafkaProducerConfig> configuration, ILogger<KafkaProducer> logger)
+        public KafkaProducer(IOptions<KafkaProducerConfig> configuration, ILogger<KafkaProducer> logger, IProducer<int, string> producer = null)
         {
             _logger = logger;
-            Topic = configuration.Value.Topic;
-            kafkaProducer = new ProducerBuilder<int, string>(configuration.Value).Build();
+            _topic = configuration.Value.Topic;
+            _kafkaProducer = producer ?? new ProducerBuilder<int, string>(configuration.Value).Build();
         }
 
-        public async Task Execute(string message)
+        public async Task Produce(string message)
         {
             try
             {
                 var partition = new Partition(0);
-                var kafkaTopic = new TopicPartition(Topic, partition);
+                var kafkaTopic = new TopicPartition(_topic, partition);
 
                 var kafkaMessage = new Message<int, string>
                 {
@@ -34,7 +33,7 @@ namespace XB.Kafka
                     Timestamp = Timestamp.Default,
                     Value = message
                 };
-                await kafkaProducer.ProduceAsync(kafkaTopic, kafkaMessage);
+                await _kafkaProducer.ProduceAsync(kafkaTopic, kafkaMessage);
             }
             catch (Exception ex)
             {

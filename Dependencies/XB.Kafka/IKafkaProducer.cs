@@ -4,6 +4,6 @@ namespace XB.Kafka
 {
     public interface IKafkaProducer
     {
-        Task Execute(string message);
+        Task Produce(string message);
     }
 }

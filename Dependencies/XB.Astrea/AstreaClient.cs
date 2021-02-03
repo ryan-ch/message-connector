@@ -93,7 +93,7 @@ namespace XB.Astrea.Client
                 var requestedProcessTrail = new RequestedProcessTrail(request, _config.Version);
                 string kafkaMessage = JsonConvert.SerializeObject(requestedProcessTrail, ProcessTrailDefaultJsonSettings.Settings);
                 _logger.LogInformation("Sending RequestedProcessTrail: " + kafkaMessage);
-                await _kafkaProducer.Execute(kafkaMessage).ConfigureAwait(false);
+                await _kafkaProducer.Produce(kafkaMessage).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -111,7 +111,7 @@ namespace XB.Astrea.Client
                        : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt), ProcessTrailDefaultJsonSettings.Settings);
 
                 _logger.LogInformation("Sending DecisionProcessTrail: " + kafkaMessage);
-                await _kafkaProducer.Execute(kafkaMessage).ConfigureAwait(false);
+                await _kafkaProducer.Produce(kafkaMessage).ConfigureAwait(false);
             }
             catch (Exception e)
             {
