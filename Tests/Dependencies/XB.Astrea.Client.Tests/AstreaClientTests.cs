@@ -20,7 +20,7 @@ namespace XB.Astrea.Client.Tests
     public class AstreaClientTests
     {
 
-        [Fact]
+        [Fact(Skip ="not ready")]
         public void Parse_MtToAstreaRequest_ShouldReturnRequest()
         {
             //var mt = MT103SingleCustomerCreditTransferParser.ParseMessage(AstreaClientTestConstants.Mt103);
@@ -34,7 +34,7 @@ namespace XB.Astrea.Client.Tests
             Assert.True(requestJson != string.Empty);
         }
 
-        [Fact]
+        [Fact(Skip = "not ready")]
         public async Task Execute_AstreaAssessmentProcess_ShouldDoAssessment()
         {
             var httpClientFactoryMock = TestHelper.GetHttpClientFactoryMock();

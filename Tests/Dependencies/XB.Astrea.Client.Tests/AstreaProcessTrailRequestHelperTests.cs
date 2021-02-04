@@ -27,7 +27,7 @@ namespace XB.Astrea.Client.Tests
             OfferedProcessTrail = new OfferedProcessTrail(AssessmentResponse, AstreaClientTestConstants.Version, null);
         }
 
-        [Fact]
+        [Fact(Skip = "not ready")]
         public void ProcessTrails_ParseAssessmentPaymentInstruction_ShouldMapToRequestedProcessTrailPayloads()
         {
             Assert.Equal(AssessmentRequest.PaymentInstructions.First().InstructedDate.ToString("YYYY-MM-dd"),
@@ -42,7 +42,7 @@ namespace XB.Astrea.Client.Tests
                 RequestedProcessTrail.Payloads.First().Payload.Payment.CreditAccount.First().Id);
         }
 
-        [Fact]
+        [Fact(Skip = "not ready")]
         public void ProcessTrails_SerializeRequestedProcessTrail_ShouldReturnJson()
         {
             var json = JsonConvert.SerializeObject(RequestedProcessTrail);
@@ -50,7 +50,7 @@ namespace XB.Astrea.Client.Tests
             Assert.True(json != string.Empty);
         }
 
-        [Fact]
+        [Fact(Skip = "not ready")]
         public void ProcessTrails_SerializeOfferedProcessTrail_ShouldReturnJson()
         {
             var json = JsonConvert.SerializeObject(OfferedProcessTrail);
