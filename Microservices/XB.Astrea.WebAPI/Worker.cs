@@ -11,6 +11,8 @@ namespace XB.Astrea.WebAPI
 {
     public class Worker : BackgroundService
     {
+        private const int waitTimeMs = 1000;
+
         private readonly ILogger<Worker> _logger;
         private readonly IMqConsumer _mqConsumer;
         private readonly IServiceProvider _services;
@@ -32,11 +34,15 @@ namespace XB.Astrea.WebAPI
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
+                    var messageReceived = false;
                     try
                     {
-                        string message = _mqConsumer.ReceiveMessage();
-                        if (!string.IsNullOrEmpty(message))
-                            _ = HandleMessage(message);
+                        var message = _mqConsumer.ReceiveMessage(waitTimeMs);
+                        if (string.IsNullOrEmpty(message))
+                            continue;
+
+                        _ = HandleMessage(message);
+                        messageReceived = true;
                     }
                     catch (Exception e)
                     {
@@ -44,7 +50,8 @@ namespace XB.Astrea.WebAPI
                     }
                     finally
                     {
-                        _mqConsumer.Commit();
+                        if (messageReceived)
+                            _mqConsumer.Commit();
                     }
                 }
                 return Task.CompletedTask;
