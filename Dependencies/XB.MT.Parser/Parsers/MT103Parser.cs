@@ -1,63 +1,82 @@
 ﻿using System;
+using System.Collections.Generic;
 using XB.MT.Common;
 using XB.MT.Common.Model.Common;
 using XB.MT.Common.Model.Tags.UserHeader;
+using XB.MT.Common.Model.Util;
 using XB.MT.Parser.Model;
 using XB.MT.Parser.Model.MessageHeader;
+using static XB.MT.Common.Model.Util.HeaderUtils;
 using static XB.MT.Parser.Model.MessageHeader.Trailer;
 
 namespace XB.MT.Parser.Parsers
 {
     public abstract class MT103Parser
     {
+        private string basicHeaderString = null;
+        private string applicationHeaderString = null;
+        private string userHeaderString = null;
+        protected string TextHeader { get; set; } = null;
+        private string trailerHeaderString = null;
 
         protected void PopulateHeaders(MT103 mT103Instans, string message, MT103Version version)
         {
             mT103Instans.SetOriginalSWIFTmessageIfNull(message);
-            PopulateBasicHeader(mT103Instans, message, version);
 
-            ApplicationHeaderType applicationHeaderType = GetApplicationHeaderType(message, version);
+            SplitIntoHeaders(message);
+
+            PopulateBasicHeader(mT103Instans, version);
+            ApplicationHeaderType applicationHeaderType = GetApplicationHeaderType(version);
             if (applicationHeaderType == ApplicationHeaderType.ApplicationHeaderInput)
             {
-                PopulateApplicationHeaderInputMessage(mT103Instans, message, version);
+                PopulateApplicationHeaderInputMessage(mT103Instans, version);
             }
             else if (applicationHeaderType == ApplicationHeaderType.ApplicationHeaderOutput)
             {
-                PopulateApplicationHeaderOutputMessage(mT103Instans, message, version);
+                PopulateApplicationHeaderOutputMessage(mT103Instans, version);
             }
-
-            PopulateUserHeader(mT103Instans, message, version);
-            PopulateTrailer(mT103Instans, message, version);
+            PopulateUserHeader(mT103Instans, version);
+            PopulateTrailer(mT103Instans, version);
         }
-        protected void PopulateBasicHeader(MT103 mT103Instans, string message, MT103Version version)
+
+        private void SplitIntoHeaders(string message)
         {
-            mT103Instans.SetOriginalSWIFTmessageIfNull(message);
+            Dictionary<HeaderId, string> headers = HeaderUtils.SplitIntoHeaders(message);
+            headers.TryGetValue(HeaderId.BasicHeader, out basicHeaderString);
+            headers.TryGetValue(HeaderId.Applicationheader, out applicationHeaderString);
+            headers.TryGetValue(HeaderId.UserHeader, out userHeaderString);
+            string textHeader;
+            headers.TryGetValue(HeaderId.TextHeader, out textHeader);
+            TextHeader = textHeader;
+            headers.TryGetValue(HeaderId.TrailerHeader, out trailerHeaderString);
+        }
+        private void PopulateBasicHeader(MT103 mT103Instans, MT103Version version)
+        {
             // Prepared to handle different versions in different ways
             if (version == MT103Version.V_2020)
             {
-                int basicHeaderStart = message.IndexOf("{1:");
-                if (basicHeaderStart >= 0)
+                if (basicHeaderString != null)
                 {
-                    mT103Instans.BasicHeader = new BasicHeader();
-                    BasicHeader basicHeader = mT103Instans.BasicHeader;
-                    CommonBlockDelimiters commonBlockFields = basicHeader.CommonBlockDelimiters;
-                    commonBlockFields.SetDefaultStartOfBlockValues("1");
-
-                    int basicHeaderEnd = message.IndexOf("}", basicHeaderStart);
-
-                    string[] tags = { BasicHeader.AppIDKey,
-                                      BasicHeader.ServiceIDKey,
-                                      BasicHeader.LTAddressKey,
-                                      BasicHeader.SessionNumberKey,
-                                      BasicHeader.SequenceNumberKey };
-                    foreach (var tag in tags)
+                    int basicHeaderStartIx = basicHeaderString.IndexOf("{1:");
+                    if (basicHeaderStartIx >= 0)
                     {
-                        SetBasicHeaderTags(tag, basicHeader, message, basicHeaderStart, basicHeaderEnd);
-                    }
+                        mT103Instans.BasicHeader = new BasicHeader();
+                        BasicHeader basicHeader = mT103Instans.BasicHeader;
+                        CommonBlockDelimiters commonBlockFields = basicHeader.CommonBlockDelimiters;
+                        commonBlockFields.SetDefaultStartOfBlockValues("1");
 
-                    if (basicHeaderEnd > 0)
-                    {
-                        commonBlockFields.SetDefaultValue(CommonBlockDelimiter.EndOfBlockDelimiter);
+                        int basicHeaderEndIx = basicHeaderString.IndexOf("}", basicHeaderStartIx);
+                        if (basicHeaderEndIx > 0)
+                        {
+                            commonBlockFields.SetDefaultValue(CommonBlockDelimiter.EndOfBlockDelimiter);
+                        }
+
+                        string[] tags = { BasicHeader.AppIDKey, BasicHeader.ServiceIDKey, BasicHeader.LTAddressKey,
+                                      BasicHeader.SessionNumberKey, BasicHeader.SequenceNumberKey };
+                        foreach (var tag in tags)
+                        {
+                            SetBasicHeaderTags(tag, basicHeader, basicHeaderStartIx, basicHeaderEndIx);
+                        }
                     }
                 }
             }
@@ -67,39 +86,38 @@ namespace XB.MT.Parser.Parsers
             }
         }
 
-        private void SetBasicHeaderTags(string tag, BasicHeader basicHeader, string message,
-                                       int basicHeaderStartIx, int basicHeaderEndIx)
+        private void SetBasicHeaderTags(string tag, BasicHeader basicHeader, int basicHeaderStartIx, int basicHeaderEndIx)
         {
             switch (tag)
             {
                 case BasicHeader.AppIDKey:
                     if (basicHeaderEndIx > basicHeaderStartIx + 3)
                     {
-                        basicHeader.AppID = message.Substring(basicHeaderStartIx + 3, 1);
+                        basicHeader.AppID = basicHeaderString.Substring(basicHeaderStartIx + 3, 1);
                     }
                     break;
                 case BasicHeader.ServiceIDKey:
                     if (basicHeaderEndIx > basicHeaderStartIx + 5)
                     {
-                        basicHeader.ServiceID = message.Substring(basicHeaderStartIx + 4, 2);
+                        basicHeader.ServiceID = basicHeaderString.Substring(basicHeaderStartIx + 4, 2);
                     }
                     break;
                 case BasicHeader.LTAddressKey:
                     if (basicHeaderEndIx > basicHeaderStartIx + 17)
                     {
-                        basicHeader.LTAddress = message.Substring(basicHeaderStartIx + 6, 12);
+                        basicHeader.LTAddress = basicHeaderString.Substring(basicHeaderStartIx + 6, 12);
                     }
                     break;
                 case BasicHeader.SessionNumberKey:
                     if (basicHeaderEndIx > basicHeaderStartIx + 21)
                     {
-                        basicHeader.SessionNumber = message.Substring(basicHeaderStartIx + 18, 4);
+                        basicHeader.SessionNumber = basicHeaderString.Substring(basicHeaderStartIx + 18, 4);
                     }
                     break;
                 case BasicHeader.SequenceNumberKey:
                     if (basicHeaderEndIx > basicHeaderStartIx + 27)
                     {
-                        basicHeader.SequenceNumber = message.Substring(basicHeaderStartIx + 22, 6);
+                        basicHeader.SequenceNumber = basicHeaderString.Substring(basicHeaderStartIx + 22, 6);
                     }
                     break;
                 default:
@@ -107,35 +125,33 @@ namespace XB.MT.Parser.Parsers
             }
         }
 
-        protected void PopulateApplicationHeaderInputMessage(MT103 mT103Instans, string message, MT103Version version)
+        private void PopulateApplicationHeaderInputMessage(MT103 mT103Instans, MT103Version version)
         {
-            mT103Instans.SetOriginalSWIFTmessageIfNull(message);
             // Prepared to handle different versions in different ways
             if (version == MT103Version.V_2020)
             {
-                int applicationHeaderStart = message.IndexOf("{2:");
-                if (applicationHeaderStart >= 0)
+                if (applicationHeaderString != null)
                 {
-                    mT103Instans.ApplicationHeaderInputMessage = new ApplicationHeaderInputMessage();
-                    ApplicationHeaderInputMessage applicationHeader = mT103Instans.ApplicationHeaderInputMessage;
-                    CommonBlockDelimiters commonBlockFields = applicationHeader.CommonBlockDelimiters;
-                    commonBlockFields.SetDefaultStartOfBlockValues("2");
-                    int applicationHeaderEnd = message.IndexOf("}", applicationHeaderStart);
-
-                    string[] tags = { ApplicationHeaderInputMessage.InputOutputIDKey,
-                                      ApplicationHeaderInputMessage.MessageTypeKey,
-                                      ApplicationHeaderInputMessage.DestinationAddressKey,
-                                      ApplicationHeaderInputMessage.PriorityKey,
-                                      ApplicationHeaderInputMessage.DeliveryMonitoringKey,
-                                      ApplicationHeaderInputMessage.ObsolescencePeriodKey };
-                    foreach (var tag in tags)
+                    int applicationHeaderStart = applicationHeaderString.IndexOf("{2:");
+                    if (applicationHeaderStart >= 0)
                     {
-                        SetApplicationHeaderInputTags(tag, applicationHeader, message, applicationHeaderStart, applicationHeaderEnd);
-                    }
+                        mT103Instans.ApplicationHeaderInputMessage = new ApplicationHeaderInputMessage();
+                        ApplicationHeaderInputMessage applicationHeader = mT103Instans.ApplicationHeaderInputMessage;
+                        CommonBlockDelimiters commonBlockFields = applicationHeader.CommonBlockDelimiters;
+                        commonBlockFields.SetDefaultStartOfBlockValues("2");
+                        int applicationHeaderEnd = applicationHeaderString.IndexOf("}", applicationHeaderStart);
+                        if (applicationHeaderEnd > 0)
+                        {
+                            commonBlockFields.SetDefaultValue(CommonBlockDelimiter.EndOfBlockDelimiter);
+                        }
 
-                    if (applicationHeaderEnd > 0)
-                    {
-                        commonBlockFields.SetDefaultValue(CommonBlockDelimiter.EndOfBlockDelimiter);
+                        string[] tags = { ApplicationHeaderInputMessage.InputOutputIDKey, ApplicationHeaderInputMessage.MessageTypeKey,
+                                      ApplicationHeaderInputMessage.DestinationAddressKey, ApplicationHeaderInputMessage.PriorityKey,
+                                      ApplicationHeaderInputMessage.DeliveryMonitoringKey, ApplicationHeaderInputMessage.ObsolescencePeriodKey };
+                        foreach (var tag in tags)
+                        {
+                            SetApplicationHeaderInputTags(tag, applicationHeader, applicationHeaderStart, applicationHeaderEnd);
+                        }
                     }
                 }
             }
@@ -145,35 +161,34 @@ namespace XB.MT.Parser.Parsers
             }
         }
 
-        protected void PopulateApplicationHeaderOutputMessage(MT103 mT103Instans, string message, MT103Version version)
+        private void PopulateApplicationHeaderOutputMessage(MT103 mT103Instans, MT103Version version)
         {
-            mT103Instans.SetOriginalSWIFTmessageIfNull(message);
             // Prepared to handle different versions in different ways
             if (version == MT103Version.V_2020)
             {
-                int applicationHeaderStart = message.IndexOf("{2:");
-                if (applicationHeaderStart >= 0)
+                if (applicationHeaderString != null)
                 {
-                    mT103Instans.ApplicationHeaderOutputMessage = new ApplicationHeaderOutputMessage();
-                    ApplicationHeaderOutputMessage applicationHeader = mT103Instans.ApplicationHeaderOutputMessage;
-                    CommonBlockDelimiters commonBlockFields = applicationHeader.CommonBlockDelimiters;
-                    commonBlockFields.SetDefaultStartOfBlockValues("2");
-                    int applicationHeaderEnd = message.IndexOf("}", applicationHeaderStart);
-                    if (applicationHeaderEnd > 0)
+                    int applicationHeaderStart = applicationHeaderString.IndexOf("{2:");
+                    if (applicationHeaderStart >= 0)
                     {
-                        commonBlockFields.SetDefaultValue(CommonBlockDelimiter.EndOfBlockDelimiter);
-                    }
+                        mT103Instans.ApplicationHeaderOutputMessage = new ApplicationHeaderOutputMessage();
+                        ApplicationHeaderOutputMessage applicationHeader = mT103Instans.ApplicationHeaderOutputMessage;
+                        CommonBlockDelimiters commonBlockFields = applicationHeader.CommonBlockDelimiters;
+                        commonBlockFields.SetDefaultStartOfBlockValues("2");
+                        int applicationHeaderEnd = applicationHeaderString.IndexOf("}", applicationHeaderStart);
+                        if (applicationHeaderEnd > 0)
+                        {
+                            commonBlockFields.SetDefaultValue(CommonBlockDelimiter.EndOfBlockDelimiter);
+                        }
 
-                    string[] tags = { ApplicationHeaderOutputMessage.InputOutputIDKey,
-                                      ApplicationHeaderOutputMessage.MessageTypeKey, 
-                                      ApplicationHeaderOutputMessage.InputTimeKey,
-                                      ApplicationHeaderOutputMessage.MessageInputReferenceKey,
-                                      ApplicationHeaderOutputMessage.OutputDateKey,
-                                      ApplicationHeaderOutputMessage.OutputTimeKey,
+                        string[] tags = { ApplicationHeaderOutputMessage.InputOutputIDKey, ApplicationHeaderOutputMessage.MessageTypeKey,
+                                      ApplicationHeaderOutputMessage.InputTimeKey, ApplicationHeaderOutputMessage.MessageInputReferenceKey,
+                                      ApplicationHeaderOutputMessage.OutputDateKey, ApplicationHeaderOutputMessage.OutputTimeKey,
                                       ApplicationHeaderOutputMessage.PriorityKey };
-                    foreach (var tag in tags)
-                    {
-                        SetApplicationHeaderOutputTags(tag, applicationHeader, message, applicationHeaderStart, applicationHeaderEnd);
+                        foreach (var tag in tags)
+                        {
+                            SetApplicationHeaderOutputTags(tag, applicationHeader, applicationHeaderStart, applicationHeaderEnd);
+                        }
                     }
                 }
             }
@@ -183,34 +198,37 @@ namespace XB.MT.Parser.Parsers
             }
         }
 
-        private ApplicationHeaderType GetApplicationHeaderType(string message, MT103Version version)
+        private ApplicationHeaderType GetApplicationHeaderType(MT103Version version)
         {
             ApplicationHeaderType applicationHeaderType = ApplicationHeaderType.DoNotExist;
             if (version == MT103Version.V_2020)
             {
-                int applicationHeaderStartIx = message.IndexOf("{2:");
-                if (applicationHeaderStartIx >= 0)
+                if (this.applicationHeaderString != null)
                 {
-                    if (message.Length > applicationHeaderStartIx + 3)
+                    int applicationHeaderStartIx = applicationHeaderString.IndexOf("{2:");
+                    if (applicationHeaderStartIx >= 0)
                     {
-                        string InputOutputID = message.Substring(applicationHeaderStartIx + 3, 1);
-                        if (InputOutputID.Equals("I", StringComparison.InvariantCultureIgnoreCase))
+                        if (applicationHeaderString.Length > applicationHeaderStartIx + 3)
                         {
-                            applicationHeaderType = ApplicationHeaderType.ApplicationHeaderInput;
-                        }
-                        else if (InputOutputID.Equals("O"))
-                        {
-                            applicationHeaderType = ApplicationHeaderType.ApplicationHeaderOutput;
+                            string InputOutputID = applicationHeaderString.Substring(applicationHeaderStartIx + 3, 1);
+                            if (InputOutputID.Equals("I", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                applicationHeaderType = ApplicationHeaderType.ApplicationHeaderInput;
+                            }
+                            else if (InputOutputID.Equals("O"))
+                            {
+                                applicationHeaderType = ApplicationHeaderType.ApplicationHeaderOutput;
+                            }
+                            else
+                            {
+                                throw new Exception("Application header InputOutputID has an invalid value: '" + InputOutputID +
+                                                    "', valid values are 'I' and 'O'");
+                            }
                         }
                         else
                         {
-                            throw new Exception("Application header InputOutputID has an invalid value: '" + InputOutputID +
-                                                "', valid values are 'I' and 'O'");
+                            throw new Exception("Application header InputOutputID could not be found, message is too short");
                         }
-                    }
-                    else
-                    {
-                        throw new Exception("Application header InputOutputID could not be found, message is too short");
                     }
                 }
             }
@@ -222,44 +240,44 @@ namespace XB.MT.Parser.Parsers
         }
 
         private void SetApplicationHeaderInputTags(string tag, ApplicationHeaderInputMessage applicationHeader,
-                                                          string message, int applicationHeaderStartIx, int applicationHeaderEndIx)
+                                                   int applicationHeaderStartIx, int applicationHeaderEndIx)
         {
             switch (tag)
             {
                 case ApplicationHeaderInputMessage.InputOutputIDKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 3)
                     {
-                        applicationHeader.InputOutputID = message.Substring(applicationHeaderStartIx + 3, 1);
+                        applicationHeader.InputOutputID = applicationHeaderString.Substring(applicationHeaderStartIx + 3, 1);
                     }
                     break;
                 case ApplicationHeaderInputMessage.MessageTypeKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 6)
                     {
-                        applicationHeader.MessageType = message.Substring(applicationHeaderStartIx + 4, 3);
+                        applicationHeader.MessageType = applicationHeaderString.Substring(applicationHeaderStartIx + 4, 3);
                     }
                     break;
                 case ApplicationHeaderInputMessage.DestinationAddressKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 18)
                     {
-                        applicationHeader.DestinationAddress = message.Substring(applicationHeaderStartIx + 7, 12);
+                        applicationHeader.DestinationAddress = applicationHeaderString.Substring(applicationHeaderStartIx + 7, 12);
                     }
                     break;
                 case ApplicationHeaderInputMessage.PriorityKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 19)
                     {
-                        applicationHeader.Priority = message.Substring(applicationHeaderStartIx + 19, 1);
+                        applicationHeader.Priority = applicationHeaderString.Substring(applicationHeaderStartIx + 19, 1);
                     }
                     break;
                 case ApplicationHeaderInputMessage.DeliveryMonitoringKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 20)
                     {
-                        applicationHeader.DeliveryMonitoring = message.Substring(applicationHeaderStartIx + 20, 1);
+                        applicationHeader.DeliveryMonitoring = applicationHeaderString.Substring(applicationHeaderStartIx + 20, 1);
                     }
                     break;
                 case ApplicationHeaderInputMessage.ObsolescencePeriodKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 23)
                     {
-                        applicationHeader.ObsolescencePeriod = message.Substring(applicationHeaderStartIx + 21, 3);
+                        applicationHeader.ObsolescencePeriod = applicationHeaderString.Substring(applicationHeaderStartIx + 21, 3);
                     }
                     break;
                 default:
@@ -268,50 +286,50 @@ namespace XB.MT.Parser.Parsers
         }
 
         private void SetApplicationHeaderOutputTags(string tag, ApplicationHeaderOutputMessage applicationHeader,
-                                                          string message, int applicationHeaderStartIx, int applicationHeaderEndIx)
+                                                    int applicationHeaderStartIx, int applicationHeaderEndIx)
         {
             switch (tag)
             {
                 case ApplicationHeaderOutputMessage.InputOutputIDKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 3)
                     {
-                        applicationHeader.InputOutputID = message.Substring(applicationHeaderStartIx + 3, 1);
+                        applicationHeader.InputOutputID = applicationHeaderString.Substring(applicationHeaderStartIx + 3, 1);
                     }
                     break;
                 case ApplicationHeaderOutputMessage.MessageTypeKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 6)
                     {
-                        applicationHeader.MessageType = message.Substring(applicationHeaderStartIx + 4, 3);
+                        applicationHeader.MessageType = applicationHeaderString.Substring(applicationHeaderStartIx + 4, 3);
                     }
                     break;
                 case ApplicationHeaderOutputMessage.InputTimeKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 10)
                     {
-                        applicationHeader.InputTime = message.Substring(applicationHeaderStartIx + 7, 4);
+                        applicationHeader.InputTime = applicationHeaderString.Substring(applicationHeaderStartIx + 7, 4);
                     }
                     break;
                 case ApplicationHeaderOutputMessage.MessageInputReferenceKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 38)
                     {
-                        applicationHeader.MessageInputReference = message.Substring(applicationHeaderStartIx + 11, 28);
+                        applicationHeader.MessageInputReference = applicationHeaderString.Substring(applicationHeaderStartIx + 11, 28);
                     }
                     break;
                 case ApplicationHeaderOutputMessage.OutputDateKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 44)
                     {
-                        applicationHeader.OutputDate = message.Substring(applicationHeaderStartIx + 39, 6);
+                        applicationHeader.OutputDate = applicationHeaderString.Substring(applicationHeaderStartIx + 39, 6);
                     }
                     break;
                 case ApplicationHeaderOutputMessage.OutputTimeKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 48)
                     {
-                        applicationHeader.OutputTime = message.Substring(applicationHeaderStartIx + 45, 4);
+                        applicationHeader.OutputTime = applicationHeaderString.Substring(applicationHeaderStartIx + 45, 4);
                     }
                     break;
                 case ApplicationHeaderOutputMessage.PriorityKey:
                     if (applicationHeaderEndIx > applicationHeaderStartIx + 49)
                     {
-                        applicationHeader.Priority = message.Substring(applicationHeaderStartIx + 49, 1);
+                        applicationHeader.Priority = applicationHeaderString.Substring(applicationHeaderStartIx + 49, 1);
                     }
                     break;
                 default:
@@ -319,41 +337,35 @@ namespace XB.MT.Parser.Parsers
             }
         }
 
-        protected void PopulateUserHeader(MT103 mT103Instans, string message, MT103Version version)
+        private void PopulateUserHeader(MT103 mT103Instans, MT103Version version)
         {
-            mT103Instans.SetOriginalSWIFTmessageIfNull(message);
             // Prepared to handle different versions in different ways
             if (version == MT103Version.V_2020)
             {
-                int userHeaderStart = message.IndexOf("{3:");
-                if (userHeaderStart >= 0)
+                if (userHeaderString != null)
                 {
-                    mT103Instans.UserHeader = new UserHeader();
-                    UserHeader userHeader = mT103Instans.UserHeader;
-                    CommonBlockDelimiters commonBlockDelimiters = userHeader.CommonBlockDelimiters;
-                    commonBlockDelimiters.SetDefaultStartOfBlockValues("3");
-
-                    string userHeaderMessage = "";
-                    int userHeaderEnd = message.IndexOf("}}", userHeaderStart);
-                    if (userHeaderEnd > -1)
+                    int userHeaderStart = userHeaderString.IndexOf("{3:");
+                    if (userHeaderStart >= 0)
                     {
-                        userHeaderEnd++;
-                        commonBlockDelimiters.SetDefaultValue(CommonBlockDelimiter.EndOfBlockDelimiter);
-                        userHeaderMessage = message.Substring(userHeaderStart, userHeaderEnd - userHeaderStart + 1);
-                    }
-                    else
-                    {
-                        // Will not be set if there is no end EndOfBlockIndicator for the UserHeader?
-                        userHeaderMessage = message;
-                    }
+                        mT103Instans.UserHeader = new UserHeader();
+                        UserHeader userHeader = mT103Instans.UserHeader;
+                        CommonBlockDelimiters commonBlockDelimiters = userHeader.CommonBlockDelimiters;
+                        commonBlockDelimiters.SetDefaultStartOfBlockValues("3");
 
-                    string[] tags = new string[] { UserHeader._103Key, UserHeader._113Key, UserHeader._108Key, UserHeader._119Key,
+                        int userHeaderEnd = userHeaderString.IndexOf("}}", userHeaderStart);
+                        if (userHeaderEnd > -1)
+                        {
+                            commonBlockDelimiters.SetDefaultValue(CommonBlockDelimiter.EndOfBlockDelimiter);
+                        }
+
+                        string[] tags = new string[] { UserHeader._103Key, UserHeader._113Key, UserHeader._108Key, UserHeader._119Key,
                                                    UserHeader._423Key, UserHeader._106Key, UserHeader._424Key, UserHeader._111Key,
                                                    UserHeader._121Key, UserHeader._115Key, UserHeader._165Key, UserHeader._433Key,
                                                    UserHeader._434Key };
-                    foreach (var tag in tags)
-                    {
-                        HandleUserHeaderTag(tag, userHeaderMessage, userHeader);
+                        foreach (var tag in tags)
+                        {
+                            HandleUserHeaderTag(tag, userHeader);
+                        }
                     }
                 }
             }
@@ -363,10 +375,10 @@ namespace XB.MT.Parser.Parsers
             }
         }
 
-        private void HandleUserHeaderTag(string tagId, string blockMessage, UserHeader userHeader)
+        private void HandleUserHeaderTag(string tagId, UserHeader userHeader)
         {
             CommonBlockDelimiters commonTagDelimiters = new CommonBlockDelimiters();
-            string tagValue = HandleTag(tagId, blockMessage, commonTagDelimiters);
+            string tagValue = HandleTag(tagId, userHeaderString, commonTagDelimiters);
             if (tagValue != null)
             {
                 CreateUserHeaderTag(tagId, userHeader, commonTagDelimiters, tagValue);
@@ -441,39 +453,33 @@ namespace XB.MT.Parser.Parsers
             }
         }
 
-        protected void PopulateTrailer(MT103 mT103Instans, string message, MT103Version version)
+        private void PopulateTrailer(MT103 mT103Instans, MT103Version version)
         {
-            mT103Instans.SetOriginalSWIFTmessageIfNull(message);
             // Prepared to handle different versions in different ways
             if (version == MT103Version.V_2020)
             {
-                int trailerStart = message.IndexOf("{5:");
-                if (trailerStart >= 0)
+                if (trailerHeaderString != null)
                 {
-                    mT103Instans.Trailer = new Trailer();
-                    Trailer trailer = mT103Instans.Trailer;
-                    CommonBlockDelimiters commonBlockFields = trailer.CommonBlockDelimiters;
-                    commonBlockFields.SetDefaultStartOfBlockValues("5");
-
-                    string trailerMessage = "";
-                    int trailerEnd = message.IndexOf("}}", trailerStart);
-                    if (trailerEnd > -1)
+                    int trailerStart = trailerHeaderString.IndexOf("{5:");
+                    if (trailerStart >= 0)
                     {
-                        trailerEnd++;
-                        commonBlockFields.SetDefaultValue(CommonBlockDelimiter.EndOfBlockDelimiter);
-                        trailerMessage = message.Substring(trailerStart, trailerEnd - trailerStart + 1);
-                    }
-                    else
-                    {
-                        // Will not be set if there is no end EndOfBlockIndicator for the Trailer?
-                        trailerMessage = message;
-                    }
+                        mT103Instans.Trailer = new Trailer();
+                        Trailer trailer = mT103Instans.Trailer;
+                        CommonBlockDelimiters commonBlockFields = trailer.CommonBlockDelimiters;
+                        commonBlockFields.SetDefaultStartOfBlockValues("5");
 
-                    string[] tags = new string[] { Trailer.CHKKey, Trailer.TNGKey, Trailer.PDEKey, Trailer.DLMKey, 
+                        int trailerEnd = trailerHeaderString.IndexOf("}}", trailerStart);
+                        if (trailerEnd > -1)
+                        {
+                            commonBlockFields.SetDefaultValue(CommonBlockDelimiter.EndOfBlockDelimiter);
+                        }
+
+                        string[] tags = new string[] { Trailer.CHKKey, Trailer.TNGKey, Trailer.PDEKey, Trailer.DLMKey,
                                                    Trailer.MRFKey, Trailer.PDMKey, Trailer.SYSKey };
-                    foreach (var tag in tags)
-                    {
-                        HandleTrailerTag(tag, trailerMessage, trailer);
+                        foreach (var tag in tags)
+                        {
+                            HandleTrailerTag(tag, trailer);
+                        }
                     }
                 }
             }
@@ -483,18 +489,15 @@ namespace XB.MT.Parser.Parsers
             }
         }
 
-
-
-        private void HandleTrailerTag(string tagId, string blockMessage, Trailer trailer)
+        private void HandleTrailerTag(string tagId, Trailer trailer)
         {
             CommonBlockDelimiters commonTagDelimiters = new CommonBlockDelimiters();
-            string tagValue = HandleTag(tagId, blockMessage, commonTagDelimiters);
+            string tagValue = HandleTag(tagId, trailerHeaderString, commonTagDelimiters);
             if (tagValue != null)
             {
                 CreateTrailerTag(tagId, trailer, commonTagDelimiters, tagValue);
             }
         }
-
 
         private void CreateTrailerTag(string tagId, Trailer trailer, CommonBlockDelimiters commonTagDelimiters, string tagValue)
         {
@@ -526,15 +529,10 @@ namespace XB.MT.Parser.Parsers
             }
         }
 
-
         protected void UnhandledVersion(MT103Version version)
         {
             throw new Exception("The MT 103 Single Customer Credit Transfer message has an unhandled version: " + version +
                                 ", valid version(s) is/are: " + MT103Version.V_2020 + ".");
         }
-
-
-    }
-
-
+    } // End of class
 }

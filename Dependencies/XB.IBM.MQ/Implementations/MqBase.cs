@@ -18,6 +18,7 @@ namespace XB.IBM.MQ.Implementations
             var connectionWmq = connection ?? CreateAndConfigureConnection(configurations);
             SessionWmq = connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
             Destination = SessionWmq.CreateQueue(configurations.MqQueueName);
+          
             connectionWmq.Start();
         }
 

@@ -50,16 +50,11 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             return new Context($"{System}-v{version}", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), AstreaClientConstants.ProcessTrailSchemaVersion);
         }
 
-        protected string GetBOType(AssessmentRequest assessmentRequest)
+        protected string GetBoType(MT103SingleCustomerCreditTransferModel model)
         {
-            //TODO: check tag72 - return "seb.payments.se.incoming.domestic" or "seb.payments.se.incoming.xb"
-            return "seb.payments.se.incoming.domestic";
-        }
-
-        protected string GetBOType(AssessmentResponse assessmentResponse)
-        {
-            //TODO: check tag72 - return "seb.payments.se.incoming.domestic" or "seb.payments.se.incoming.xb"
-            return "seb.payments.se.incoming.domestic";
+            return model.MT103SingleCustomerCreditTransferBlockText.Field72 != null && 
+                   model.MT103SingleCustomerCreditTransferBlockText.Field72.Row1.StartsWith("/DOM") ? 
+                "seb.payments.se.incoming.domestic" : "seb.payments.se.incoming.xb";
         }
 
         protected abstract List<ProcessTrailPayload> SetupPayloads(AssessmentRequest request);
@@ -80,7 +75,8 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                             {
                                 new References(pi.OrderIdentity, "swift.tag121.uniqueId"),
                                 new References(parsedMt.MT103SingleCustomerCreditTransferBlockText.Field20.SenderReference, "swift.tag20.sendersRef"),
-                                new References(parsedMt.MT103SingleCustomerCreditTransferBlockText.Field70.RemittanceInformation, "swift.tag20.remittanceInfo")
+                                parsedMt.MT103SingleCustomerCreditTransferBlockText.Field70 != null ? 
+                                    new References(parsedMt.MT103SingleCustomerCreditTransferBlockText.Field70.RemittanceInformation, "swift.tag20.remittanceInfo") : null
                             },
                         },
                         Extras = new PayloadExtras()
@@ -113,7 +109,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                 {
                     Id = request.Mt103Model.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
                     IdType = "swift.tag121",
-                    Type = GetBOType(request)
+                    Type = GetBoType(request.Mt103Model)
                 }
             };
         }
@@ -124,9 +120,9 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                 Time = Time,
                 Bo = new Bo()
                 {
-                    Id = response.RequestIdentity,
+                    Id = response.Identity,
                     IdType = "swift.tag121",
-                    Type = GetBOType(response)
+                    Type = GetBoType(parsedMt)
                 },
                 Refs = new List<Ref> {
                     new Ref

@@ -30,16 +30,17 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                             {
                                 new References(request.BasketIdentity, "swift.tag121.uniqueId"),
                                 new References(request.Mt103Model.MT103SingleCustomerCreditTransferBlockText.Field20.SenderReference, "swift.tag20.sendersRef"),
-                                new References(request.Mt103Model.MT103SingleCustomerCreditTransferBlockText.Field70.RemittanceInformation, "swift.tag20.remittanceInfo")
+                                request.Mt103Model.MT103SingleCustomerCreditTransferBlockText.Field70 != null ?
+                                    new References(request.Mt103Model.MT103SingleCustomerCreditTransferBlockText.Field70.RemittanceInformation, "swift.tag20.remittanceInfo") : null
                             },
                             DebitAccount = new List<Account>()
                             {
-                                new Account(pi.DebitAccount.First().Identity, "other", "TBD")
+                                new Account(pi.DebitAccount.First().Identity, "other", "")
                             },
                             CreditAccount = new List<Account>()
                             {
                                 //TODO: What types are there?
-                                new Account(pi.CreditAccount.First().Identity,AstreaClientConstants.Iban, "TBD")
+                                new Account(pi.CreditAccount.First().Identity,"other", "")
                             }
                         },
                         Original = new Original(request.Mt.ToString()) //TODO: Store actual unparsed swift message

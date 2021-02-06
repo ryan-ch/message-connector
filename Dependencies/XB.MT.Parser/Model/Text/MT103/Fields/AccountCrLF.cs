@@ -2,14 +2,14 @@
 
 namespace XB.MT.Parser.Model.Text.MT103.Fields
 {
-    public class AccountCrLF
+    public class AccountCrLf
     {
         public string Account { get; set; }
         public string AccountIndicator { get; set; }
         public string CarriageReturn { get; set; }
         public string LineFeed { get; set; }
 
-        public AccountCrLF(string account, bool setCrLf)
+        public AccountCrLf(string account, bool setCrLf)
         {
             if (account.StartsWith("/"))
             {
@@ -32,13 +32,13 @@ namespace XB.MT.Parser.Model.Text.MT103.Fields
 
         public override bool Equals(object o)
         {
-            if (o == null || !GetType().Equals(o.GetType()))
+            if (o == null || !this.GetType().Equals(o.GetType()))
             {
                 return false;
             }
             else
             {
-                AccountCrLF other = (AccountCrLF)o;
+                AccountCrLf other = (AccountCrLf)o;
                 return (Account == other.Account &&
                         AccountIndicator == other.AccountIndicator &&
                         CarriageReturn == other.CarriageReturn &&

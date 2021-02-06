@@ -1,4 +1,5 @@
-﻿using IBM.XMS;
+﻿using System.Collections.Generic;
+using IBM.XMS;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using XB.IBM.MQ.Config;

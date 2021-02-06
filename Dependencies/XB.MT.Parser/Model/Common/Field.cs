@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using XB.MT.Parser.Model.Text.MT103.Fields;
+using XB.MT.Parser.Parsers.Util.Text.Fields;
 
 namespace XB.MT.Parser.Model.Common
 {
@@ -25,6 +28,37 @@ namespace XB.MT.Parser.Model.Common
             {
                 return null;
             }
+        }
+
+        protected AccountCrLfAdditionalRows ExtractAccountAndAdditionalRows(string fieldValue)
+        {
+            AccountCrLfAdditionalRows accountAndRows = new AccountCrLfAdditionalRows();
+            accountAndRows.AccountCrLf = null;
+            accountAndRows.AdditionalRows = null;
+
+            string[] parts = SplitFieldByCrLf(fieldValue);
+            if (parts != null)
+            {
+                bool firstPart = true;
+                foreach (var part in parts)
+                {
+                    if (firstPart && part[0] == '/')
+                    {
+                        accountAndRows.AccountCrLf = new AccountCrLf(part, true);
+                    }
+                    else
+                    {
+                        if (accountAndRows.AdditionalRows == null)
+                        {
+                            accountAndRows.AdditionalRows = new List<AdditionalRow>();
+                        }
+                        accountAndRows.AdditionalRows.Add(new AdditionalRow(part, true));
+                    }
+                    firstPart = false;
+                }
+            }
+
+            return accountAndRows;
         }
     }
 }

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using XB.Astrea.Client.Constants;
 using XB.MT.Parser.Model;
+using XB.MT.Parser.Model.Common;
+using XB.MT.Parser.Model.Text.MT103;
 
 
 namespace XB.Astrea.Client.Messages.Assessment
@@ -44,22 +46,68 @@ namespace XB.Astrea.Client.Messages.Assessment
                     InstructedDate = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.ValueDate,
                     Amount = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.InterbankSettledAmount,
                     Currency = mt.MT103SingleCustomerCreditTransferBlockText.Field32A.Currency,
-                    //TODO: check if length is greater then 11 and if first two are alphabetic
-                    DebitAccount = new List<Account>() { new Account(AstreaClientConstants.Iban, mt.MT103SingleCustomerCreditTransferBlockText.Field50K.AccountCrLf.Account) },
-                    //TODO: check if length is greater then 11 and if first two are alphabetic
-                    CreditAccount = new List<Account> { new Account(AstreaClientConstants.Iban, mt.MT103SingleCustomerCreditTransferBlockText.Field59.AccountCrLf.Account) },
+                    DebitAccount = new List<Account>() { GetDebitAccount(mt) },
+                    CreditAccount = new List<Account> { GetCreditAccount(mt) },
                     RemittanceInfo = new List<RemittanceInfo>(),
-                    InstructionContext = new InstructionContext(new List<string>(),"",""),
+                    InstructionContext = new InstructionContext(new List<string>(),"", "0"),
                 }
             };
             return paymentInstructionList;
+        }
+
+        private static Account GetDebitAccount(MT103SingleCustomerCreditTransferModel model)
+        {
+            var account = string.Empty;
+
+            if (model.MT103SingleCustomerCreditTransferBlockText.Field50K != null)
+            {
+                account = model.MT103SingleCustomerCreditTransferBlockText.Field50K.AccountCrLf.Account;
+            } else if (model.MT103SingleCustomerCreditTransferBlockText.Field50F != null)
+            {
+                account = model.MT103SingleCustomerCreditTransferBlockText.Field50F.PartyIdentifier.AccountCrLf.Account;
+            } else if (model.MT103SingleCustomerCreditTransferBlockText.Field50A.IdentifierCodes.Count > 0)
+            {
+                account = model.MT103SingleCustomerCreditTransferBlockText.Field50A.AccountCrLf.Account;
+            }
+
+            return new Account(GetAccountType(account), account);
+        }
+
+        private static Account GetCreditAccount(MT103SingleCustomerCreditTransferModel model)
+        {
+            var account = string.Empty;
+
+            if (model.MT103SingleCustomerCreditTransferBlockText.Field59 != null)
+            {
+                account = model.MT103SingleCustomerCreditTransferBlockText.Field59.AccountCrLf.Account;
+            } else if (model.MT103SingleCustomerCreditTransferBlockText.Field59F != null)
+            {
+                account = model.MT103SingleCustomerCreditTransferBlockText.Field59F.AccountCrLf.Account;
+            } else if (model.MT103SingleCustomerCreditTransferBlockText.Field59A.AdditionalRows.Count > 0)
+            {
+                account = model.MT103SingleCustomerCreditTransferBlockText.Field59A.AccountCrLf.Account;
+            }
+
+            return new Account(GetAccountType(account), account);
+        }
+
+        private static string GetAccountType(string account)
+        {
+            if (account.Length >= 11 &&
+                char.IsLetter(account[0]) &&
+                char.IsLetter(account[1]))
+            {
+                return AstreaClientConstants.Iban;
+            }
+
+            return AstreaClientConstants.Bban;
         }
     }
 
     public record RegisteringParty(string AuthId, string SebId);
     public record Account(string Type, string Identity);
     public record RemittanceInfo(string Info, string Type);
-    public record InstructionContext(List<string> Debtors, string DebitAccountAvailableAmount, string DebitAccountCurrency);
+    public record InstructionContext(List<string> Debtors, string Beneficiary, string DebitAccountAvailableAmount);
     public record Actor(string SebId, string AuthId);
     public record Principal(string SebId, string AuthId);
     public record Tags();
