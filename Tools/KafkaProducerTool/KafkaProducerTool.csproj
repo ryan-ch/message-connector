@@ -37,6 +37,12 @@
     <None Update="KafkaCerts\DevAstreaConnector.sebank.se.pem">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="KafkaCerts\PreProdAstreaConnector.sebank.se.cer">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="KafkaCerts\PreProdAstreaConnector.sebank.se.pem">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="KafkaCerts\SEB_CA.cer">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
