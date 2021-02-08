@@ -21,7 +21,6 @@ namespace XB.MT.Parser.Model.Text.MT103.Fields
                 } else { 
                     AdditionalRows.Add(new AdditionalRow(row, true));
                 }
-
                 index++;
             });
         }

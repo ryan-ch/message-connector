@@ -7,6 +7,10 @@
         /// </summary>
         public const string CrLf = "\r\n";
         /// <summary>
+        /// Escaped CarriageReturn + LineFeed, used for displaying output
+        /// </summary>
+        public const string escapedCrLf = "\\r\\n";
+        /// <summary>
         /// CarriageReturn
         /// </summary>
         public const string Cr = "\r";

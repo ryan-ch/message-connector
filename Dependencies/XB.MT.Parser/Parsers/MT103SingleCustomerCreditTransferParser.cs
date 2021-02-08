@@ -109,8 +109,10 @@ namespace XB.MT.Parser.Parsers
                 int endOfBlockIx = TextHeader.IndexOf(Constants.CrLf + "-}", fieldStartIx + fieldIdentifier.Length + 2); // End of block Text
                 if (nextFieldIx < 0 && endOfBlockIx < 0)
                 {
-                    throw new Exception("End of field ('" + Constants.CrLf + ":') and end of block ('" + Constants.CrLf + "-}') not found in textMessage after index " +
-                                        (fieldStartIx + fieldIdentifier.Length + 2) + ", textMessage: '" + TextHeader + "'.");
+                    throw new Exception("End of field ('" + Constants.escapedCrLf + ":') and end of block ('" + 
+                                         Constants.escapedCrLf + "-}') not found in textMessage after index " +
+                                        (fieldStartIx + fieldIdentifier.Length + 2) + ". TextMessage: '" + 
+                                        TextHeader.Replace(Constants.CrLf, Constants.escapedCrLf) + "'.");
                 }
                 int fieldEndIx = GetSmallestValidIx(nextFieldIx, endOfBlockIx);
                 if (fieldEndIx > -1)

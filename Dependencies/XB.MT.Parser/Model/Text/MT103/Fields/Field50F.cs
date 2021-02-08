@@ -5,7 +5,7 @@ namespace XB.MT.Parser.Model.Text.MT103.Fields
 {
     public class Field50F : Field50Base
     {
-        public PartyIdentifierCrLf PartyIdentifier { get; set; }
+        public PartyIdentifier PartyIdentifier { get; set; }
         public List<AdditionalRow> NumberNameAndAdresses { get; set; }
 
         public Field50F(CommonFieldDelimiters commonFieldDelimiters, string fieldValue) : base(commonFieldDelimiters, fieldValue)
@@ -18,7 +18,7 @@ namespace XB.MT.Parser.Model.Text.MT103.Fields
                 {
                     if (firstPart)
                     {
-                        PartyIdentifier = new PartyIdentifierCrLf(part);
+                        PartyIdentifier = new PartyIdentifier(part);
                         firstPart = false;
                     }
                     else

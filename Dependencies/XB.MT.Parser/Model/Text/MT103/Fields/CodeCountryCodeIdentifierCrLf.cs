@@ -17,5 +17,19 @@ namespace XB.MT.Parser.Model.Text.MT103.Fields
                 LineFeed = Constants.Lf;
             }
         }
+        public override bool Equals(object o)
+        {
+            if (o == null || !this.GetType().Equals(o.GetType()))
+            {
+                return false;
+            }
+            else
+            {
+                CodeCountryCodeIdentifierCrLf other = (CodeCountryCodeIdentifierCrLf)o;
+                return (CodeCountryCodeIdentifier == other.CodeCountryCodeIdentifier &&
+                        CarriageReturn == other.CarriageReturn &&
+                        LineFeed == other.LineFeed);
+            }
+        }
     }
 }
