@@ -52,17 +52,19 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
         protected string GetBoType(MT103SingleCustomerCreditTransferModel model)
         {
-            return model.MT103SingleCustomerCreditTransferBlockText.Field72 != null && 
-                   model.MT103SingleCustomerCreditTransferBlockText.Field72.Row1.StartsWith("/DOM") ? 
+            return model.MT103SingleCustomerCreditTransferBlockText.Field72 != null &&
+                   model.MT103SingleCustomerCreditTransferBlockText.Field72.Row1.StartsWith("/DOM") ?
                 "seb.payments.se.incoming.domestic" : "seb.payments.se.incoming.xb";
         }
 
         protected abstract List<ProcessTrailPayload> SetupPayloads(AssessmentRequest request);
 
-        protected virtual List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response, MT103SingleCustomerCreditTransferModel parsedMt) {
-            
+        protected virtual List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response, MT103SingleCustomerCreditTransferModel parsedMt)
+        {
+
             var payloads = new List<ProcessTrailPayload>();
-            response.Results.ForEach(pi => { 
+            response.Results.ForEach(pi =>
+            {
                 int.TryParse(pi.RiskLevel, out int riskLevel);
                 payloads.Add(new ProcessTrailPayload()
                 {
@@ -75,7 +77,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                             {
                                 new References(pi.OrderIdentity, "swift.tag121.uniqueId"),
                                 new References(parsedMt.MT103SingleCustomerCreditTransferBlockText.Field20.SenderReference, "swift.tag20.sendersRef"),
-                                parsedMt.MT103SingleCustomerCreditTransferBlockText.Field70 != null ? 
+                                parsedMt.MT103SingleCustomerCreditTransferBlockText.Field70 != null ?
                                     new References(parsedMt.MT103SingleCustomerCreditTransferBlockText.Field70.RemittanceInformation, "swift.tag20.remittanceInfo") : null
                             },
                         },
@@ -101,10 +103,13 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             return payloads;
         }
 
-        protected virtual General SetupGeneral(AssessmentRequest request) {
+        protected virtual General SetupGeneral(AssessmentRequest request)
+        {
             return new()
             {
-                Time = DateTime.ParseExact(request.Mt103Model.ApplicationHeaderOutputMessage.OutputDate+ request.Mt103Model.ApplicationHeaderOutputMessage.OutputTime, "yyMMddHHmm", CultureInfo.InvariantCulture),
+                Time = DateTime.ParseExact(
+                    request.Mt103Model.ApplicationHeaderOutputMessage.OutputDate + request.Mt103Model.ApplicationHeaderOutputMessage.OutputTime,
+                    "yyMMddHHmm", CultureInfo.InvariantCulture),
                 Bo = new Bo()
                 {
                     Id = request.Mt103Model.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
@@ -114,10 +119,13 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             };
         }
 
-        protected virtual General SetupGeneral(AssessmentResponse response, MT103SingleCustomerCreditTransferModel parsedMt) {
-            return new General
+        protected virtual General SetupGeneral(AssessmentResponse response, MT103SingleCustomerCreditTransferModel parsedMt)
+        {
+            return new()
             {
-                Time = Time,
+                Time = Time = DateTime.ParseExact(
+                    parsedMt.ApplicationHeaderOutputMessage.OutputDate + parsedMt.ApplicationHeaderOutputMessage.OutputTime,
+                    "yyMMddHHmm", CultureInfo.InvariantCulture),
                 Bo = new Bo()
                 {
                     Id = response.Identity,
