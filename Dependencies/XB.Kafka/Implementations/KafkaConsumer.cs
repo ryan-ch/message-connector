@@ -28,13 +28,14 @@ namespace XB.Kafka
                 // Todo: Should we return the message or the whole result?
                 message = result.Message.Value;
             }
+            catch (OperationCanceledException)
+            {
+                _logger.LogError("Operation Canceled");
+                _kafkaConsumer.Close();
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error when consuming topic: " + topic);
-            }
-            finally
-            {
-                _kafkaConsumer.Close();
             }
             return message;
         }
