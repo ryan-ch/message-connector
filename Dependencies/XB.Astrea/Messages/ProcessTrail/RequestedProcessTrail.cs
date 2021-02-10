@@ -54,7 +54,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         protected override General SetupGeneral(AssessmentRequest assessment)
         {
             var general = base.SetupGeneral(assessment);
-            general.Event = new Event(AstreaClientConstants.EventType_Requested, $"{assessment.BasketIdentity}|{general.Time}");
+            general.Event = new Event(AstreaClientConstants.EventType_Requested, $"{assessment.BasketIdentity}|{general.Time.ToString(AstreaClientConstants.DateFormat)}");
             return general;
         }
 

@@ -13,7 +13,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         protected override General SetupGeneral(AssessmentResponse response, MT103SingleCustomerCreditTransferModel parsedMt)
         {
             var general = base.SetupGeneral(response, parsedMt);
-            general.Event = new Event(AstreaClientConstants.EventType_Rejected, $"{parsedMt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference}|{general.Time}");
+            general.Event = new Event(AstreaClientConstants.EventType_Rejected, $"{parsedMt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference}|{general.Time.ToString(AstreaClientConstants.DateFormat)}");
             return general;
         }
 

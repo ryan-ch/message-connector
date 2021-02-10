@@ -19,5 +19,6 @@
         internal const string ActorRole = "agent";
         internal const string Action_PassThrough = "passthrough";
         internal const string Action_Block = "block";
+        internal const string DateFormat = "yyyy-MM-ddTHH:mm:ss.fff+01:00";
     }
 }

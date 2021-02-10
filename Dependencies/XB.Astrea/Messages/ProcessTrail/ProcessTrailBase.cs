@@ -123,7 +123,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         {
             return new()
             {
-                Time = Time = DateTime.ParseExact(
+                Time = DateTime.ParseExact(
                     parsedMt.ApplicationHeaderOutputMessage.OutputDate + parsedMt.ApplicationHeaderOutputMessage.OutputTime,
                     "yyMMddHHmm", CultureInfo.InvariantCulture),
                 Bo = new Bo()
