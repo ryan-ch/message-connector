@@ -14,7 +14,6 @@ namespace XB.Astrea.WebAPI.Extensions
         {
             services.AddAstreaClient(config, appsettingsPrefix);
             services.AddMQ(config, appsettingsPrefix);
-            services.AddHubert();
         }
     }
 }

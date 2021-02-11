@@ -9,8 +9,10 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using SEB.SEBCS.RTM.v1.Client.Uakm463.Crossbordpmt.Update01.Fcpsts01;
 using XB.Astrea.Client.Config;
 using XB.Astrea.Client.Messages.Assessment;
+using XB.Hubert;
 using XB.Kafka;
 using XB.MT.Parser.Parsers;
 using Xunit;
@@ -39,22 +41,23 @@ namespace XB.Astrea.Client.Tests
         {
             var httpClientFactoryMock = TestHelper.GetHttpClientFactoryMock();
 
+            var hubertMock = new Mock<IHubertClient>();
+            hubertMock.Setup(hubert =>
+                hubert.SendAssessmentResponse()).Returns(Task.FromResult(new CrossbordpmtUpdate01Fcpsts01Response()));
             var producerMock = new Mock<IKafkaProducer>();
             producerMock.Setup(producer =>
                 producer.Produce(It.IsAny<string>())).Returns(Task.CompletedTask);
 
-            var configurationMock = new Mock<IOptions<AtreaClientOptions>>();
-            configurationMock.Setup(config => config.Value).Returns(new AtreaClientOptions { Version = AstreaClientTestConstants.Version });
+            var configurationMock = new Mock<IOptions<AstreaClientOptions>>();
+            configurationMock.Setup(config => config.Value).Returns(new AstreaClientOptions { Version = AstreaClientTestConstants.Version });
 
-            var astreaClient = new AstreaClient(httpClientFactoryMock.Object, producerMock.Object, configurationMock.Object, new Mock<ILogger<AstreaClient>>().Object);
+            var astreaClient = new AstreaClient(httpClientFactoryMock.Object, producerMock.Object, configurationMock.Object, new Mock<ILogger<AstreaClient>>().Object, hubertMock.Object);
 
             await astreaClient.AssessAsync(AstreaClientTestConstants.Mt103);
 
             producerMock.Verify(mock =>
                 mock.Produce(It.IsAny<string>()), Times.Once());
         }
-
-
     }
 
     internal static class TestHelper

@@ -10,6 +10,7 @@ using XB.Astrea.Client.Config;
 using XB.Astrea.Client.Exceptions;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.Astrea.Client.Messages.ProcessTrail;
+using XB.Hubert;
 using XB.Kafka;
 using XB.MT.Parser.Model;
 using XB.MT.Parser.Parsers;
@@ -20,18 +21,20 @@ namespace XB.Astrea.Client
     {
         private const int WaitingBeforeRetry = 60000;
 
-        private readonly AtreaClientOptions _config;
+        private readonly AstreaClientOptions _config;
         private readonly HttpClient _httpClient;
         private readonly IKafkaProducer _kafkaProducer;
         private readonly ILogger<AstreaClient> _logger;
+        private readonly IHubertClient _hubertClient;
 
-        public AstreaClient(IHttpClientFactory httpClientFactory, IKafkaProducer kafkaProducer, IOptions<AtreaClientOptions> config,
-            ILogger<AstreaClient> logger)
+        public AstreaClient(IHttpClientFactory httpClientFactory, IKafkaProducer kafkaProducer, IOptions<AstreaClientOptions> config,
+            ILogger<AstreaClient> logger, IHubertClient hubertClient)
         {
             _kafkaProducer = kafkaProducer;
             _logger = logger;
             _config = config.Value;
             _httpClient = httpClientFactory.CreateClient(AstreaClientExtensions.HttpClientName);
+            _hubertClient = hubertClient;
         }
 
         public async Task<AssessmentResponse> AssessAsync(string mt)
@@ -92,7 +95,6 @@ namespace XB.Astrea.Client
 
             _ = SendDecisionProcessTrail(assessmentResponse, mt103);
 
-            //Todo: we need to send the result to Hubert
             return assessmentResponse;
         }
 
@@ -121,8 +123,9 @@ namespace XB.Astrea.Client
         {
             try
             {
-                var riskLevel = int.Parse(assessmentResponse.RiskLevel);
-                var kafkaMessage = (riskLevel > _config.RiskThreshold)
+                var hubertResponse = _hubertClient.SendAssessmentResponse();
+                
+                var kafkaMessage = (hubertResponse.Result.Result.Uakw4630.TransactionStatus.ToUpper() == "REJECTED")
                        ? JsonConvert.SerializeObject(new RejectedProcessTrail(assessmentResponse, _config.Version, parsedMt), ProcessTrailDefaultJsonSettings.Settings)
                        : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt), ProcessTrailDefaultJsonSettings.Settings);
 
