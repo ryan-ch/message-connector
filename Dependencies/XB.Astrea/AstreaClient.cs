@@ -50,12 +50,28 @@ namespace XB.Astrea.Client
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error caught when trying to assess message: " + mt);
+                    _logger.LogError(ex, "Error caught when trying to assess message, will retry: " + mt);
                     await Task.Delay(WaitingBeforeRetry).ConfigureAwait(false);
                 }
             }
-            _logger.LogError("Couldn't Handle this transaction message: " + mt);
+            _ = HandleTimeOutAsync(mt);
+            _logger.LogError("Couldn't Handle this transaction message, stopped: " + mt);
+            
             return new AssessmentResponse();
+        }
+
+        private async Task<AssessmentResponse> HandleTimeOutAsync(string mt)
+        {
+            var mt103 = GetPaymentInstruction(mt);
+            var request = new AssessmentRequest(mt103);
+            _logger.LogInformation("Sending to Hubert");
+            var offeredTimeOut = new OfferedTimeOutProcessTrail(request, _config.Version);
+
+            string offeredTimeOutProccessTrail = JsonConvert.SerializeObject(offeredTimeOut, ProcessTrailDefaultJsonSettings.Settings);
+            _logger.LogInformation("Printing OfferedTimeOutProcessTrail: " + offeredTimeOutProccessTrail);
+            
+            return new AssessmentResponse();
+            
         }
 
         private async Task<AssessmentResponse> HandleAssessAsync(string mt)
