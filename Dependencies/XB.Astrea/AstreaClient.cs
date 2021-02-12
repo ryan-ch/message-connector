@@ -141,20 +141,26 @@ namespace XB.Astrea.Client
         {
             try
             {
-                var hubertResponse = _hubertClient.SendAssessmentResponse(currentDateTime.ToString(), 
-                    parsedMt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference, 
+                var hubertResponse = _hubertClient.SendAssessmentResponse(currentDateTime.ToString(),
+                    parsedMt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
                     assessmentResponse.Results.First().RiskLevel);
-                
+
                 var kafkaMessage = (hubertResponse.Result.Result.Uakw4630.TransactionStatus.ToUpper() == "REJECTED")
-                       ? JsonConvert.SerializeObject(new RejectedProcessTrail(assessmentResponse, _config.Version, parsedMt), ProcessTrailDefaultJsonSettings.Settings)
-                       : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt), ProcessTrailDefaultJsonSettings.Settings);
+                    ? JsonConvert.SerializeObject(
+                        new RejectedProcessTrail(assessmentResponse, _config.Version, parsedMt),
+                        ProcessTrailDefaultJsonSettings.Settings)
+                    : JsonConvert.SerializeObject(
+                        new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt),
+                        ProcessTrailDefaultJsonSettings.Settings);
 
                 _logger.LogInformation("Sending DecisionProcessTrail: " + kafkaMessage);
                 await _kafkaProducer.Produce(kafkaMessage).ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Couldn't Send Decision ProcessTrail for response: " + JsonConvert.SerializeObject(assessmentResponse));
+                _logger.LogError(e,
+                    "Couldn't Send Decision ProcessTrail for response: " +
+                    JsonConvert.SerializeObject(assessmentResponse));
             }
         }
     }
