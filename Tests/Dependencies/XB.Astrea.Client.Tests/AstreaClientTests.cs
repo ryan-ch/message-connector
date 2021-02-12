@@ -43,7 +43,7 @@ namespace XB.Astrea.Client.Tests
 
             var hubertMock = new Mock<IHubertClient>();
             hubertMock.Setup(hubert =>
-                hubert.SendAssessmentResponse()).Returns(Task.FromResult(new CrossbordpmtUpdate01Fcpsts01Response()));
+                hubert.SendAssessmentResponse(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>())).Returns(Task.FromResult(new CrossbordpmtUpdate01Fcpsts01Response()));
             var producerMock = new Mock<IKafkaProducer>();
             producerMock.Setup(producer =>
                 producer.Produce(It.IsAny<string>())).Returns(Task.CompletedTask);
