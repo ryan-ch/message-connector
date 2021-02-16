@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using IBM.XMS;
 using XB.IBM.MQ.Interfaces;
 
 namespace MqTool
