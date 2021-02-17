@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Net;
 using XB.Astrea.Client.Config;
 using XB.Kafka;
 using XB.Hubert;
@@ -19,6 +20,7 @@ namespace XB.Astrea.Client
             {
                 c.BaseAddress = new Uri(configuration[appsettingsPrefix + AstreaClientOptions.ConfigurationSection + ":Url"]);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestVersion = HttpVersion.Version20;
             });
 
             return services

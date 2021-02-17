@@ -19,7 +19,8 @@ namespace XB.Hubert
         public HubertClient(IHttpClientFactory httpClientFactory, IOptions<HubertClientOptions> config, ILogger<HubertClient> logger)
         {
             _config = config.Value;
-            _httpClient = httpClientFactory.CreateClient(HubertExtensions.HttpClientName);
+            _httpClient = httpClientFactory.CreateClient("sebcs");
+            _httpClient.BaseAddress = new Uri(_config.Url);
             _logger = logger;
         }
 

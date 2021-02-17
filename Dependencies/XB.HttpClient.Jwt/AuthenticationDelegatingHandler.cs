@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
@@ -8,23 +9,23 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using XB.Hubert.Config;
+using XB.HttpClientJwt.Config;
 
-namespace XB.Hubert.Delegate
+namespace XB.HttpClientJwt
 {
     public class AuthenticationDelegatingHandler : DelegatingHandler
     {
         private readonly ILogger<AuthenticationDelegatingHandler> _logger;
-        private readonly HubertClientOptions _hubertClientOptions;
+        private readonly HttpClientJwtOptions _httpClientJwtOptions;
 
         private string _jwt;
         private long _jwtExpire;
 
         public AuthenticationDelegatingHandler(ILogger<AuthenticationDelegatingHandler> logger,
-            IOptions<HubertClientOptions> config)
+            IOptions<HttpClientJwtOptions> config)
         {
             _logger = logger;
-            _hubertClientOptions = config.Value;
+            _httpClientJwtOptions = config.Value;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -49,7 +50,19 @@ namespace XB.Hubert.Delegate
         {
             if (_jwt == null || DateTimeOffset.UtcNow.ToUnixTimeSeconds() > _jwtExpire)
             {
-                var jwtRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(GetUrlToJwt()));
+                var jwtRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(_httpClientJwtOptions.Url));
+
+                var jwtDetails = new Dictionary<string, string>
+                {
+                    { "grant_type", "password" },
+                    { "client_id", _httpClientJwtOptions.ClientId },
+                    { "client_secret", _httpClientJwtOptions.ClientSecret },
+                    { "username", _httpClientJwtOptions.Username },
+                    { "password", _httpClientJwtOptions.Password },
+                    { "scope", "openid" },
+                };
+
+                jwtRequest.Content = new FormUrlEncodedContent(jwtDetails);
 
                 var response = await base.SendAsync(jwtRequest, cancellationToken);
 
@@ -59,20 +72,15 @@ namespace XB.Hubert.Delegate
                 _jwtExpire = long.Parse(content?.SelectToken("expires_in")?.ToString() ?? "0", CultureInfo.InvariantCulture);
 
                 _logger.LogInformation(
-                    $"Successfully fetched an new JWT for user {_hubertClientOptions.JwtClientId}.");
+                    $"Successfully fetched an new JWT for user {_httpClientJwtOptions.ClientId}.");
 
                 return _jwt;
             }
 
             _logger.LogInformation(
-                $"Successfully re-used JWT for user {_hubertClientOptions.JwtClientId}.");
+                $"Successfully re-used JWT for user {_httpClientJwtOptions.ClientId}.");
 
             return _jwt;
-        }
-
-        private string GetUrlToJwt()
-        {
-            return _hubertClientOptions.JwtUrl + $"?grant_typ=password&client_id={_hubertClientOptions.JwtClientId}&client_secret={_hubertClientOptions.JwtClientSecret}&username={_hubertClientOptions.Username}&password={_hubertClientOptions.Password}&scope=openid";
         }
     }
 }
