@@ -20,6 +20,8 @@ namespace XB.Kafka.Tests
         {
             _loggerMock = new Mock<ILogger<KafkaConsumer>>();
             _consumer = new Mock<IConsumer<string, string>>();
+            _consumer.Setup(a => a.Consume(It.IsAny<CancellationToken>()))
+                .Returns(new ConsumeResult<string, string> { Message = new Message<string, string> { Value = "Test Message" }, Partition = new Partition(0) });
             _configurationMock = new Mock<IOptions<KafkaConsumerConfig>>();
 
             _kafkaConsumer = new KafkaConsumer(_configurationMock.Object, _loggerMock.Object, _consumer.Object);
@@ -36,7 +38,6 @@ namespace XB.Kafka.Tests
 
             // Assert
             _consumer.Verify(a => a.Subscribe(topic), Times.Once);
-            _consumer.Verify(a => a.Close(), Times.Once);
         }
 
         [Fact]
@@ -44,8 +45,6 @@ namespace XB.Kafka.Tests
         {
             // Arrange
             const string messageText = "Test Message";
-            _consumer.Setup(a => a.Consume(It.IsAny<CancellationToken>()))
-                .Returns(new ConsumeResult<string, string> { Message = new Message<string, string> { Value = messageText }, Partition = new Partition(0) });
 
             // Act
             var result = _kafkaConsumer.Consume("Test Topic");
@@ -62,7 +61,7 @@ namespace XB.Kafka.Tests
         }
 
         [Fact]
-        public void Consume_WillLogExceptionAndCloseConsumer()
+        public void Consume_WillLogExceptionConsumer()
         {
             // Arrange
             const string topic = "Test Topic";
@@ -81,6 +80,28 @@ namespace XB.Kafka.Tests
                   exception,
                   It.IsAny<Func<It.IsAnyType, Exception, string>>()),
               Times.Once);
+        }
+        
+        [Fact]
+        public void Consume_WillLogExceptionAndCloseConsumer()
+        {
+            // Arrange
+            const string topic = "Test Topic";
+            var exception = new OperationCanceledException();
+            _consumer.Setup(a => a.Consume(It.IsAny<CancellationToken>()))
+                .Throws(exception);
+
+            //Act
+            _kafkaConsumer.Consume(topic);
+
+            //Assert
+            _loggerMock.Verify(a => a.Log(
+                    LogLevel.Error,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, _) => v.ToString().Contains("Operation Canceled")),
+                    It.IsAny<OperationCanceledException>(),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                Times.Once);
             _consumer.Verify(a => a.Close(), Times.Once);
         }
     }
