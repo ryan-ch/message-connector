@@ -30,28 +30,4 @@
     <ProjectReference Include="..\..\Microservices\XB.Astrea.WebAPI\XB.Astrea.WebAPI.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="KafkaCerts\DevAstreaConnector.sebank.se.cer">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="KafkaCerts\DevAstreaConnector.sebank.se.pem">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="KafkaCerts\PreProdAstreaConnector.sebank.se.cer">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="KafkaCerts\PreProdAstreaConnector.sebank.se.pem">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="KafkaCerts\SEB_CA.cer">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="KafkaCerts\YourAppName.cer">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="KafkaCerts\YourAppName.pem">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
