@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
-using XB.MT.Parser.Model;
+using XB.MtParser.Mt103;
 
 namespace XB.Astrea.Client.Messages.ProcessTrail
 {
@@ -14,27 +14,12 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
     public abstract class ProcessTrailBase
     {
-        private readonly string version;
-
-        private ProcessTrailBase(string appVersion)
+        protected ProcessTrailBase(string appVersion)
         {
-            version = appVersion;
             Id = Guid.NewGuid();
             Time = DateTime.Now;
             System = AstreaClientConstants.System;
-            Context = SetupContext();
-        }
-
-        protected ProcessTrailBase(AssessmentRequest assessmentRequest, string appVersion) : this(appVersion)
-        {
-            General = SetupGeneral(assessmentRequest);
-            Payloads = SetupPayloads(assessmentRequest);
-        }
-
-        protected ProcessTrailBase(AssessmentResponse assessmentResponse, string appVersion, MT103SingleCustomerCreditTransferModel parsedMt) : this(appVersion)
-        {
-            General = SetupGeneral(assessmentResponse, parsedMt);
-            Payloads = SetupPayloads(assessmentResponse, parsedMt);
+            Context = SetupContext(appVersion);
         }
 
         public Guid Id { get; set; }
@@ -44,58 +29,55 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         public General General { get; set; }
         public List<ProcessTrailPayload> Payloads { get; set; }
 
-        protected Context SetupContext()
+        protected Context SetupContext(string version)
         {
             //TODO: Cli: is this the application eventId of the system that generates the process trail?
             return new Context($"{System}-v{version}", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), AstreaClientConstants.ProcessTrailSchemaVersion);
         }
 
-        protected string GetBoType(MT103SingleCustomerCreditTransferModel model)
+        protected List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response, Mt103Message parsedMt, Reason reason, string actAction)
         {
-            return model.MT103SingleCustomerCreditTransferBlockText.Field72 != null &&
-                   model.MT103SingleCustomerCreditTransferBlockText.Field72.Row1.StartsWith("/DOM") ?
-                "seb.payments.se.incoming.domestic" : "seb.payments.se.incoming.xb";
-        }
-
-        protected abstract List<ProcessTrailPayload> SetupPayloads(AssessmentRequest request);
-
-        protected virtual List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response, MT103SingleCustomerCreditTransferModel parsedMt)
-        {
-
             var payloads = new List<ProcessTrailPayload>();
-            response.Results.ForEach(pi =>
+
+            response.Results.ForEach(assessmentResult =>
             {
-                int.TryParse(pi.RiskLevel, out int riskLevel);
-                payloads.Add(new ProcessTrailPayload()
+                int.TryParse(assessmentResult.RiskLevel, out int riskLevel);
+                payloads.Add(new ProcessTrailPayload
                 {
                     Id = Id + "-1",
-                    Payload = new EnvelopPayload()
+                    Payload = new EnvelopPayload
                     {
-                        Payment = new Payment()
+                        Act = new Act(actAction, actAction),
+                        Reason = reason,
+
+                        Payment = new Payment
                         {
-                            References = new List<References>()
+                            References = new List<References>
                             {
-                                new References(pi.OrderIdentity, "swift.tag121.uniqueId"),
-                                new References(parsedMt.MT103SingleCustomerCreditTransferBlockText.Field20.SenderReference, "swift.tag20.sendersRef"),
-                                parsedMt.MT103SingleCustomerCreditTransferBlockText.Field70 != null ?
-                                    new References(parsedMt.MT103SingleCustomerCreditTransferBlockText.Field70.RemittanceInformation, "swift.tag20.remittanceInfo") : null
+                                new References(assessmentResult.OrderIdentity, "swift.tag121.uniqueId"),
+                                new References(parsedMt.SenderReference, "swift.tag20.sendersRef")
                             },
+                            RemittanceInfos = string.IsNullOrEmpty(parsedMt.SenderToReceiverInformation) && string.IsNullOrEmpty(parsedMt.RemittanceInformation) ?
+                                              null : new List<ProcessTrailRemittanceInfo>
+                                              {
+                                                  !string.IsNullOrEmpty(parsedMt.SenderToReceiverInformation) ? new ProcessTrailRemittanceInfo(parsedMt.SenderToReceiverInformation, "swift.tag72.senderToReceiver") : null,
+                                                  !string.IsNullOrEmpty(parsedMt.RemittanceInformation) ? new ProcessTrailRemittanceInfo(parsedMt.RemittanceInformation, "swift.tag70.remittanceInfo") : null
+                                              }
                         },
-                        Extras = new PayloadExtras()
+                        Extras = new PayloadExtras(),
+                        Assess = new Assess
                         {
-                        },
-                        Assess = new Assess()
-                        {
-                            Id = pi.OrderIdentity,
+                            Id = assessmentResult.OrderIdentity,
                             RiskLevel = riskLevel,
-                            Hints = pi.Hints,
-                            Extras = new AssessExtras()
+                            Hints = assessmentResult.Hints,
+                            Extras = new AssessExtras
                             {
-                                BeneficiaryCustomerAccount = pi.Extras.AccountNumber,
-                                BeneficiaryCustomerName = pi.Extras.FullName
+                                BeneficiaryCustomerAccount = assessmentResult.Extras.AccountNumber,
+                                BeneficiaryCustomerName = assessmentResult.Extras.FullName,
+                                OrderingCustomerAccount = assessmentResult.Extras.OrderingCustomerAccount
                             }
                         },
-                        Original = riskLevel > 0 ? new Original(parsedMt.ToString()) : null
+                        Original = riskLevel > 0 ? new Original(parsedMt.OriginalSwiftMessage) : null
                     }
                 });
             });
@@ -103,57 +85,41 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             return payloads;
         }
 
-        protected virtual General SetupGeneral(AssessmentRequest request)
+        protected General SetupGeneral(string eventType, AssessmentResponse response, Mt103Message parsedMt)
         {
-            return new()
+            var formattedTime = DateTime.ParseExact(parsedMt.ApplicationHeader.OutputDate + parsedMt.ApplicationHeader.OutputTime,
+                "yyMMddHHmm", CultureInfo.InvariantCulture);
+            return new General
             {
-                Time = DateTime.ParseExact(
-                    request.Mt103Model.ApplicationHeaderOutputMessage.OutputDate + request.Mt103Model.ApplicationHeaderOutputMessage.OutputTime,
-                    "yyMMddHHmm", CultureInfo.InvariantCulture),
-                Bo = new Bo()
-                {
-                    Id = request.Mt103Model.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
-                    IdType = "swift.tag121",
-                    Type = GetBoType(request.Mt103Model)
-                }
-            };
-        }
-
-        protected virtual General SetupGeneral(AssessmentResponse response, MT103SingleCustomerCreditTransferModel parsedMt)
-        {
-            return new()
-            {
-                Time = DateTime.ParseExact(
-                    parsedMt.ApplicationHeaderOutputMessage.OutputDate + parsedMt.ApplicationHeaderOutputMessage.OutputTime,
-                    "yyMMddHHmm", CultureInfo.InvariantCulture),
-                Bo = new Bo()
+                Time = formattedTime,
+                Bo = new Bo
                 {
                     Id = response.Identity,
                     IdType = "swift.tag121",
                     Type = GetBoType(parsedMt)
                 },
-                Refs = new List<Ref> {
-                    new Ref
-                    {
-                        Id = response.Identity,
-                        IdType = AstreaClientConstants.ProcessTrailRefIdType,
-                        Type = AstreaClientConstants.ProcessTrailRefType
-                    }
-                },
+                Refs = new List<Ref> { new Ref(response.Identity, AstreaClientConstants.ProcessTrailRefType, AstreaClientConstants.ProcessTrailRefIdType) },
+                Event = new Event(eventType, $"{parsedMt.UserHeader.UniqueEndToEndTransactionReference}|{formattedTime.ToString(AstreaClientConstants.DateFormat)}")
             };
+        }
+
+        protected string GetBoType(Mt103Message model)
+        {
+            return model.SenderToReceiverInformation != null &&
+                   model.SenderToReceiverInformation.StartsWith("/DOM") ?
+                "seb.payments.se.incoming.domestic" : "seb.payments.se.incoming.xb";
         }
     }
 
-    //TODO: GUID or string? => Verify excel requirements: Should we use only tag121 from swift or use tag121|general.time as id
     public record Event(string Type, string Id);
 
     public record Location(string Type = "sys", string Id = "SWIFT");
 
     public record Context(string Cli, string Env, string Sch);
 
-    public record Account(string Id, string IdType, string bic);
+    public record Account(string Id, string IdType, string Bic);
 
-    public record References(string Type, string Reference);
+    public record References(string Reference, string Type);
 
     public record ProcessTrailActor(string Id, string Type, List<string> Roles);
 
@@ -163,98 +129,94 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
     public record Original(string Content, string ContentType = "swift/plain", string Encoding = "none");
 
-    public record Reason(string code, string text);
+    public record Reason(string Code, string Text);
 
-    public record Act(string recommendedAction, string executedAction);
+    public record Act(string RecommendedAction, string ExecutedAction);
 
-    public class General
+    public record Ref(string Id, string Type, string IdType);
+
+
+    public record General
     {
-        public Bo Bo { get; set; }
-        public DateTime Time { get; set; }
-        public List<Ref> Refs { get; set; }
-        public Event Event { get; set; }
-        public Location Location { get; set; }
-        public List<ProcessTrailActor> Actors { get; set; }
-        public List<Tag> Tags { get; set; }
+        public Bo Bo { get; init; }
+        public DateTime Time { get; init; }
+        public List<Ref> Refs { get; init; }
+        public Event Event { get; init; }
+        public Location Location { get; init; }
+        public List<ProcessTrailActor> Actors { get; init; }
+        public List<Tag> Tags { get; init; }
     }
 
-    public class Bo
+    public record Bo
     {
-        public string Type { get; set; } //seb.payments.se.incoming.(domestic/xb)
-        public string Id { get; set; } //swift block3.tag121
-        public string IdType { get; set; } = AstreaClientConstants.BoIdType;
+        public string Type { get; init; } //seb.payments.se.incoming.(domestic/xb)
+        public string Id { get; init; } //swift block3.tag121
+        public string IdType { get; init; } = AstreaClientConstants.BoIdType;
     }
 
-    public class Ref
+    public record ProcessTrailPayload
     {
-        public string Type { get; set; } = AstreaClientConstants.ProcessTrailRefType;
-        public string Id { get; set; }
-        public string IdType { get; set; } = AstreaClientConstants.ProcessTrailRefIdType;
+        public string Id { get; init; }
+        public string Encoding { get; init; } = AstreaClientConstants.PayloadEncoding;
+        public string Store { get; init; } = AstreaClientConstants.PayloadStore;
+        public string SchemaVersion { get; init; } = AstreaClientConstants.PayloadSchemaVersion;
+        public EnvelopPayload Payload { get; init; }
     }
 
-    public class ProcessTrailPayload
+    public record EnvelopPayload
     {
-        public string Id { get; set; }
-        public string Encoding { get; set; } = AstreaClientConstants.PayloadEncoding;
-        public string Store { get; set; } = AstreaClientConstants.PayloadStore;
-        public string SchemaVersion { get; set; } = AstreaClientConstants.PayloadSchemaVersion;
-        public EnvelopPayload Payload { get; set; }
+        public Payment Payment { get; init; }
+        public Original Original { get; init; }
+        public PayloadExtras Extras { get; init; }
+        public Assess Assess { get; init; }
+        public Reason Reason { get; init; }
+        public Act Act { get; init; }
     }
 
-    public class EnvelopPayload
+    public record Assess
     {
-        public Payment Payment { get; set; }
-        public Original Original { get; set; }
-        public PayloadExtras Extras { get; set; }
-        public Assess Assess { get; set; }
-        public Reason Reason { get; set; }
-        public Act Act { get; set; }
+        public string Id { get; init; }
+        public int RiskLevel { get; init; }
+        public List<Hint> Hints { get; init; }
+        public AssessExtras Extras { get; init; }
     }
 
-    public class Assess
+    public record AssessExtras
     {
-        public string Id { get; set; }
-        public int RiskLevel { get; set; }
-        public List<Hint> Hints { get; set; }
-        public AssessExtras Extras { get; set; }
+        public string OrderingCustomerAccount { get; init; }
+        public string OrderingCustomerName { get; init; }
+        public string OrderingCustomerAddress { get; init; }
+        public string OrderingBankBic { get; init; }
+        public string BeneficiaryCustomerAccount { get; init; }
+        public string BeneficiaryCustomerName { get; init; }
+        public string BeneficiaryCustomerAddress { get; init; }
+        public string BeneficiaryBankBic { get; init; }
+        public string CustomerId { get; init; }
+        public bool Physical { get; init; }
+        public bool SoleProprietorship { get; init; }
+        public string FullName { get; init; }
+        public string AccountNumber { get; init; }
+        public string RawMessage { get; init; }
     }
 
-    public class AssessExtras
+    public record PayloadExtras
     {
-        public string OrderingCustomerAccount { get; set; }
-        public string OrderingCustomerName { get; set; }
-        public string OrderingCustomerAddress { get; set; }
-        public string OrderingBankBic { get; set; }
-        public string BeneficiaryCustomerAccount { get; set; }
-        public string BeneficiaryCustomerName { get; set; }
-        public string BeneficiaryCustomerAddress { get; set; }
-        public string BeneficiaryBankBic { get; set; }
-        public string CustomerId { get; set; }
-        public bool Physical { get; set; }
-        public bool SoleProprietorship { get; set; }
-        public string FullName { get; set; }
-        public string AccountNumber { get; set; }
-        public string RawMessage { get; set; }
+        public string SwiftBeneficiaryCustomerAccount { get; init; }
+        public string SwiftBeneficiaryCustomerName { get; init; }
+        public string SwiftBeneficiaryCustomerAddress { get; init; }
+        public string SwiftBeneficiaryBankBIC { get; init; }
+        public string SwiftRawMessage { get; init; }
     }
 
-    public class PayloadExtras
+    public record Payment
     {
-        public string SwiftBeneficiaryCustomerAccount { get; set; }
-        public string SwiftBeneficiaryCustomerName { get; set; }
-        public string SwiftBeneficiaryCustomerAddress { get; set; }
-        public string SwiftBeneficiaryBankBIC { get; set; }
-        public string SwiftRawMessage { get; set; }
-    }
-
-    public class Payment
-    {
-        public string InstructedDate { get; set; }
-        public string ExecutionDate { get; set; }
-        public double InstructedAmount { get; set; }
-        public string InstructedCurrency { get; set; }
-        public List<Account> DebitAccount { get; set; }
-        public List<Account> CreditAccount { get; set; }
-        public List<References> References { get; set; }
-        public List<ProcessTrailRemittanceInfo> RemittanceInfos { get; set; }
+        public string InstructedDate { get; init; }
+        public string ExecutionDate { get; init; }
+        public decimal InstructedAmount { get; init; }
+        public string InstructedCurrency { get; init; }
+        public List<Account> DebitAccount { get; init; }
+        public List<Account> CreditAccount { get; init; }
+        public List<References> References { get; init; }
+        public List<ProcessTrailRemittanceInfo> RemittanceInfos { get; init; }
     }
 }
