@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using IBM.XMS;
 using XB.IBM.MQ.Interfaces;
 
 namespace MqTool
@@ -38,7 +35,7 @@ namespace MqTool
                         int writes = int.Parse((Console.ReadLine()));
                         for (int i = 0; i < writes; i++)
                         {
-                            mqClientProducer.WriteMessage(@"{1:F01ESSESES0AXXX8000019102}{2:O1030955100518CIBCCATTAXXX76763960792012021544N}{3:{103:}{108:WA SQ9E3P}{119:}{111:001}{121:2e66e52d-5448-4742-875a-c39a844bbdc2}}{4:
+                            mqClientProducer.WriteMessage(@"{1:F01ESSESES0AXXX8000019102}{2:O1030955100518CIBCCATTAXXX7676396079" + DateTime.Now.ToString("yyMMddHHmm") + @"N}{3:{103:}{108:WA SQ9E3P}{119:}{111:001}{121:2e66e52d-5448-4742-875a-c39a844bbdc2}}{4:
 :20:GEcG
 :23B:CRED
 :32A:200825SEK3500,00

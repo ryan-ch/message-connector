@@ -22,7 +22,7 @@ namespace XB.Hubert.Tests
             _loggerMock = new Mock<ILogger<HubertClient>>();
             _clientFactoryMock = new Mock<IHttpClientFactory>();
 
-            _hubertClient = new HubertClient(_clientFactoryMock.Object, _configMock.Object, _loggerMock.Object);
+            //_hubertClient = new HubertClient(_clientFactoryMock.Object, _configMock.Object, _loggerMock.Object);
         }
 
         [Fact]
