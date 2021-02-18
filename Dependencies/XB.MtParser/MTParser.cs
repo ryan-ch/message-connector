@@ -12,6 +12,7 @@ namespace XB.MtParser
         {
             _logger = logger;
         }
+
         public Mt103Message ParseSwiftMt103Message(string rawSwiftMessage)
         {
             return new Mt103Message(rawSwiftMessage, _logger);

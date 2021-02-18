@@ -1,29 +1,29 @@
-﻿using XB.MtParser.Enums;
+﻿using System.Linq;
+using XB.MtParser.Enums;
 
 namespace XB.MtParser.Swift_Message
 {
-    public record ApplicationHeader
+    public record ApplicationHeader : SwiftHeaderBase
     {
-        private const string InputIdentifier = "I";
+        private const char InputIdentifier = 'I';
+        public const SwiftMessageBlockIdentifiers HeaderType = SwiftMessageBlockIdentifiers.ApplicationHeader;
 
-        public ApplicationHeader(string applicationHeaderContent)
+        public ApplicationHeader(string basicHeaderContent) : base(basicHeaderContent, HeaderType)
         {
-            if (string.IsNullOrWhiteSpace(applicationHeaderContent))
-                return;
-            InputOutputIdentifier = applicationHeaderContent.Substring(0, 1);
-            SwiftMessageType = EnumUtil.ParseEnum(applicationHeaderContent.Substring(1, 3), SwiftMessageTypes.Unknown);
+            SwiftMessageType = EnumUtil.ParseEnum(basicHeaderContent.Substring(1, 3), SwiftMessageTypes.Unknown);
 
+            InputOutputIdentifier = basicHeaderContent.First();
             if (InputOutputIdentifier == InputIdentifier)
-                ParseInputApplicationHeaderContent(applicationHeaderContent);
+                ParseInputApplicationHeaderContent();
             else
-                ParseOutputApplicationHeaderContent(applicationHeaderContent);
+                ParseOutputApplicationHeaderContent();
         }
 
         /// <summary>
         /// For an input message, the Input/Output Identifier consists of the single letter 'I'
         /// For an output message, the Input/Output Identifier consists of the single letter 'O'
         /// </summary>
-        public string InputOutputIdentifier { get; init; }
+        public char InputOutputIdentifier { get; init; }
         /// <summary>
         /// The Message Type consists of 3 digits which define the MT number of the message being input
         /// </summary>
@@ -82,21 +82,21 @@ namespace XB.MtParser.Swift_Message
 
         public string ISOCountryCode => string.IsNullOrEmpty(MessageInputReference) ? string.Empty : MessageInputReference.Substring(10, 2);
 
-        private void ParseInputApplicationHeaderContent(string applicationHeaderContent)
+        private void ParseInputApplicationHeaderContent()
         {
-            DestinationAddress = applicationHeaderContent.Substring(4, 12);
-            Priority = applicationHeaderContent.Substring(16, 1);
-            DeliveryMonitoring = applicationHeaderContent.Substring(17, 1);
-            ObsolescencePeriod = applicationHeaderContent.Substring(18, 3);
+            DestinationAddress = HeaderContent.Substring(4, 12);
+            Priority = HeaderContent.Substring(16, 1);
+            DeliveryMonitoring = HeaderContent.Substring(17, 1);
+            ObsolescencePeriod = HeaderContent.Substring(18, 3);
         }
 
-        private void ParseOutputApplicationHeaderContent(string applicationHeaderContent)
+        private void ParseOutputApplicationHeaderContent()
         {
-            InputTime = applicationHeaderContent.Substring(4, 4);
-            MessageInputReference = applicationHeaderContent.Substring(8, 28);
-            OutputDate = applicationHeaderContent.Substring(36, 6);
-            OutputTime = applicationHeaderContent.Substring(42, 4);
-            Priority = applicationHeaderContent.Substring(46, 1);
+            InputTime = HeaderContent.Substring(4, 4);
+            MessageInputReference = HeaderContent.Substring(8, 28);
+            OutputDate = HeaderContent.Substring(36, 6);
+            OutputTime = HeaderContent.Substring(42, 4);
+            Priority = HeaderContent.Substring(46, 1);
         }
     }
 }

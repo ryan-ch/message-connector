@@ -18,14 +18,12 @@ namespace XB.MtParser.Models
 
         public string Identifier { get; init; }
         public int IdentifierAsInt => int.TryParse(Identifier, out var result) ? result : -1;
-
         public string Content { get; init; }
-
-
+        
         public static List<Block> ParseOneLevelBlocks(string blocksString)
         {
             var blockRegex = Regex.Matches(blocksString, "{(\\w{1,3}):(.*?)}", RegexOptions.Singleline);
-            return blockRegex.Where(a => a.Success).Select(a => new Block(a.Groups[1].Value, a.Groups[2].Value))?.ToList();
+            return blockRegex.Where(a => a.Success).Select(a => new Block(a.Groups[1].Value, a.Groups[2].Value)).ToList();
         }
 
         public override string ToString()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using XB.MtParser.Enums;
 using XB.MtParser.Swift_Message;
@@ -16,8 +17,11 @@ namespace XB.MtParser.Mt103
 
         public Mt103Message(string rawSwiftMessage, ILogger<MtParser> logger) : base(rawSwiftMessage, logger)
         {
-            _textBlockContent = Blocks.Find(a => a.IdentifierAsInt == (int)SwiftMessageBlockIdentifiers.Text)?.Content;
-            ExtractFields();
+            _textBlockContent = Blocks.FirstOrDefault(a => a.IdentifierAsInt == (int)SwiftMessageBlockIdentifiers.Text)?.Content;
+            if (string.IsNullOrWhiteSpace(_textBlockContent))
+                Logger.LogError("Text block is empty");
+            else
+                ExtractFields();
         }
 
         /// <summary>
@@ -98,13 +102,7 @@ namespace XB.MtParser.Mt103
             SenderReference = ExtractFieldByKey(FieldsKeys.SenderReference_20Key);
             BankOperationCode = EnumUtil.ParseEnum(ExtractFieldByKey(FieldsKeys.BankOperationCode_23BKey), OperationTypes.Unknown);
 
-            var Date_Currency_SettledAmount = ExtractFieldByKey(FieldsKeys.Date_Currency_SettledAmount_32AKey);
-            if (DateTime.TryParseExact(Date_Currency_SettledAmount.Substring(0, 6), "yyMMdd", null, DateTimeStyles.None, out DateTime parsedDate))
-                ValueDate = parsedDate;
-            Currency = Date_Currency_SettledAmount.Substring(6, 3);
-            // Todo: should we consider a formatter?
-            if (decimal.TryParse(Date_Currency_SettledAmount[9..].Replace(',', '.'), out var amount))
-                SettledAmount = amount;
+            (ValueDate, Currency, SettledAmount) = ExtractDateCurrencyAmount();
 
             OrderingCustomer = new OrderingCustomer(ExtractFieldByKey(FieldsKeys.OrderingCustomer_50AKey),
                 ExtractFieldByKey(FieldsKeys.OrderingCustomer_50FKey),
@@ -134,5 +132,27 @@ namespace XB.MtParser.Mt103
             var regex = Regex.Match(_textBlockContent, $":{key}:(.*?)(:|-)", RegexOptions.Singleline);
             return regex.Success ? regex.Groups[1].Value.TrimEnd('\n', '\r') : string.Empty;
         }
+
+        private (DateTime date, string currency, decimal amount) ExtractDateCurrencyAmount()
+        {
+            var Date_Currency_SettledAmount = ExtractFieldByKey(FieldsKeys.Date_Currency_SettledAmount_32AKey);
+            if (string.IsNullOrWhiteSpace(Date_Currency_SettledAmount) || Date_Currency_SettledAmount.Length < 10)
+            {
+                Logger.LogError($"Invalid field {FieldsKeys.Date_Currency_SettledAmount_32AKey} with value: {Date_Currency_SettledAmount}");
+                return default;
+            }
+
+            if (!DateTime.TryParseExact(Date_Currency_SettledAmount.Substring(0, 6), "yyMMdd", null, DateTimeStyles.None, out var parsedDate))
+                Logger.LogError($"Couldn't extract Date from field {FieldsKeys.Date_Currency_SettledAmount_32AKey} with value: {Date_Currency_SettledAmount}");
+
+            var currency = Date_Currency_SettledAmount.Substring(6, 3);
+
+            // Todo: should we consider a formatter?
+            if (!decimal.TryParse(Date_Currency_SettledAmount[9..].Replace(',', '.'), out var amount))
+                Logger.LogError($"Couldn't extract SettledAmount from field {FieldsKeys.Date_Currency_SettledAmount_32AKey} with value: {Date_Currency_SettledAmount}");
+
+            return (parsedDate, currency, amount);
+        }
+
     }
 }
