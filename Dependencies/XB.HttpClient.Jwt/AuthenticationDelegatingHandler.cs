@@ -54,12 +54,12 @@ namespace XB.HttpClientJwt
 
                 var jwtDetails = new Dictionary<string, string>
                 {
-                    { "grant_type", "password" },
+                    { "grant_type", _httpClientJwtOptions.Grant_Type },
                     { "client_id", _httpClientJwtOptions.ClientId },
                     { "client_secret", _httpClientJwtOptions.ClientSecret },
                     { "username", _httpClientJwtOptions.Username },
                     { "password", _httpClientJwtOptions.Password },
-                    { "scope", "openid" },
+                    { "scope", _httpClientJwtOptions.Scope },
                 };
 
                 jwtRequest.Content = new FormUrlEncodedContent(jwtDetails);
