@@ -30,19 +30,21 @@ namespace XB.HttpClientJwt
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var token = await GetJwt(cancellationToken);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var response = await base.SendAsync(request, cancellationToken);
+            var response = await DoRequestWithJwt(request, cancellationToken);
 
             if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
             {
-                token = await GetJwt(cancellationToken);
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                response = await base.SendAsync(request, cancellationToken);
-
-                return response;
+                return await DoRequestWithJwt(request, cancellationToken);
             }
 
+            return response;
+        }
+
+        private async Task<HttpResponseMessage> DoRequestWithJwt(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var token = await GetJwt(cancellationToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var response = await base.SendAsync(request, cancellationToken);
             return response;
         }
 
@@ -63,20 +65,25 @@ namespace XB.HttpClientJwt
                 };
 
                 jwtRequest.Content = new FormUrlEncodedContent(jwtDetails);
+                
+                var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
                 var response = await base.SendAsync(jwtRequest, cancellationToken);
 
                 var content = JObject.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
 
                 _jwt = content?.SelectToken("access_token")?.ToString();
-                _jwtExpire = long.Parse(content?.SelectToken("expires_in")?.ToString() ?? "0", CultureInfo.InvariantCulture);
+                _jwtExpire = long.Parse(content?.SelectToken("expires_in")?.ToString() ?? "0", CultureInfo.InvariantCulture)
+                             + currentTime;
 
+                //TODO: Maybe we can remove this logging?
                 _logger.LogInformation(
                     $"Successfully fetched an new JWT for user {_httpClientJwtOptions.ClientId}.");
 
                 return _jwt;
             }
 
+            //TODO: Maybe we can remove this logging?
             _logger.LogInformation(
                 $"Successfully re-used JWT for user {_httpClientJwtOptions.ClientId}.");
 
