@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using XB.Astrea.Client.Config;
+using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.Astrea.Client.Messages.ProcessTrail;
 using XB.Hubert;
@@ -28,7 +29,7 @@ namespace XB.Astrea.Client
         private readonly IHubertClient _hubertClient;
 
         public AstreaClient(IHttpClientFactory httpClientFactory, IKafkaProducer kafkaProducer, IOptions<AstreaClientOptions> config,
-            ILogger<AstreaClient> logger, IHubertClient hubertClient)
+            ILogger<AstreaClient> logger, IMTParser mTParser, IHubertClient hubertClient)
         {
             _kafkaProducer = kafkaProducer;
             _mTParser = mTParser;
@@ -68,13 +69,13 @@ namespace XB.Astrea.Client
 
         private async Task<AssessmentResponse> HandleTimeOutAsync(string mt, DateTime currentDateTime)
         {
-            var mt103 = GetPaymentInstruction(mt);
+            var mt103 = _mTParser.ParseSwiftMt103Message(mt);
             var request = new AssessmentRequest(mt103);
             try
             {
                 _logger.LogInformation("Sending to Hubert");
                 var hubertResponse = _hubertClient.SendAssessmentResponse(currentDateTime.ToString(),
-                    mt103.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
+                    mt103.UserHeader.UniqueEndToEndTransactionReference,
                     AstreaClientConstants.Hubert_Timeout);
                 if (hubertResponse.Result.Result.Uakw4630.TransactionStatus == AstreaClientConstants.Hubert_Accepted)
                 {
@@ -132,12 +133,12 @@ namespace XB.Astrea.Client
             }
         }
 
-        private async Task SendDecisionProcessTrail(AssessmentResponse assessmentResponse, Mt103Message parsedMt)
+        private async Task SendDecisionProcessTrail(AssessmentResponse assessmentResponse, Mt103Message parsedMt, DateTime currentDateTime)
         {
             try
             {
                 var hubertResponse = _hubertClient.SendAssessmentResponse(currentDateTime.ToString(),
-                    parsedMt.UserHeader.Tag121_UniqueEndToEndTransactionReference.UniqueEndToEndTransactionReference,
+                    parsedMt.UserHeader.UniqueEndToEndTransactionReference,
                     assessmentResponse.Results.First().RiskLevel);
 
                 var kafkaMessage = (hubertResponse.Result.Result.Uakw4630.TransactionStatus.ToUpper() == "REJECTED")
