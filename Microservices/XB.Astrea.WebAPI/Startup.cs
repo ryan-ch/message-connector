@@ -17,8 +17,8 @@ namespace XB.Astrea.WebAPI
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _ = bool.TryParse(Environment.GetEnvironmentVariable("Debugging"), out var _debugging);
-            SerilogConfiguration.ConfigureLogging("Astrea-Connector", _debugging);
+            _ = bool.TryParse(Environment.GetEnvironmentVariable("Debugging"), out var debugging);
+            SerilogConfiguration.ConfigureLogging("Astrea-Connector", debugging);
         }
 
         public void ConfigureServices(IServiceCollection services)

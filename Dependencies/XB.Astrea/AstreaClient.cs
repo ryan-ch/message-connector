@@ -7,14 +7,12 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using XB.Astrea.Client.Config;
-using XB.Astrea.Client.Constants;
-using XB.Astrea.Client.Exceptions;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.Astrea.Client.Messages.ProcessTrail;
 using XB.Hubert;
 using XB.Kafka;
-using XB.MT.Parser.Model;
-using XB.MT.Parser.Parsers;
+using XB.MtParser.Interfaces;
+using XB.MtParser.Mt103;
 
 namespace XB.Astrea.Client
 {
@@ -25,6 +23,7 @@ namespace XB.Astrea.Client
         private readonly AstreaClientOptions _config;
         private readonly HttpClient _httpClient;
         private readonly IKafkaProducer _kafkaProducer;
+        private readonly IMTParser _mTParser;
         private readonly ILogger<AstreaClient> _logger;
         private readonly IHubertClient _hubertClient;
 
@@ -32,6 +31,7 @@ namespace XB.Astrea.Client
             ILogger<AstreaClient> logger, IHubertClient hubertClient)
         {
             _kafkaProducer = kafkaProducer;
+            _mTParser = mTParser;
             _logger = logger;
             _config = config.Value;
             _httpClient = httpClientFactory.CreateClient(AstreaClientExtensions.HttpClientName);
@@ -98,14 +98,14 @@ namespace XB.Astrea.Client
 
         private async Task<AssessmentResponse> HandleAssessAsync(string mt, DateTime currentDateTime)
         {
-            var mt103 = GetPaymentInstruction(mt);
+            var mt103 = _mTParser.ParseSwiftMt103Message(mt);
             var request = new AssessmentRequest(mt103);
             var postBody = JsonConvert.SerializeObject(request, ProcessTrailDefaultJsonSettings.Settings);
             var data = new StringContent(postBody, Encoding.UTF8, "application/json");
             var result = await _httpClient.PostAsync("/sas/v3/assessOrders/paymentInstruction", data).ConfigureAwait(false);
 
             if (!result.IsSuccessStatusCode)
-                throw new AssessmentErrorException("Request to Astrea API could not be completed, returned code: " + result.StatusCode);
+                throw new Exception("Request to Astrea API could not be completed, returned code: " + result.StatusCode);
 
             _ = SendRequestedProcessTrail(request);
 
@@ -115,12 +115,6 @@ namespace XB.Astrea.Client
             _ = SendDecisionProcessTrail(assessmentResponse, mt103, currentDateTime);
 
             return assessmentResponse;
-        }
-
-        private MT103SingleCustomerCreditTransferModel GetPaymentInstruction(string mt)
-        {
-            var parser = new MT103SingleCustomerCreditTransferParser();
-            return parser.ParseMessage(mt);
         }
 
         private async Task SendRequestedProcessTrail(AssessmentRequest request)
@@ -138,7 +132,7 @@ namespace XB.Astrea.Client
             }
         }
 
-        private async Task SendDecisionProcessTrail(AssessmentResponse assessmentResponse, MT103SingleCustomerCreditTransferModel parsedMt, DateTime currentDateTime)
+        private async Task SendDecisionProcessTrail(AssessmentResponse assessmentResponse, Mt103Message parsedMt)
         {
             try
             {

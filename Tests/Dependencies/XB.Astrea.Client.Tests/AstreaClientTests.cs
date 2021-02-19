@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -22,19 +20,19 @@ namespace XB.Astrea.Client.Tests
     public class AstreaClientTests
     {
 
-        [Fact(Skip ="not ready")]
-        public void Parse_MtToAstreaRequest_ShouldReturnRequest()
-        {
-            //var mt = MT103SingleCustomerCreditTransferParser.ParseMessage(AstreaClientTestConstants.Mt103);
-            var parser = new MT103SingleCustomerCreditTransferParser();
-            var mt = parser.ParseMessage(AstreaClientTestConstants.Mt103);
-            var request = new AssessmentRequest(mt);
+        //[Fact(Skip ="not ready")]
+        //public void Parse_MtToAstreaRequest_ShouldReturnRequest()
+        //{
+        //    //var mt = MT103SingleCustomerCreditTransferParser.ParseMessage(AstreaClientTestConstants.Mt103);
+        //    var parser = new MTParser();
+        //    var mt = parser.ParseSwiftMt103Message(AstreaClientTestConstants.Mt103);
+        //    var request = new AssessmentRequest(mt);
 
-            var requestJson = TestHelper.SerializeToCamelCaseJson(request);
+        //    var requestJson = TestHelper.SerializeToCamelCaseJson(request);
 
-            Assert.True(request.Mt != string.Empty);
-            Assert.True(requestJson != string.Empty);
-        }
+        //    Assert.True(request.Mt != string.Empty);
+        //    Assert.True(requestJson != string.Empty);
+        //}
 
         [Fact(Skip = "not ready")]
         public async Task Execute_AstreaAssessmentProcess_ShouldDoAssessment()
@@ -53,7 +51,8 @@ namespace XB.Astrea.Client.Tests
 
             var astreaClient = new AstreaClient(httpClientFactoryMock.Object, producerMock.Object, configurationMock.Object, new Mock<ILogger<AstreaClient>>().Object, hubertMock.Object);
 
-            await astreaClient.AssessAsync(AstreaClientTestConstants.Mt103);
+        //    var configurationMock = new Mock<IOptions<AtreaClientOptions>>();
+        //    configurationMock.Setup(config => config.Value).Returns(new AtreaClientOptions { Version = AstreaClientTestConstants.Version });
 
             producerMock.Verify(mock =>
                 mock.Produce(It.IsAny<string>()), Times.Once());

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using XB.Astrea.Client;
 using XB.Hubert;
 using XB.IBM.MQ;
+using XB.MtParser;
 
 namespace XB.Astrea.WebAPI.Extensions
 {
@@ -14,6 +15,7 @@ namespace XB.Astrea.WebAPI.Extensions
         {
             services.AddAstreaClient(config, appsettingsPrefix);
             services.AddMQ(config, appsettingsPrefix);
+            services.AddMtParser();
         }
     }
 }

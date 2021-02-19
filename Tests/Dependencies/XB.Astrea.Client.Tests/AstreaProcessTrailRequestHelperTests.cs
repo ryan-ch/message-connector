@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.Astrea.Client.Messages.ProcessTrail;
@@ -20,7 +18,7 @@ namespace XB.Astrea.Client.Tests
 
         public AstreaProcessTrailRequestHelperTests()
         {
-            SetupAssessmentRequest();
+           // SetupAssessmentRequest();
             SetupAssessmentResponse();
 
             RequestedProcessTrail = new RequestedProcessTrail(AssessmentRequest, AstreaClientTestConstants.Version);
@@ -58,29 +56,29 @@ namespace XB.Astrea.Client.Tests
             Assert.True(json != string.Empty);
         }
 
-        private void SetupAssessmentRequest()
-        {
-            AssessmentRequest.BasketIdentity = Guid.NewGuid().ToString(); //Mt103->{3:->:121: ???
-            AssessmentRequest.PaymentInstructions.Add(new PaymentInstruction()
-            {
-                InstructedDate = DateTime.Now, //Possible Mt103->{4:->32A->Date..
-                Amount = 3.14, //Mt103->{4:->:32A:->Date..Currency..Amount
-                Currency = "SEK",
-                Identity = "cd7z1Lja3", //Mt103->{4:->:20: Senders reference
-                DebitAccount = new List<Messages.Assessment.Account>()
-                {
-                    //Mt103->{4:->:50K:->rad2
-                    //Mt103->{4:->:50K:->rad1
-                    new Messages.Assessment.Account("seb.payment.se.swift","SE2880000832790000012345")
-                },
-                CreditAccount = new List<Messages.Assessment.Account>()
-                {
-                    //Mt103->{4:->:59:->rad2
-                     //Mt103->{4:->:59:rad1
-                    new Messages.Assessment.Account("seb.payment.se.swift","SE3550000000054910000003")
-                }
-            });
-        }
+        //private void SetupAssessmentRequest()
+        //{
+        //    AssessmentRequest.BasketIdentity = Guid.NewGuid().ToString(); //Mt103->{3:->:121: ???
+        //    AssessmentRequest.PaymentInstructions.Add(new PaymentInstruction()
+        //    {
+        //        InstructedDate = DateTime.Now, //Possible Mt103->{4:->32A->Date..
+        //        Amount = 3.14m, //Mt103->{4:->:32A:->Date..Currency..Amount
+        //        Currency = "SEK",
+        //        Identity = "cd7z1Lja3", //Mt103->{4:->:20: Senders reference
+        //        DebitAccount = new List<Messages.Assessment.Account>()
+        //        {
+        //            //Mt103->{4:->:50K:->rad2
+        //            //Mt103->{4:->:50K:->rad1
+        //            new Messages.Assessment.Account("seb.payment.se.swift","SE2880000832790000012345")
+        //        },
+        //        CreditAccount = new List<Messages.Assessment.Account>()
+        //        {
+        //            //Mt103->{4:->:59:->rad2
+        //             //Mt103->{4:->:59:rad1
+        //            new Messages.Assessment.Account("seb.payment.se.swift","SE3550000000054910000003")
+        //        }
+        //    });
+        //}
 
         private void SetupAssessmentResponse()
         {

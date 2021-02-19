@@ -1,9 +1,0 @@
-﻿using XB.MT.Parser.Model.Text.MT103;
-
-namespace XB.MT.Parser.Model
-{
-    public class MT103SingleCustomerCreditTransferModel : MT103
-    {
-        public MT103SingleCustomerCreditTransferText MT103SingleCustomerCreditTransferBlockText { get; set; }
-    }
-}
