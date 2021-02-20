@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
-using XB.MT.Parser.Model;
+using XB.MtParser.Mt103;
 
 namespace XB.Astrea.Client.Messages.ProcessTrail
 {
     public class OfferedTimeOutProcessTrail : ProcessTrailBase
     {
-        public OfferedTimeOutProcessTrail(AssessmentRequest request, string appVersion) : base(request, appVersion) { }
+        public OfferedTimeOutProcessTrail(AssessmentRequest request, string appVersion) : base(appVersion)
+        {
+            General = SetupGeneral(request);
+            Payloads = SetupPayloads(request);
+        }
 
-        protected override List<ProcessTrailPayload> SetupPayloads(AssessmentRequest request)
+        protected List<ProcessTrailPayload> SetupPayloads(AssessmentRequest request)
         {
             var payloads = new List<ProcessTrailPayload>();
 
@@ -47,22 +51,22 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             return payloads;
         }
 
-        protected override General SetupGeneral(AssessmentRequest assessment)
+        protected General SetupGeneral(AssessmentRequest assessment)
         {
-            var general = base.SetupGeneral(assessment);
-            general.Event = new Event(AstreaClientConstants.EventType_Offered, $"{assessment.BasketIdentity}|ERROR");
-            return general;
-        }
+            var formattedTime = DateTime.ParseExact(assessment.Mt103Model.ApplicationHeader.OutputDate + assessment.Mt103Model.ApplicationHeader.OutputTime,
+                "yyMMddHHmm", CultureInfo.InvariantCulture);
+            return new General
+            {
+                Time = formattedTime,
+                Bo = new Bo
+                {
+                    Id = assessment.Mt103Model.UserHeader.UniqueEndToEndTransactionReference,
+                    IdType = "swift.tag121",
+                    Type = GetBoType(assessment.Mt103Model)
+                },
+                Event = new Event(AstreaClientConstants.EventType_Offered, $"{assessment.BasketIdentity}|ERROR")
+            };
 
-        #region Redundant methods
-        protected override List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response, MT103SingleCustomerCreditTransferModel parsedMt)
-        {
-            throw new NotImplementedException();
         }
-        protected override General SetupGeneral(AssessmentResponse response, MT103SingleCustomerCreditTransferModel parsedMt)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
     }
 }
