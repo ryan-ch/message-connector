@@ -14,7 +14,6 @@ namespace XB.HttpClientJwt.Tests
     public class HttpClientJwtTests
     {
         private readonly HttpClientJwtOptions _httpClientJwtOptions;
-        private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
         private readonly AuthenticationDelegatingHandler _authenticationDelegatingHandler;
 
         public HttpClientJwtTests()
@@ -36,48 +35,28 @@ namespace XB.HttpClientJwt.Tests
 
             _authenticationDelegatingHandler = new AuthenticationDelegatingHandler(loggerMock.Object, configurationMock.Object)
             {
-                InnerHandler = new TestHandler((r, c) =>
-                {
-                    return TestHandler.Return200();
-                })
+                InnerHandler = new TestHandler()
             };
         }
 
         [Fact]
         public void Test1()
         {
+            //Arrange
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _httpClientJwtOptions.Url);
+            var invoker = new HttpMessageInvoker(_authenticationDelegatingHandler);
+            
+            //Act
+            var response = invoker.SendAsync(httpRequestMessage, new CancellationToken()).Result;
 
-            var client = new HttpClient(_authenticationDelegatingHandler);
-            var result = client.SendAsync(httpRequestMessage).Result;
-
-            Assert.True(result.StatusCode == HttpStatusCode.OK);
+            //Assert
+            Assert.True(response.IsSuccessStatusCode);
         }
     }
 
     public class TestHandler : DelegatingHandler
     {
-        private readonly Func<HttpRequestMessage,
-            CancellationToken, Task<HttpResponseMessage>> _handlerFunc;
-
-        public TestHandler()
-        {
-            _handlerFunc = (r, c) => Return200();
-        }
-
-        public TestHandler(Func<HttpRequestMessage,
-            CancellationToken, Task<HttpResponseMessage>> handlerFunc)
-        {
-            _handlerFunc = handlerFunc;
-        }
-
-        protected override Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            return _handlerFunc(request, cancellationToken);
-        }
-
-        public static Task<HttpResponseMessage> Return200()
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var response = new HttpResponseMessage(HttpStatusCode.OK);
             response.Content = new StringContent("{\"access_token\":\"access_token\", \"expires_in\":\"300\"}");
