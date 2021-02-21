@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,11 @@ using Xunit;
 
 namespace XB.HttpClientJwt.Tests
 {
+    public static class TestHelper
+    {
+        public static readonly string AstreaResponseJson = "{\"astrea_response\": \"OK\"}";
+    }
+
     public class HttpClientJwtTests
     {
         private readonly HttpClientJwtOptions _httpClientJwtOptions;
@@ -40,7 +46,7 @@ namespace XB.HttpClientJwt.Tests
         }
 
         [Fact]
-        public void Test1()
+        public void FetchJwtToken_ShouldReturnJwtAndDoRequest()
         {
             //Arrange
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _httpClientJwtOptions.Url);
@@ -51,6 +57,7 @@ namespace XB.HttpClientJwt.Tests
 
             //Assert
             Assert.True(response.IsSuccessStatusCode);
+            Assert.True(response.Content.ReadAsStringAsync().Result.Equals(TestHelper.AstreaResponseJson));
         }
     }
 
@@ -60,6 +67,21 @@ namespace XB.HttpClientJwt.Tests
         {
             var response = new HttpResponseMessage(HttpStatusCode.OK);
             response.Content = new StringContent("{\"access_token\":\"access_token\", \"expires_in\":\"300\"}");
+
+            if (request.Headers.Authorization != null && request.Headers.Authorization.Scheme == "Bearer")
+            {
+                if (!string.IsNullOrEmpty(request.Headers.Authorization.Parameter))
+                {
+                    response = new HttpResponseMessage(HttpStatusCode.OK);
+                    response.Content = new StringContent(TestHelper.AstreaResponseJson);
+                }
+                else
+                {
+                    response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
+                    response.Content = new StringContent("");
+                }
+            }
+
             return Task.Factory.StartNew(
                 () => response);
         }
