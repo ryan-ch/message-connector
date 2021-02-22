@@ -141,12 +141,15 @@ namespace XB.Astrea.Client
                     parsedMt.UserHeader.UniqueEndToEndTransactionReference,
                     assessmentResponse.Results.First().RiskLevel);
 
-                var kafkaMessage = (hubertResponse.Result.Result.Uakw4630.TransactionStatus.ToUpper() == "REJECTED")
+                var hubertResponseTransactionStatus = hubertResponse.Result.Result.Uakw4630.TransactionStatus.ToUpper();
+
+                var kafkaMessage = (hubertResponseTransactionStatus == "REJECTED")
                     ? JsonConvert.SerializeObject(
                         new RejectedProcessTrail(assessmentResponse, _config.Version, parsedMt),
                         ProcessTrailDefaultJsonSettings.Settings)
                     : JsonConvert.SerializeObject(
-                        new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt),
+                        new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt,
+                            hubertResponseTransactionStatus == "TIMEOUT"),
                         ProcessTrailDefaultJsonSettings.Settings);
 
                 _logger.LogInformation("Sending DecisionProcessTrail: " + kafkaMessage);
