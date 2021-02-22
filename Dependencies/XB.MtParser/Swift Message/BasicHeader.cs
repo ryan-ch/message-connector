@@ -1,17 +1,20 @@
-﻿namespace XB.MtParser.Swift_Message
+﻿using XB.MtParser.Enums;
+
+namespace XB.MtParser.Swift_Message
 {
-    public record BasicHeader
+    public record BasicHeader : SwiftHeaderBase
     {
-        public BasicHeader(string basicHeaderContent)
+        public const SwiftMessageBlockIdentifiers HeaderType = SwiftMessageBlockIdentifiers.BasicHeader;
+
+        public BasicHeader(string basicHeaderContent) : base(basicHeaderContent, HeaderType)
         {
-            if (string.IsNullOrWhiteSpace(basicHeaderContent))
-                return;
             AppID = basicHeaderContent.Substring(0, 1);
             ServiceID = basicHeaderContent.Substring(1, 2);
             LTAddress = basicHeaderContent.Substring(3, 12);
             SessionNumber = basicHeaderContent.Substring(15, 4);
             SequenceNumber = basicHeaderContent.Substring(19, 6);
         }
+
         /// <summary>
         /// The Application Identifier identifies the application within which the message is being sent or received. 
         /// The available options are: F = FIN All user-to-user, FIN system and FIN service messages A = GPA (General Purpose Application) 

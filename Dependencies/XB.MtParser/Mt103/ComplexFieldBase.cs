@@ -8,7 +8,7 @@ namespace XB.MtParser.Mt103
         protected string ExtractNextLine(string input, string prefix, bool removeFromOriginalString, out string newString)
         {
             newString = input;
-            var regex = Regex.Match(input, $"^{prefix}(.+)$", RegexOptions.Multiline);
+            var regex = Regex.Match(input, $"^{prefix}(.*)$", RegexOptions.Multiline);
             if (!regex.Success)
                 return string.Empty;
 
@@ -20,20 +20,20 @@ namespace XB.MtParser.Mt103
         protected (string name, string address, string countryAndTown) ExtractNameAndAddress(string input)
         {
             // Lines with number 1 are for the name
-            var name = CombineMultiRegexLines(input, "^1/(.+)$", RegexOptions.Multiline);
+            var name = CombineMultiRegexLines(input, "^1/(.*)$");
             // Lines with number 2 for the address
-            var address = CombineMultiRegexLines(input, "^2/(.+)$", RegexOptions.Multiline);
+            var address = CombineMultiRegexLines(input, "^2/(.*)$");
             // Lines with number 3 for country and town
-            var countryAndTown = CombineMultiRegexLines(input, "^3/(.+)$", RegexOptions.Multiline);
+            var countryAndTown = CombineMultiRegexLines(input, "^3/(.*)$");
 
-            return new(name, address, countryAndTown);
+            return (name, address, countryAndTown);
         }
 
-        private string CombineMultiRegexLines(string input, string pattern, RegexOptions options)
+        private string CombineMultiRegexLines(string input, string pattern)
         {
             var result = string.Empty;
-            var regex = Regex.Matches(input, pattern, options);
-            regex.Where(a => a.Success).ToList().ForEach(a => result += a.Groups[1].Value);
+            var regex = Regex.Matches(input, pattern, RegexOptions.Multiline);
+            regex.Where(a => a.Success).ToList().ForEach(a => result += a.Groups[1].Value + '\n');
 
             return result.Trim('\n', '\r');
         }

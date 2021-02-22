@@ -10,8 +10,8 @@ namespace XB.IBM.MQ.Implementations
     {
         private readonly IMessageConsumer _consumer;
 
-        public MqConsumer(IOptions<MqOptions> configurations, ILogger<MqConsumer> logger, IConnection connection = null)
-            : base(configurations.Value.ReaderConfig, logger, connection)
+        public MqConsumer(IOptions<MqOptions> configurations, ILogger<MqConsumer> logger, IConnectionFactory connectionFactory)
+            : base(configurations.Value.ReaderConfig, logger, connectionFactory)
         {
             _consumer = SessionWmq.CreateConsumer(Destination);
         }

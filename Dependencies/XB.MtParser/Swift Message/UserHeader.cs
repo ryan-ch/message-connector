@@ -4,13 +4,12 @@ using XB.MtParser.Models;
 
 namespace XB.MtParser.Swift_Message
 {
-    public record UserHeader
+    public record UserHeader : SwiftHeaderBase
     {
-        public UserHeader(string userHeaderContent)
-        {
-            if (string.IsNullOrWhiteSpace(userHeaderContent))
-                return;
+        public const SwiftMessageBlockIdentifiers HeaderType = SwiftMessageBlockIdentifiers.UserHeader;
 
+        public UserHeader(string userHeaderContent) : base(userHeaderContent, HeaderType)
+        {
             var blocks = Block.ParseOneLevelBlocks(userHeaderContent);
 
             ServiceIdentifier = blocks.FirstOrDefault(block => block.IdentifierAsInt == (int)UserHeaderBlockIdentifiers.ServiceIdentifier)?.Content;
