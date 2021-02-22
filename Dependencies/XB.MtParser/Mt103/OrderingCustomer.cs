@@ -43,9 +43,9 @@ namespace XB.MtParser.Mt103
             // First line with one of the known codes is PartyIdentifier
             if (string.IsNullOrWhiteSpace(Account))
             {
-                var identifierRegex = Regex.Match(f50F, "^(ARNU|CCPT|CUST|DRLC|EMPL|NIDN|SOSE|TXID/.+)$", RegexOptions.Multiline);
+                var identifierRegex = Regex.Match(f50F, "^(ARNU|CCPT|CUST|DRLC|EMPL|NIDN|SOSE|TXID)/.+$", RegexOptions.Multiline);
                 if (identifierRegex.Success)
-                    PartyIdentifier = identifierRegex.Groups[1].Value.TrimEnd('\n', '\r');
+                    PartyIdentifier = identifierRegex.Groups[0].Value.TrimEnd('\n', '\r');
             }
 
             // Line with number 1,2 and 3 for Name, Address and CountryAndTown
@@ -56,7 +56,7 @@ namespace XB.MtParser.Mt103
             if (DateTime.TryParseExact(dob, "yyyyMMdd", null, DateTimeStyles.None, out var dateOfBirth))
                 DateOfBirth = dateOfBirth;
 
-            // Line with number 5 is for the place of birth          
+            // Line with number 5 is for the place of birth
             PlaceOfBirth = ExtractNextLine(f50F, "5/", false, out _);
 
             // Line with number 6 is for Customer Identification Number

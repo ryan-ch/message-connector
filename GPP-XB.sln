@@ -43,7 +43,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.MtParser", "Dependencies\XB.MtParser\XB.MtParser.csproj", "{93F2EC87-161C-4B26-A1FD-A4CA4327B08C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.IBM.MQ.Tests", "Tests\Dependencies\XB.IBM.MQ.Tests\XB.IBM.MQ.Tests.csproj", "{939ED580-5235-41D5-8305-5161B92F3A68}"
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XB.MtParser.Tests", "Tests\Dependencies\XB.MtParser.Tests\XB.MtParser.Tests\XB.MtParser.Tests.csproj", "{AD979FC7-6C48-4F95-8BCA-487630CF4E17}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XB.MtParser.Tests", "Tests\Dependencies\XB.MtParser.Tests\XB.MtParser.Tests\XB.MtParser.Tests.csproj", "{AD979FC7-6C48-4F95-8BCA-487630CF4E17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

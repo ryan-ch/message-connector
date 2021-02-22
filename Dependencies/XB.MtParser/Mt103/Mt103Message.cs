@@ -148,7 +148,7 @@ namespace XB.MtParser.Mt103
             var currency = Date_Currency_SettledAmount.Substring(6, 3);
 
             // Todo: should we consider a formatter?
-            if (!decimal.TryParse(Date_Currency_SettledAmount[9..].Replace(',', '.'), out var amount))
+            if (!decimal.TryParse(Date_Currency_SettledAmount[9..].Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount))
                 Logger.LogError($"Couldn't extract SettledAmount from field {FieldsKeys.Date_Currency_SettledAmount_32AKey} with value: {Date_Currency_SettledAmount}");
 
             return (parsedDate, currency, amount);
