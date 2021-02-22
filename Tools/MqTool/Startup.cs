@@ -23,7 +23,7 @@ namespace MqTool
             // add necessary services
             services.AddSingleton(configuration);
             services.AddLogging(configure => configure.AddConsole());
-            services.AddMQ(configuration, "AppSettings:");
+            services.AddMq(configuration, "AppSettings:");
             services.AddMtParser();
 
             // build the pipeline

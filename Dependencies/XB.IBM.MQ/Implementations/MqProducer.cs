@@ -10,16 +10,15 @@ namespace XB.IBM.MQ.Implementations
     {
         private readonly IMessageProducer _producer;
 
-        public MqProducer(IOptions<MqOptions> configurations, ILogger<MqProducer> logger, IConnection connection = null)
-            : base(configurations.Value.WriterConfig, logger, connection)
+        public MqProducer(IOptions<MqOptions> configurations, ILogger<MqProducer> logger, IConnectionFactory connectionFactory)
+            : base(configurations.Value.WriterConfig, logger, connectionFactory)
         {
             _producer = SessionWmq.CreateProducer(Destination);
         }
 
         public void WriteMessage(string message)
         {
-            var textMessage = SessionWmq.CreateTextMessage();
-            textMessage.Text = message;
+            var textMessage = SessionWmq.CreateTextMessage(message);
             _producer.Send(textMessage);
         }
 

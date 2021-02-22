@@ -11,14 +11,14 @@ namespace XB.IBM.MQ.Implementations
         protected ISession SessionWmq { get; }
         protected IDestination Destination { get; }
 
-        public MqBase(MqConfigurations configurations, ILogger<MqBase> logger, IConnection connection = null)
+        public MqBase(MqConfigurations configurations, ILogger<MqBase> logger, IConnectionFactory connectionFactory)
         {
             Logger = logger;
-
-            var connectionWmq = connection ?? CreateAndConfigureConnection(configurations);
+            ConfigureConnection(connectionFactory, configurations);
+            var connectionWmq = connectionFactory.CreateConnection();
             SessionWmq = connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
             Destination = SessionWmq.CreateQueue(configurations.MqQueueName);
-          
+
             connectionWmq.Start();
         }
 
@@ -32,10 +32,8 @@ namespace XB.IBM.MQ.Implementations
             SessionWmq.Rollback();
         }
 
-        private IConnection CreateAndConfigureConnection(MqConfigurations config)
+        private void ConfigureConnection(IConnectionFactory connectionFactory, MqConfigurations config)
         {
-            var connectionFactory = XMSFactoryFactory.GetInstance(XMSC.CT_WMQ).CreateConnectionFactory();
-
             if (!string.IsNullOrWhiteSpace(config.MqSslPath) && !string.IsNullOrWhiteSpace(config.MqPassword))
             {
                 AddCertificate(config.MqSslPath, config.MqPassword);
@@ -63,8 +61,6 @@ namespace XB.IBM.MQ.Implementations
             connectionFactory.SetStringProperty(XMSC.WMQ_QUEUE_MANAGER, config.MqQueueManagerName);
             connectionFactory.SetStringProperty(XMSC.WMQ_QUEUE_NAME, config.MqQueueName);
             connectionFactory.SetIntProperty(XMSC.WMQ_CONNECTION_MODE, XMSC.WMQ_CM_CLIENT);
-
-            return connectionFactory.CreateConnection();
         }
 
         private void AddCertificate(string certPath, string password)

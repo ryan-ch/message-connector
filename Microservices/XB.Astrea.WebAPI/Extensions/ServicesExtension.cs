@@ -14,7 +14,7 @@ namespace XB.Astrea.WebAPI.Extensions
         public static void ConfigureDependencies(this IServiceCollection services, IConfiguration config)
         {
             services.AddAstreaClient(config, appsettingsPrefix);
-            services.AddMQ(config, appsettingsPrefix);
+            services.AddMq(config, appsettingsPrefix);
             services.AddMtParser();
             services.AddHubert();
         }
