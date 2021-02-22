@@ -129,7 +129,7 @@ namespace XB.MtParser.Mt103
 
         private string ExtractFieldByKey(string key)
         {
-            var regex = Regex.Match(_textBlockContent, $":{key}:(.*?)(:|-)", RegexOptions.Singleline);
+            var regex = Regex.Match(_textBlockContent, $":{key}:(.*?)(:|-$)", RegexOptions.Singleline);
             return regex.Success ? regex.Groups[1].Value.TrimEnd('\n', '\r') : string.Empty;
         }
 
