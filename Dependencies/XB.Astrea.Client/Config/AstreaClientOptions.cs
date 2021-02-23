@@ -2,7 +2,7 @@
 
 namespace XB.Astrea.Client.Config
 {
-    public class AtreaClientOptions
+    public record AstreaClientOptions
     {
         public const string ConfigurationSection = "AstreaClient";
 

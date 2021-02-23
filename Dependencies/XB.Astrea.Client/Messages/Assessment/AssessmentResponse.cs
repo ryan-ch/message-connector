@@ -2,35 +2,35 @@
 
 namespace XB.Astrea.Client.Messages.Assessment
 {
-    public class AssessmentResponse
+    public record AssessmentResponse
     {
-        public string RequestIdentity { get; set; }
-        public string Identity { get; set; }
-        public string RiskLevel { get; set; }
-        public List<Hint> Hints { get; set; }
-        public string AssessmentStatus { get; set; }
-        public List<string> RiskyInstructions { get; set; }
-        public List<AssessmentResult> Results { get; set; }
+        public string RequestIdentity { get; init; }
+        public string Identity { get; init; }
+        public string RiskLevel { get; init; }
+        public List<Hint> Hints { get; init; }
+        public string AssessmentStatus { get; init; }
+        public List<string> RiskyInstructions { get; init; }
+        public List<AssessmentResult> Results { get; init; }
     }
 
-    public class ExtraAssessmentInfo
+    public record ExtraAssessmentInfo
     {
-        public string PhysicalNonPhysical { get; set; }
-        public string OrderingCustomerAddress { get; set; }
-        public string OrderingCustomerAccount { get; set; }
-        public string OrderingCustomerName { get; set; }
-        public string FullName { get; set; }
-        public object OrderingBankBIC { get; set; }
-        public string AccountHolderID { get; set; }
-        public string SoleProprietorship { get; set; }
-        public string AccountNumber { get; set; }
+        public string PhysicalNonPhysical { get; init; }
+        public string OrderingCustomerAddress { get; init; }
+        public string OrderingCustomerAccount { get; init; }
+        public string OrderingCustomerName { get; init; }
+        public string FullName { get; init; }
+        public object OrderingBankBIC { get; init; }
+        public string AccountHolderID { get; init; }
+        public string SoleProprietorship { get; init; }
+        public string AccountNumber { get; init; }
     }
 
-    public class AssessmentResult
+    public record AssessmentResult
     {
-        public string OrderIdentity { get; set; }
-        public string RiskLevel { get; set; }
-        public List<Hint> Hints { get; set; }
-        public ExtraAssessmentInfo Extras { get; set; }
+        public string OrderIdentity { get; init; }
+        public string RiskLevel { get; init; }
+        public List<Hint> Hints { get; init; }
+        public ExtraAssessmentInfo Extras { get; init; }
     }
 }

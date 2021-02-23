@@ -19,13 +19,13 @@ namespace XB.Astrea.Client
     {
         private const int WaitingBeforeRetry = 60000;
 
-        private readonly AtreaClientOptions _config;
+        private readonly AstreaClientOptions _config;
         private readonly HttpClient _httpClient;
         private readonly IKafkaProducer _kafkaProducer;
         private readonly IMTParser _mTParser;
         private readonly ILogger<AstreaClient> _logger;
 
-        public AstreaClient(IHttpClientFactory httpClientFactory, IKafkaProducer kafkaProducer, IOptions<AtreaClientOptions> config, IMTParser mTParser,
+        public AstreaClient(IHttpClientFactory httpClientFactory, IKafkaProducer kafkaProducer, IOptions<AstreaClientOptions> config, IMTParser mTParser,
             ILogger<AstreaClient> logger)
         {
             _kafkaProducer = kafkaProducer;
@@ -44,6 +44,7 @@ namespace XB.Astrea.Client
                 try
                 {
                     // Todo: Check the performance of the next line (maybe replace with parsed object check)
+                    // Todo: Can it be I instead of O?
                     if (!_config.AcceptableTransactionTypes.Any(format => mt.Contains("}{2:O" + format)))
                         return new AssessmentResponse();
 

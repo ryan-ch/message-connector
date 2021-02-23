@@ -2,12 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using XB.MtParser.Enums;
 using XB.MtParser.Models;
 
-[assembly: InternalsVisibleTo("XB.MtParser.Tests")]
 namespace XB.MtParser.Swift_Message
 {
     public record SwiftMessage

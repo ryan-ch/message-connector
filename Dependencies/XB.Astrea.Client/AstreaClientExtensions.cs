@@ -12,11 +12,11 @@ namespace XB.Astrea.Client
 
         public static IServiceCollection AddAstreaClient(this IServiceCollection services, IConfiguration configuration, string appSettingsPrefix = "")
         {
-            services.Configure<AtreaClientOptions>(configuration.GetSection(appSettingsPrefix + AtreaClientOptions.ConfigurationSection));
+            services.Configure<AstreaClientOptions>(configuration.GetSection(appSettingsPrefix + AstreaClientOptions.ConfigurationSection));
 
             services.AddHttpClient(HttpClientName, c =>
             {
-                c.BaseAddress = new Uri(configuration[appSettingsPrefix + AtreaClientOptions.ConfigurationSection + ":Url"]);
+                c.BaseAddress = new Uri(configuration[appSettingsPrefix + AstreaClientOptions.ConfigurationSection + ":Url"]);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
             });
 

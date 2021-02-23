@@ -9,7 +9,6 @@ namespace XB.IBM.MQ.Tests
 {
     public class MqBaseUnitTests
     {
-        private readonly Mock<ILogger<MqBase>> _loggerMock;
         private readonly Mock<IConnection> _connectionMock;
         private readonly Mock<ISession> _sessionMock;
         private readonly Mock<IConnectionFactory> _connectionFactoryMock;
@@ -30,12 +29,12 @@ namespace XB.IBM.MQ.Tests
         };
         public MqBaseUnitTests()
         {
-            _loggerMock = new Mock<ILogger<MqBase>>();
+            var loggerMock = new Mock<ILogger<MqBase>>();
             _connectionMock = new Mock<IConnection>();
             _sessionMock = new Mock<ISession>();
             _connectionFactoryMock = TestHelper.GetConnectionFactoryMock(_connectionMock, _sessionMock);
 
-            _mqBase = new MqBase(_mqConfigurations, _loggerMock.Object, _connectionFactoryMock.Object);
+            _mqBase = new MqBase(_mqConfigurations, loggerMock.Object, _connectionFactoryMock.Object);
         }
 
         [Fact]
