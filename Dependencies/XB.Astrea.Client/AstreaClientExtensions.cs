@@ -10,20 +10,20 @@ namespace XB.Astrea.Client
     {
         internal const string HttpClientName = "astrea";
 
-        public static IServiceCollection AddAstreaClient(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
+        public static IServiceCollection AddAstreaClient(this IServiceCollection services, IConfiguration configuration, string appSettingsPrefix = "")
         {
-            services.Configure<AtreaClientOptions>(configuration.GetSection(appsettingsPrefix + AtreaClientOptions.ConfigurationSection));
+            services.Configure<AtreaClientOptions>(configuration.GetSection(appSettingsPrefix + AtreaClientOptions.ConfigurationSection));
 
             services.AddHttpClient(HttpClientName, c =>
             {
-                c.BaseAddress = new Uri(configuration[appsettingsPrefix + AtreaClientOptions.ConfigurationSection + ":Url"]);
+                c.BaseAddress = new Uri(configuration[appSettingsPrefix + AtreaClientOptions.ConfigurationSection + ":Url"]);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
             });
 
             return services
                 .AddScoped<IAstreaClient, AstreaClient>()
-                .AddKafkaProducer(configuration, appsettingsPrefix);
-            //.AddKafkaConsumer(configuration, appsettingsPrefix)
+                .AddKafkaProducer(configuration, appSettingsPrefix);
+            //.AddKafkaConsumer(configuration, appSettingsPrefix)
         }
     }
 }
