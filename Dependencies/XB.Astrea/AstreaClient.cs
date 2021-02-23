@@ -67,14 +67,14 @@ namespace XB.Astrea.Client
             return new AssessmentResponse();
         }
 
-        private async Task<AssessmentResponse> HandleTimeOutAsync(string mt, DateTime currentDateTime)
+        private async Task<AssessmentResponse> HandleTimeOutAsync(string mt, DateTime currentTimestamp)
         {
             var mt103 = _mTParser.ParseSwiftMt103Message(mt);
             var request = new AssessmentRequest(mt103);
             try
             {
                 _logger.LogInformation("Sending to Hubert");
-                var hubertResponse = _hubertClient.SendAssessmentResponse(currentDateTime.ToString(),
+                var hubertResponse = _hubertClient.SendAssessmentResponse(currentTimestamp.ToString(),
                     mt103.UserHeader.UniqueEndToEndTransactionReference,
                     AstreaClientConstants.Hubert_Timeout);
                 if (hubertResponse.Result.Result.Uakw4630.TransactionStatus == AstreaClientConstants.Hubert_Accepted)
@@ -97,7 +97,7 @@ namespace XB.Astrea.Client
             
         }
 
-        private async Task<AssessmentResponse> HandleAssessAsync(string mt, DateTime currentDateTime)
+        private async Task<AssessmentResponse> HandleAssessAsync(string mt, DateTime currentTimestamp)
         {
             var mt103 = _mTParser.ParseSwiftMt103Message(mt);
             var request = new AssessmentRequest(mt103);
@@ -113,7 +113,7 @@ namespace XB.Astrea.Client
             var apiResponse = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
             var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
 
-            _ = SendDecisionProcessTrail(assessmentResponse, mt103, currentDateTime);
+            _ = SendDecisionProcessTrail(assessmentResponse, mt103, currentTimestamp);
 
             return assessmentResponse;
         }
@@ -133,11 +133,11 @@ namespace XB.Astrea.Client
             }
         }
 
-        private async Task SendDecisionProcessTrail(AssessmentResponse assessmentResponse, Mt103Message parsedMt, DateTime currentDateTime)
+        private async Task SendDecisionProcessTrail(AssessmentResponse assessmentResponse, Mt103Message parsedMt, DateTime currentTimestamp)
         {
             try
             {
-                var hubertResponse = _hubertClient.SendAssessmentResponse(currentDateTime.ToString(),
+                var hubertResponse = _hubertClient.SendAssessmentResponse(currentTimestamp.ToString(),
                     parsedMt.UserHeader.UniqueEndToEndTransactionReference,
                     assessmentResponse.Results.First().RiskLevel);
 
