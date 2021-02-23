@@ -48,7 +48,7 @@ namespace XB.MtParser.Swift_Message
                 {
                     var blockStringMatch = Regex.Match(rawSwiftMessage, $"{{{i}:(.*?)}}({{\\w:|$)", RegexOptions.Singleline);
                     if (blockStringMatch.Success)
-                        blocks.Add(new Block(i.ToString(), blockStringMatch.Groups[1].Value));
+                        blocks.Add(new Block(i.ToString(), blockStringMatch.Groups[1].Value.Trim('\r', '\n')));
                 }
                 catch (Exception ex)
                 {
