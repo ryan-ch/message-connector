@@ -16,20 +16,15 @@ namespace XB.Hubert.Tests
 {
     public class HubertClientTests
     {
-        private readonly Mock<IOptions<HubertClientOptions>> _configMock;
-        private readonly Mock<HttpClient> _httpClientMock;
-        private readonly Mock<ILogger<HubertClient>> _loggerMock;
-        private readonly Mock<IHttpClientFactory> _clientFactoryMock;
         private readonly IHubertClient _hubertClient;
-        private readonly HubertClientOptions _hubertClientOptions;
 
         public HubertClientTests()
         {
-            _configMock = new Mock<IOptions<HubertClientOptions>>();
-            _httpClientMock = new Mock<HttpClient>();
-            _loggerMock = new Mock<ILogger<HubertClient>>();
-            _clientFactoryMock = new Mock<IHttpClientFactory>();
-            _hubertClientOptions = new HubertClientOptions()
+            var configMock = new Mock<IOptions<HubertClientOptions>>();
+            var httpClientMock = new Mock<HttpClient>();
+            var loggerMock = new Mock<ILogger<HubertClient>>();
+            var clientFactoryMock = new Mock<IHttpClientFactory>();
+            var hubertClientOptions = new HubertClientOptions()
             {
                 Url = "https://sfsfsdfdsfsdfdsdfssdf.se"
             };
@@ -61,15 +56,15 @@ namespace XB.Hubert.Tests
                     return response;
                 });
 
-            var httpClient = new HttpClient(mockHttpMessageHandler.Object);
+            httpClientMock = new Mock<HttpClient>(mockHttpMessageHandler.Object);
 
-            _clientFactoryMock.Setup(a => a.CreateClient(It.IsAny<string>())).Returns(httpClient);
-            _configMock.Setup(a => a.Value).Returns(_hubertClientOptions);
-            _hubertClient = new HubertClient(_clientFactoryMock.Object, _configMock.Object, _loggerMock.Object);
+            clientFactoryMock.Setup(a => a.CreateClient(It.IsAny<string>())).Returns(httpClientMock.Object);
+            configMock.Setup(a => a.Value).Returns(hubertClientOptions);
+            _hubertClient = new HubertClient(clientFactoryMock.Object, configMock.Object, loggerMock.Object);
         }
 
         [Fact]
-        public void SendAssessmentResponse_WillCreateAndPostRequest()
+        public void SendAssessmentResponse_WillCreateAndSendRequest()
         {
             const string timestamp = "";
             const string guid = "ced0f305-f722-4855-bfc7-5da3bf38bebc";
@@ -77,6 +72,7 @@ namespace XB.Hubert.Tests
 
             var response = _hubertClient.SendAssessmentResponse(timestamp, guid, transactionStatus).Result;
 
+            Assert.NotNull(response);
             Assert.Equal(response.Result.Uakw4630.Guid, guid);
         }
     }
