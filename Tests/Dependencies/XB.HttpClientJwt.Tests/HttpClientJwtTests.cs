@@ -1,3 +1,5 @@
+using System;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -5,24 +7,28 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using Moq.Protected;
 using XB.HttpClientJwt.Config;
 using Xunit;
 
 namespace XB.HttpClientJwt.Tests
 {
-    public static class TestHelper
-    {
-        public static readonly string AstreaResponseJson = "{\"astrea_response\": \"OK\"}";
-    }
-
     public class HttpClientJwtTests
     {
+        private static readonly string _sebcsUrl = "https://localhost/sebcs";
+        private static readonly string _jwtUrl = "https://localhost/jwt";
+
+        private readonly Mock<ILogger<AuthenticationDelegatingHandler>> _loggerMock;
+        private readonly Mock<IOptions<HttpClientJwtOptions>> _configurationMock;
         private readonly HttpClientJwtOptions _httpClientJwtOptions;
-        private readonly AuthenticationDelegatingHandler _authenticationDelegatingHandler;
+       
+        private Expression _sebcsRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_sebcsUrl));
+        private Expression _jwtRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_jwtUrl));
+
 
         public HttpClientJwtTests()
         {
-            var loggerMock = new Mock<ILogger<AuthenticationDelegatingHandler>>();
+            _loggerMock = new Mock<ILogger<AuthenticationDelegatingHandler>>();
 
             _httpClientJwtOptions = new HttpClientJwtOptions()
             {
@@ -31,57 +37,112 @@ namespace XB.HttpClientJwt.Tests
                 ClientId = "ClientId",
                 ClientSecret = "ClientSecret",
                 Password = "Password",
-                Url = "http://test.com",
+                Url = _jwtUrl,
                 Username = "Username"
             };
-            var configurationMock = new Mock<IOptions<HttpClientJwtOptions>>();
-            configurationMock.Setup(a => a.Value).Returns(_httpClientJwtOptions);
-
-            _authenticationDelegatingHandler = new AuthenticationDelegatingHandler(loggerMock.Object, configurationMock.Object)
-            {
-                InnerHandler = new TestHandler()
-            };
+            _configurationMock = new Mock<IOptions<HttpClientJwtOptions>>();
+            _configurationMock.Setup(a => a.Value).Returns(_httpClientJwtOptions);
         }
 
         [Fact]
-        public void FetchJwtToken_ShouldReturnJwtAndDoRequest()
+        public async Task FetchJwtToken_ShouldReturnJwtAndDoRequest()
         {
             //Arrange
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, _httpClientJwtOptions.Url);
-            var invoker = new HttpMessageInvoker(_authenticationDelegatingHandler);
-            
+            var innerMock = new Mock<DelegatingHandler>();
+
+            innerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", _sebcsRequestMatcher,
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)).Verifiable();
+
+            innerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", _jwtRequestMatcher,
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                    { Content = new StringContent("{ \"access_token\": \"bearertoken123\"}") }).Verifiable();
+
+            var authenticationDelegatingHandler = SetupDelegatingHandler(innerMock.Object);
+            var request = new HttpRequestMessage(HttpMethod.Post, _sebcsUrl);
+            var invoker = new HttpMessageInvoker(authenticationDelegatingHandler);
+
             //Act
-            var response = invoker.SendAsync(httpRequestMessage, new CancellationToken()).Result;
+            var result = await invoker.SendAsync(request, CancellationToken.None);
 
             //Assert
-            Assert.True(response.IsSuccessStatusCode);
-            Assert.True(response.Content.ReadAsStringAsync().Result.Equals(TestHelper.AstreaResponseJson));
+            Assert.Equal($"Bearer bearertoken123", request.Headers.Authorization.ToString());
         }
-    }
 
-    public class TestHandler : DelegatingHandler
-    {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        [Fact]
+        public async Task FetchJwtToken_ShouldReuseJwtAndDoRequest()
         {
-            var response = new HttpResponseMessage(HttpStatusCode.OK);
-            response.Content = new StringContent("{\"access_token\":\"access_token\", \"expires_in\":\"300\"}");
+            //Arrange
+            var innerMock = new Mock<DelegatingHandler>();
 
-            if (request.Headers.Authorization != null && request.Headers.Authorization.Scheme == "Bearer")
+            innerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", _sebcsRequestMatcher, ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+            innerMock.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>("SendAsync", _jwtRequestMatcher, ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                    { Content = new StringContent("{ \"access_token\": \"bearertoken1\", \"expires_in\":\"300\"}") })
+                .ThrowsAsync(new Exception("tried to fetch new query"));
+
+            var authenticationDelegatingHandler = SetupDelegatingHandler(innerMock.Object);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, _sebcsUrl);
+            var request2 = new HttpRequestMessage(HttpMethod.Post, _sebcsUrl);
+
+            var invoker = new HttpMessageInvoker(authenticationDelegatingHandler);
+
+            //Act
+            var result = await invoker.SendAsync(request, CancellationToken.None);
+            var result2 = await invoker.SendAsync(request2, CancellationToken.None);
+
+            //Assert
+            Assert.Equal($"Bearer bearertoken1", request.Headers.Authorization.ToString());
+            Assert.Equal($"Bearer bearertoken1", request2.Headers.Authorization.ToString());
+
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, result2.StatusCode);
+        }
+
+        [Fact]
+        public async Task FetchJwtToken_ShouldFetchNewTokenOnUnauthorized()
+        {
+            //Arrange
+            var innerMock = new Mock<DelegatingHandler>();
+
+            innerMock.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>("SendAsync", _sebcsRequestMatcher, ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Unauthorized))
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+            innerMock.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>("SendAsync", _jwtRequestMatcher, ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                    { Content = new StringContent("{ \"access_token\": \"bearertoken1\"}") })
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                    { Content = new StringContent("{ \"access_token\": \"bearertoken2\"}") });
+
+            var authenticationDelegatingHandler = SetupDelegatingHandler(innerMock.Object);
+            var request = new HttpRequestMessage(HttpMethod.Post, _sebcsUrl);
+            var invoker = new HttpMessageInvoker(authenticationDelegatingHandler);
+
+            //Act
+            var result = await invoker.SendAsync(request, CancellationToken.None);
+
+            //Assert
+            Assert.Equal($"Bearer bearertoken2", request.Headers.Authorization.ToString());
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        }
+
+        private AuthenticationDelegatingHandler SetupDelegatingHandler(DelegatingHandler handler)
+        {
+            return new AuthenticationDelegatingHandler(_loggerMock.Object, _configurationMock.Object)
             {
-                if (!string.IsNullOrEmpty(request.Headers.Authorization.Parameter))
-                {
-                    response = new HttpResponseMessage(HttpStatusCode.OK);
-                    response.Content = new StringContent(TestHelper.AstreaResponseJson);
-                }
-                else
-                {
-                    response = new HttpResponseMessage(HttpStatusCode.Unauthorized);
-                    response.Content = new StringContent("");
-                }
-            }
-
-            return Task.Factory.StartNew(
-                () => response);
+                InnerHandler = handler
+            };
         }
     }
 }
