@@ -27,7 +27,6 @@ namespace XB.Astrea.Client.Messages.Assessment
         public Tags Tags { get; set; }
         [JsonIgnore]
         public string Mt { get; set; }
-        //TODO: As there are many fields that are unconfirmed, we will use this for data transfer for fields that have not been classified
         [JsonIgnore]
         public Mt103Message Mt103Model { get; set; }
 

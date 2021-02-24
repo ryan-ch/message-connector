@@ -7,11 +7,6 @@ using XB.MtParser.Mt103;
 
 namespace XB.Astrea.Client.Messages.ProcessTrail
 {
-    /**
-     * TODOs:
-     * MT Parsing for the following tags: 72, 52, 57
-    **/
-
     public abstract class ProcessTrailBase
     {
         protected ProcessTrailBase(string appVersion)
@@ -31,7 +26,6 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
         protected Context SetupContext(string version)
         {
-            //TODO: Cli: is this the application eventId of the system that generates the process trail?
             return new Context($"{System}-v{version}", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), AstreaClientConstants.ProcessTrailSchemaVersion);
         }
 
