@@ -34,6 +34,9 @@ namespace XB.HttpClientJwt
 
             if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
             {
+                _jwt = string.Empty;
+                _jwtExpire = 0;
+
                 return await DoRequestWithJwt(request, cancellationToken);
             }
 
@@ -50,7 +53,7 @@ namespace XB.HttpClientJwt
 
         private async Task<string> GetJwt(CancellationToken cancellationToken)
         {
-            if (_jwt == null || DateTimeOffset.UtcNow.ToUnixTimeSeconds() > _jwtExpire)
+            if (string.IsNullOrEmpty(_jwt) || DateTimeOffset.UtcNow.ToUnixTimeSeconds() > _jwtExpire)
             {
                 var jwtRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(_httpClientJwtOptions.Url));
 
