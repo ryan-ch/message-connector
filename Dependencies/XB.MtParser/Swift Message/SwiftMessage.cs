@@ -2,12 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using XB.MtParser.Enums;
 using XB.MtParser.Models;
 
-[assembly: InternalsVisibleTo("XB.MtParser.Tests")]
 namespace XB.MtParser.Swift_Message
 {
     public record SwiftMessage
@@ -48,7 +46,7 @@ namespace XB.MtParser.Swift_Message
                 {
                     var blockStringMatch = Regex.Match(rawSwiftMessage, $"{{{i}:(.*?)}}({{\\w:|$)", RegexOptions.Singleline);
                     if (blockStringMatch.Success)
-                        blocks.Add(new Block(i.ToString(), blockStringMatch.Groups[1].Value));
+                        blocks.Add(new Block(i.ToString(), blockStringMatch.Groups[1].Value.Trim('\r', '\n')));
                 }
                 catch (Exception ex)
                 {

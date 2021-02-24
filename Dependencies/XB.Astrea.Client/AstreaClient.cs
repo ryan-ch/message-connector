@@ -49,6 +49,7 @@ namespace XB.Astrea.Client
                 try
                 {
                     // Todo: Check the performance of the next line (maybe replace with parsed object check)
+                    // Todo: Can it be I instead of O?
                     if (!_config.AcceptableTransactionTypes.Any(format => mt.Contains("}{2:O" + format)))
                         return new AssessmentResponse();
 

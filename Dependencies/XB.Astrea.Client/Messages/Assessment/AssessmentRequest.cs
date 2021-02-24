@@ -21,7 +21,7 @@ namespace XB.Astrea.Client.Messages.Assessment
 
         public string OrderIdentity { get; set; }
         public string BasketIdentity { get; set; }
-        public List<PaymentInstruction> PaymentInstructions { get; set; } = new List<PaymentInstruction>();
+        public List<PaymentInstruction> PaymentInstructions { get; set; }
         [JsonProperty(Required = Required.Always)]
         public string TargetState { get; set; }
         public Tags Tags { get; set; }
@@ -43,7 +43,7 @@ namespace XB.Astrea.Client.Messages.Assessment
                     InstructedDate = mt.ValueDate,
                     Amount = mt.SettledAmount,
                     Currency = mt.Currency,
-                    DebitAccount = new List<Account>() { GetDebitAccount(mt) },
+                    DebitAccount = new List<Account> { GetDebitAccount(mt) },
                     CreditAccount = new List<Account> { GetCreditAccount(mt) },
                     RemittanceInfo = new List<RemittanceInfo>(),
                     InstructionContext = new InstructionContext(new List<string>(),"", "0"),
