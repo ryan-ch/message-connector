@@ -25,7 +25,7 @@ namespace XB.Astrea.Client
 
             return services
                 .AddScoped<IAstreaClient, AstreaClient>()
-                .AddKafkaProducer(configuration, appSettingsPrefix);
+                .AddKafkaProducer(configuration, appSettingsPrefix)
                 .AddHubert(configuration, appSettingsPrefix);
             //.AddKafkaConsumer(configuration, appSettingsPrefix)
         }
