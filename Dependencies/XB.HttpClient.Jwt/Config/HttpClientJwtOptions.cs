@@ -1,6 +1,6 @@
 ﻿namespace XB.HttpClientJwt.Config
 {
-    public class HttpClientJwtOptions
+    public record HttpClientJwtOptions
     {
         public const string ConfigurationSection = "HttpClientJwt";
 
