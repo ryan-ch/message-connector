@@ -5,7 +5,7 @@ namespace XB.IBM.MQ.Tests
 {
     internal static class TestHelper
     {
-        internal static Mock<IConnectionFactory> GetConnectionFactoryMock(Mock<IConnection> connectionMock, Mock<ISession> sessionMock)
+        internal static Mock<IConnectionFactory> GetMqConnectionFactoryMock(Mock<IConnection> connectionMock, Mock<ISession> sessionMock)
         {
             var factory = new Mock<IConnectionFactory>();
             var destination = new Mock<IDestination>();

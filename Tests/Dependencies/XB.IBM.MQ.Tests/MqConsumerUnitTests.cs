@@ -30,7 +30,7 @@ namespace XB.IBM.MQ.Tests
             sessionMock.Setup(a => a.CreateConsumer(It.IsAny<IDestination>())).Returns(_messageConsumerMock.Object);
 
             configurationMock.Setup(ap => ap.Value).Returns(mqOptions);
-            var connectionFactoryMock = TestHelper.GetConnectionFactoryMock(connectionMock, sessionMock);
+            var connectionFactoryMock = TestHelper.GetMqConnectionFactoryMock(connectionMock, sessionMock);
             _mqConsumer = new MqConsumer(configurationMock.Object, loggerMock.Object, connectionFactoryMock.Object);
         }
 

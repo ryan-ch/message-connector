@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Dependencies\XB.Astrea.Client\XB.Astrea.Client.csproj" />
+    <ProjectReference Include="..\..\Testing.Common\Testing.Common.csproj" />
   </ItemGroup>
 
 </Project>
