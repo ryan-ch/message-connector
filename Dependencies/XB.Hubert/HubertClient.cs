@@ -29,11 +29,11 @@ namespace XB.Hubert
             var csUpdate01Fcpsts01SimpleClient =
                 new CrossbordpmtUpdate01Fcpsts01SimpleClient(_httpClient);
 
-            var request = new CrossbordpmtUpdate01Fcpsts01Request()
+            var request = new CrossbordpmtUpdate01Fcpsts01Request
             {
-                Data = new CrossbordpmtUpdate01Fcpsts01Tables()
+                Data = new CrossbordpmtUpdate01Fcpsts01Tables
                 {
-                    Uakw4630 = new UAKW4630()
+                    Uakw4630 = new UAKW4630
                     {
                         CreateTimestamp = timestamp,
                         Guid = guid,
