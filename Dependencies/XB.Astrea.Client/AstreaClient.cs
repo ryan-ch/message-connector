@@ -17,8 +17,6 @@ namespace XB.Astrea.Client
 {
     public class AstreaClient : IAstreaClient
     {
-        private const int WaitingBeforeRetry = 60000;
-
         private readonly AstreaClientOptions _config;
         private readonly HttpClient _httpClient;
         private readonly IKafkaProducer _kafkaProducer;
@@ -53,7 +51,7 @@ namespace XB.Astrea.Client
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error caught when trying to assess message: " + mt);
-                    await Task.Delay(WaitingBeforeRetry).ConfigureAwait(false);
+                    await Task.Delay(Convert.ToInt32(_config.WaitingBeforeRetryInSec * 1000)).ConfigureAwait(false);
                 }
             }
             _logger.LogError("Couldn't Handle this transaction message: " + mt);
@@ -66,12 +64,12 @@ namespace XB.Astrea.Client
             var request = new AssessmentRequest(mt103);
             var postBody = JsonConvert.SerializeObject(request, ProcessTrailDefaultJsonSettings.Settings);
             var data = new StringContent(postBody, Encoding.UTF8, "application/json");
+
+            _ = SendRequestedProcessTrail(request);
             var result = await _httpClient.PostAsync("/sas/v3/assessOrders/paymentInstruction", data).ConfigureAwait(false);
 
             if (!result.IsSuccessStatusCode)
                 throw new Exception("Request to Astrea API could not be completed, returned code: " + result.StatusCode);
-
-            _ = SendRequestedProcessTrail(request);
 
             var apiResponse = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
             var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
@@ -87,7 +85,7 @@ namespace XB.Astrea.Client
             try
             {
                 var requestedProcessTrail = new RequestedProcessTrail(request, _config.Version);
-                string kafkaMessage = JsonConvert.SerializeObject(requestedProcessTrail, ProcessTrailDefaultJsonSettings.Settings);
+                var kafkaMessage = JsonConvert.SerializeObject(requestedProcessTrail, ProcessTrailDefaultJsonSettings.Settings);
                 _logger.LogInformation("Sending RequestedProcessTrail: " + kafkaMessage);
                 await _kafkaProducer.Produce(kafkaMessage).ConfigureAwait(false);
             }
@@ -102,7 +100,7 @@ namespace XB.Astrea.Client
             try
             {
                 var riskLevel = int.Parse(assessmentResponse.RiskLevel);
-                var kafkaMessage = (riskLevel > _config.RiskThreshold)
+                var kafkaMessage = riskLevel > _config.RiskThreshold
                        ? JsonConvert.SerializeObject(new RejectedProcessTrail(assessmentResponse, _config.Version, parsedMt), ProcessTrailDefaultJsonSettings.Settings)
                        : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt), ProcessTrailDefaultJsonSettings.Settings);
 
