@@ -47,8 +47,7 @@ namespace XB.HttpClientJwt
         {
             var token = await GetJwt(cancellationToken);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var response = await base.SendAsync(request, cancellationToken);
-            return response;
+            return await base.SendAsync(request, cancellationToken);
         }
 
         private async Task<string> GetJwt(CancellationToken cancellationToken)
