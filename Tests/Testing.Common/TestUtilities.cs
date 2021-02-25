@@ -7,11 +7,11 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace XB.Astrea.Client.Tests
+namespace Testing.Common
 {
-    internal static class TestHelper
+    public static class TestUtilities
     {
-        internal static (Mock<IHttpClientFactory>, Mock<HttpMessageHandler>) GetHttpClientFactoryMock(string expectedResultString, HttpStatusCode status = HttpStatusCode.OK)
+        public static (Mock<IHttpClientFactory>, Mock<HttpMessageHandler>) GetHttpClientFactoryMock(string expectedResultString, HttpStatusCode status = HttpStatusCode.OK)
         {
             var factoryMock = new Mock<IHttpClientFactory>();
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
@@ -29,7 +29,7 @@ namespace XB.Astrea.Client.Tests
             return (factoryMock, mockHttpMessageHandler);
         }
 
-        internal static void VerifyLoggerCall<T>(this Mock<ILogger<T>> loggerMock, LogLevel level, string message, Times times, Exception exception = null)
+        public static void VerifyLoggerCall<T>(this Mock<ILogger<T>> loggerMock, LogLevel level, string message, Times times, Exception exception = null)
         {
             if (exception == null)
                 loggerMock.Verify(a => a.Log(

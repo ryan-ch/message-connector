@@ -9,16 +9,16 @@ namespace XB.MtParser.Tests
     {
         [Theory]
         [InlineData('I', "103", "SOGEFRPPZXXX", "U", "3", "003")]        
-        public void ApplicationHeader_ShouldInitializeWithCorrectValues_WithInputApplicationHeaderContent(char IOIdentifier, string swiftMessageType, string destinationAddress, string priority, string deliveryMonitoring, string obsolescencePeriod)
+        public void ApplicationHeader_ShouldInitializeWithCorrectValues_WithInputApplicationHeaderContent(char ioIdentifier, string swiftMessageType, string destinationAddress, string priority, string deliveryMonitoring, string obsolescencePeriod)
         {
             //Arrange
-            var applicationHeaderContent = $"{IOIdentifier}{swiftMessageType}{destinationAddress}{priority}{deliveryMonitoring}{obsolescencePeriod}";
+            var applicationHeaderContent = $"{ioIdentifier}{swiftMessageType}{destinationAddress}{priority}{deliveryMonitoring}{obsolescencePeriod}";
 
             //Act
             var applicationHeader = new ApplicationHeader(applicationHeaderContent);
 
             //Assert
-            Assert.Equal(IOIdentifier, applicationHeader.InputOutputIdentifier);
+            Assert.Equal(ioIdentifier, applicationHeader.InputOutputIdentifier);
             Assert.Equal(Convert.ToInt32(swiftMessageType), (int)applicationHeader.SwiftMessageType);
             Assert.Equal(destinationAddress, applicationHeader.DestinationAddress);
             Assert.Equal(priority, applicationHeader.Priority);
@@ -35,16 +35,16 @@ namespace XB.MtParser.Tests
 
         [Theory]
         [InlineData('O', "103", "0955", "100518IRVTUS3NAXXX7676396079", "210215", "1814", "N")]
-        public void ApplicationHeader_ShouldInitializeWithCorrectValues_WithOutputApplicationHeaderContent(char IOIdentifier, string swiftMessageType, string inputTime, string messageInputReference, string outputDate, string outputTime, string priority)
+        public void ApplicationHeader_ShouldInitializeWithCorrectValues_WithOutputApplicationHeaderContent(char ioIdentifier, string swiftMessageType, string inputTime, string messageInputReference, string outputDate, string outputTime, string priority)
         {
             //Arrange
-            var applicationHeaderContent = $"{IOIdentifier}{swiftMessageType}{inputTime}{messageInputReference}{outputDate}{outputTime}{priority}";
+            var applicationHeaderContent = $"{ioIdentifier}{swiftMessageType}{inputTime}{messageInputReference}{outputDate}{outputTime}{priority}";
 
             //Act
             var applicationHeader = new ApplicationHeader(applicationHeaderContent);
 
             //Assert
-            Assert.Equal(IOIdentifier, applicationHeader.InputOutputIdentifier);
+            Assert.Equal(ioIdentifier, applicationHeader.InputOutputIdentifier);
             Assert.Equal(Convert.ToInt32(swiftMessageType), (int)applicationHeader.SwiftMessageType);
             Assert.Equal(inputTime, applicationHeader.InputTime);
             Assert.Equal(messageInputReference, applicationHeader.MessageInputReference);
@@ -63,7 +63,7 @@ namespace XB.MtParser.Tests
         public void ApplicationHeader_SwiftMessageShouldBeUnknown_WhenParsingUnacceptedMessageTypes()
         {
             //Arrange
-            var unacceptedMessageTypeApplicationHeaderContent = "I105SOGEFRPPZXXXU3003";
+            const string unacceptedMessageTypeApplicationHeaderContent = "I105SOGEFRPPZXXXU3003";
 
             //Act
             var applicationHeader = new ApplicationHeader(unacceptedMessageTypeApplicationHeaderContent);

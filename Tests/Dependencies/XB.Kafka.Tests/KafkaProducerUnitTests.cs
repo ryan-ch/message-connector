@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Threading;
+using Testing.Common;
 using XB.Kafka.Config;
 using Xunit;
 
@@ -15,7 +16,6 @@ namespace XB.Kafka.Tests
         private readonly KafkaProducerConfig _producerConfig;
         private readonly Mock<IProducer<int, string>> _producer;
         private readonly Mock<ILogger<KafkaProducer>> _loggerMock;
-        private readonly Mock<IOptions<KafkaProducerConfig>> _configurationMock;
 
         public KafkaProducerUnitTests()
         {
@@ -23,10 +23,10 @@ namespace XB.Kafka.Tests
             _producer = new Mock<IProducer<int, string>>();
 
             _producerConfig = new KafkaProducerConfig { Topic = "TestTopic001" };
-            _configurationMock = new Mock<IOptions<KafkaProducerConfig>>();
-            _configurationMock.Setup(a => a.Value).Returns(_producerConfig);
+            var configurationMock = new Mock<IOptions<KafkaProducerConfig>>();
+            configurationMock.Setup(a => a.Value).Returns(_producerConfig);
 
-            _kafkaProducer = new KafkaProducer(_configurationMock.Object, _loggerMock.Object, _producer.Object);
+            _kafkaProducer = new KafkaProducer(configurationMock.Object, _loggerMock.Object, _producer.Object);
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace XB.Kafka.Tests
             TopicPartition passedTopic = null;
             Message<int, string> passedMessage = null;
             _producer.Setup(a => a.ProduceAsync(It.IsAny<TopicPartition>(), It.IsAny<Message<int, string>>(), default))
-                .Callback<TopicPartition, Message<int, string>, CancellationToken>((a, b, c) =>
+                .Callback<TopicPartition, Message<int, string>, CancellationToken>((a, b, _) =>
                   {
                       passedTopic = a;
                       passedMessage = b;
@@ -68,14 +68,7 @@ namespace XB.Kafka.Tests
             _kafkaProducer.Produce("Test Message");
 
             //Assert
-            _loggerMock.Verify(
-                m => m.Log(
-                   LogLevel.Error,
-                   It.IsAny<EventId>(),
-                   It.Is<It.IsAnyType>((v, _) => v.ToString().Contains("Couldn't send ProcessTrail with message: Test Message")),
-                   exception,
-                   It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-               Times.Once);
+            _loggerMock.VerifyLoggerCall(LogLevel.Error, "Couldn't send ProcessTrail with message: Test Message", Times.Once(), exception);
         }
     }
 }

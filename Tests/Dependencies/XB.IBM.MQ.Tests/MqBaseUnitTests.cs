@@ -32,7 +32,7 @@ namespace XB.IBM.MQ.Tests
             var loggerMock = new Mock<ILogger<MqBase>>();
             _connectionMock = new Mock<IConnection>();
             _sessionMock = new Mock<ISession>();
-            _connectionFactoryMock = TestHelper.GetConnectionFactoryMock(_connectionMock, _sessionMock);
+            _connectionFactoryMock = TestHelper.GetMqConnectionFactoryMock(_connectionMock, _sessionMock);
 
             _mqBase = new MqBase(_mqConfigurations, loggerMock.Object, _connectionFactoryMock.Object);
         }

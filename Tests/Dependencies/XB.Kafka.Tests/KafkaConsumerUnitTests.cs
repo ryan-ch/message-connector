@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Threading;
+using Testing.Common;
 using XB.Kafka.Config;
 using Xunit;
 
@@ -14,7 +15,6 @@ namespace XB.Kafka.Tests
         private readonly IKafkaConsumer _kafkaConsumer;
         private readonly Mock<IConsumer<string, string>> _consumer;
         private readonly Mock<ILogger<KafkaConsumer>> _loggerMock;
-        private readonly Mock<IOptions<KafkaConsumerConfig>> _configurationMock;
 
         public KafkaConsumerUnitTests()
         {
@@ -22,9 +22,9 @@ namespace XB.Kafka.Tests
             _consumer = new Mock<IConsumer<string, string>>();
             _consumer.Setup(a => a.Consume(It.IsAny<CancellationToken>()))
                 .Returns(new ConsumeResult<string, string> { Message = new Message<string, string> { Value = "Test Message" }, Partition = new Partition(0) });
-            _configurationMock = new Mock<IOptions<KafkaConsumerConfig>>();
+            var configurationMock = new Mock<IOptions<KafkaConsumerConfig>>();
 
-            _kafkaConsumer = new KafkaConsumer(_configurationMock.Object, _loggerMock.Object, _consumer.Object);
+            _kafkaConsumer = new KafkaConsumer(configurationMock.Object, _loggerMock.Object, _consumer.Object);
         }
 
         [Fact]
@@ -51,13 +51,7 @@ namespace XB.Kafka.Tests
 
             // Assert
             Assert.Equal(messageText, result);
-            _loggerMock.Verify(a => a.Log(
-                  LogLevel.Information,
-                  It.IsAny<EventId>(),
-                  It.Is<It.IsAnyType>((v, _) => v.ToString().Contains($"Consumed message '{messageText}'")),
-                  null,
-                  It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-              Times.Once);
+            _loggerMock.VerifyLoggerCall(LogLevel.Information, $"Consumed message '{messageText}'", Times.Once());
         }
 
         [Fact]
@@ -73,15 +67,9 @@ namespace XB.Kafka.Tests
             _kafkaConsumer.Consume(topic);
 
             //Assert
-            _loggerMock.Verify(a => a.Log(
-                  LogLevel.Error,
-                  It.IsAny<EventId>(),
-                  It.Is<It.IsAnyType>((v, _) => v.ToString().Contains($"Error when consuming topic: " + topic)),
-                  exception,
-                  It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-              Times.Once);
+            _loggerMock.VerifyLoggerCall(LogLevel.Error, $"Error when consuming topic: {topic}", Times.Once(), exception);
         }
-        
+
         [Fact]
         public void Consume_WillLogExceptionAndCloseConsumer()
         {
@@ -95,13 +83,7 @@ namespace XB.Kafka.Tests
             _kafkaConsumer.Consume(topic);
 
             //Assert
-            _loggerMock.Verify(a => a.Log(
-                    LogLevel.Error,
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, _) => v.ToString().Contains("Operation Canceled")),
-                    It.IsAny<OperationCanceledException>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-                Times.Once);
+            _loggerMock.VerifyLoggerCall(LogLevel.Error, "Operation Canceled", Times.Once());
             _consumer.Verify(a => a.Close(), Times.Once);
         }
     }

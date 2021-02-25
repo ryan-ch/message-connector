@@ -1,14 +1,20 @@
 ﻿using System.Collections.Generic;
+using Testing.Common.Test_Data;
 using XB.MtParser.Swift_Message;
-using XB.MtParser.Tests.Test_Data;
 using Xunit;
 
 namespace XB.MtParser.Tests
 {
     public class SwiftMessageTests
     {
+        public static IEnumerable<object[]> SwiftMessagesProvider => new[]
+        {
+            new object[] { SwiftMessages.SwiftMessage_1.OriginalMessage, SwiftMessages.SwiftMessage_1.BasicHeader, SwiftMessages.SwiftMessage_1.ApplicationHeader, SwiftMessages.SwiftMessage_1.UserHeader, SwiftMessages.SwiftMessage_1.TextBlock },
+            new object[] { SwiftMessages.SwiftMessage_2.OriginalMessage, SwiftMessages.SwiftMessage_2.BasicHeader, SwiftMessages.SwiftMessage_2.ApplicationHeader, SwiftMessages.SwiftMessage_2.UserHeader, SwiftMessages.SwiftMessage_2.TextBlock },
+        };
+
         [Theory]
-        [MemberData(nameof(SwiftMessageTestData.SwiftMessages), MemberType = typeof(SwiftMessageTestData))]
+        [MemberData(nameof(SwiftMessagesProvider))]
         public void SwiftMessage_ShouldInitializeCorrectly(string rawSwiftMessage, string basicHeaderContent, string applicationHeaderContent, string userHeaderContent, string textContent)
         {
             //Arrange
@@ -27,7 +33,7 @@ namespace XB.MtParser.Tests
         }
 
         [Theory]
-        [MemberData(nameof(SwiftMessageTestData.SwiftMessages), MemberType = typeof(SwiftMessageTestData))]
+        [MemberData(nameof(SwiftMessagesProvider))]
         public void SwiftMessage_ShouldParseBlocksCorrectly(string rawSwiftMessage, string basicHeaderContent, string applicationHeaderContent, string userHeaderContent, string textContent)
         {
             //Arrange

@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Testing.Common;
 using XB.Astrea.Client.Config;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.Kafka;
@@ -55,9 +56,9 @@ BENEF
 
             _configMock = new Mock<IOptions<AstreaClientOptions>>();
             _configMock.Setup(c => c.Value)
-                .Returns(new AstreaClientOptions { RetryPeriodInMin = 0.04, WaitingBeforeRetryInSec = 1.5, AcceptableTransactionTypes = new List<string> { "103" }, RiskThreshold = 3, Version = "1.0" });
+                .Returns(new AstreaClientOptions { RetryPeriodInMin = 0.03, WaitingBeforeRetryInSec = 1, AcceptableTransactionTypes = new List<string> { "103" }, RiskThreshold = 3, Version = "1.0" });
 
-            (_httpClientFactoryMock, _messageHandlerMock) = TestHelper.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject));
+            (_httpClientFactoryMock, _messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject));
 
             _astreaClient = new AstreaClient(_httpClientFactoryMock.Object, _kafkaProducerMock.Object,
                 _configMock.Object, _mTParserMock.Object, _loggerMock.Object);
@@ -122,7 +123,7 @@ BENEF
         public async Task AssessAsync_WhenAstreaFail_WillLogItAndRetry()
         {
             // Arrange
-            var (httpClientFactoryMock, messageHandlerMock) = TestHelper.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject), HttpStatusCode.InternalServerError);
+            var (httpClientFactoryMock, messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject), HttpStatusCode.InternalServerError);
             var astreaClient = new AstreaClient(httpClientFactoryMock.Object, _kafkaProducerMock.Object,
                 _configMock.Object, _mTParserMock.Object, _loggerMock.Object);
 
@@ -134,7 +135,7 @@ BENEF
             messageHandlerMock.Protected().Verify("SendAsync", Times.Exactly(2), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
             _loggerMock.VerifyLoggerCall(LogLevel.Error, "Error caught when trying to assess message", Times.Exactly(2));
             _loggerMock.VerifyLoggerCall(LogLevel.Error, "Couldn't Handle this transaction message", Times.Once());
-            _kafkaProducerMock.Verify(a => a.Produce(It.IsAny<string>()), Times.Exactly(2));
+            _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains(JsonConvert.SerializeObject(SwiftMessage)))), Times.Exactly(2));
             Assert.Equal(new AssessmentResponse(), result);
         }
 

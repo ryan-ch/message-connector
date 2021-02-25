@@ -25,13 +25,10 @@ namespace XB.IBM.MQ.Tests
             var configurationsMock = new Mock<IOptions<MqOptions>>();
             _textMessage = new Mock<ITextMessage>();
 
-            var mqOptions = new MqOptions()
-            {
-                WriterConfig = new MqConfigurations()
-            };
+            var mqOptions = new MqOptions { WriterConfig = new MqConfigurations() };
 
             configurationsMock.Setup(a => a.Value).Returns(mqOptions);
-            var connectionFactoryMock = TestHelper.GetConnectionFactoryMock(connectionMock, _sessionMock);
+            var connectionFactoryMock = TestHelper.GetMqConnectionFactoryMock(connectionMock, _sessionMock);
             _sessionMock.Setup(s => s.CreateProducer(It.IsAny<IDestination>())).Returns(_messageProducerMock.Object);
             _sessionMock.Setup(s => s.CreateTextMessage(It.IsAny<string>())).Returns(_textMessage.Object);
 
