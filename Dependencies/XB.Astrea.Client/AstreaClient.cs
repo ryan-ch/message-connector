@@ -68,7 +68,7 @@ namespace XB.Astrea.Client
             return new AssessmentResponse();
         }
 
-        private async Task<AssessmentResponse> HandleTimeOutAsync(string mt, DateTime currentTimestamp)
+        private async Task HandleTimeOutAsync(string mt, DateTime currentTimestamp)
         {
             var mt103 = _mTParser.ParseSwiftMt103Message(mt);
             var request = new AssessmentRequest(mt103);
@@ -93,9 +93,6 @@ namespace XB.Astrea.Client
             {
                 _logger.LogError(e, "Couldn't Send Requested ProcessTrail for request: " + JsonConvert.SerializeObject(request, ProcessTrailDefaultJsonSettings.Settings));
             }
-
-            return new AssessmentResponse();
-            
         }
 
         private async Task<AssessmentResponse> HandleAssessAsync(string mt, DateTime currentTimestamp)
