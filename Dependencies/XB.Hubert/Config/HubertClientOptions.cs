@@ -1,6 +1,6 @@
 ﻿namespace XB.Hubert.Config
 {
-    public class HubertClientOptions
+    public record HubertClientOptions
     {
         public const string ConfigurationSection = "HubertClient";
         public const string HttpClientIdentifier = "sebcs";
