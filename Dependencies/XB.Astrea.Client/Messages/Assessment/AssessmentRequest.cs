@@ -8,6 +8,8 @@ namespace XB.Astrea.Client.Messages.Assessment
 {
     public class AssessmentRequest
     {
+        public AssessmentRequest() { }
+
         public AssessmentRequest(Mt103Message mt103)
         {
             OrderIdentity = Guid.NewGuid().ToString();
