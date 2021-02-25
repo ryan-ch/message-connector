@@ -70,7 +70,7 @@ namespace XB.Hubert.Tests
             const string guid = "ced0f305-f722-4855-bfc7-5da3bf38bebc";
             const string transactionStatus = "";
 
-            var response = _hubertClient.SendAssessmentResponse(timestamp, guid, transactionStatus).Result;
+            var response = _hubertClient.SendAssessmentResultAsync(timestamp, guid, transactionStatus).Result;
 
             Assert.NotNull(response);
             Assert.Equal(response.Result.Uakw4630.Guid, guid);

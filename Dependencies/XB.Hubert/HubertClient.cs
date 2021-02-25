@@ -24,7 +24,7 @@ namespace XB.Hubert
             _logger = logger;
         }
 
-        public async Task<CrossbordpmtUpdate01Fcpsts01Response> SendAssessmentResponse(string timestamp, string guid, string transactionStatus, int rowId = 0, string sourceId = "SWIFT")
+        public async Task<CrossbordpmtUpdate01Fcpsts01Response> SendAssessmentResultAsync(string timestamp, string guid, string transactionStatus, int rowId = 0, string sourceId = "SWIFT")
         {
             var csUpdate01Fcpsts01SimpleClient =
                 new CrossbordpmtUpdate01Fcpsts01SimpleClient(_httpClient);

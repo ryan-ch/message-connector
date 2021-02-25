@@ -75,7 +75,7 @@ namespace XB.Astrea.Client
             try
             {
                 _logger.LogInformation("Sending to Hubert");
-                var hubertResponse = _hubertClient.SendAssessmentResponse(currentTimestamp.ToString(),
+                var hubertResponse = _hubertClient.SendAssessmentResultAsync(currentTimestamp.ToString(),
                     mt103.UserHeader.UniqueEndToEndTransactionReference,
                     AstreaClientConstants.Hubert_Timeout);
                 if (hubertResponse.Result.Result.Uakw4630.TransactionStatus == AstreaClientConstants.Hubert_Accepted)
@@ -135,7 +135,7 @@ namespace XB.Astrea.Client
         {
             try
             {
-                var hubertResponse = _hubertClient.SendAssessmentResponse(currentTimestamp.ToString(),
+                var hubertResponse = _hubertClient.SendAssessmentResultAsync(currentTimestamp.ToString(),
                     parsedMt.UserHeader.UniqueEndToEndTransactionReference,
                     assessmentResponse.Results.First().RiskLevel);
 
