@@ -10,7 +10,7 @@ namespace XB.Hubert
         public static IServiceCollection AddHubert(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
         {
             services.Configure<HubertClientOptions>(configuration.GetSection(appsettingsPrefix + HubertClientOptions.ConfigurationSection));
-            services.AddHttpClientJwt(configuration, appsettingsPrefix);
+            services.AddHttpClientJwt(configuration, appsettingsPrefix, HubertClientOptions.HttpClientIdentifier);
             return services.AddScoped<IHubertClient, HubertClient>();
         }
     }
