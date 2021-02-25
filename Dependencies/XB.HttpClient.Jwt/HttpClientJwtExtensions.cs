@@ -9,11 +9,11 @@ namespace XB.HttpClientJwt
     public static class HttpClientJwtExtensions
     {
         public static IServiceCollection AddHttpClientJwt(this IServiceCollection services, IConfiguration configuration,
-            string hubertHttpClientIdentifier, string appsettingsPrefix = "")
+            string appsettingsPrefix = "", string httpClientIdentifier = "default")
         {
             services.Configure<HttpClientJwtOptions>(configuration.GetSection(appsettingsPrefix + HttpClientJwtOptions.ConfigurationSection));
             services.AddSingleton<AuthenticationDelegatingHandler>();
-            services.AddHttpClient(hubertHttpClientIdentifier, c =>
+            services.AddHttpClient(httpClientIdentifier, c =>
             {
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
             }).AddHttpMessageHandler<AuthenticationDelegatingHandler>();
