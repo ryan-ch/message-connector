@@ -26,7 +26,7 @@ namespace XB.Hubert.Tests
             var clientFactoryMock = new Mock<IHttpClientFactory>();
             var hubertClientOptions = new HubertClientOptions()
             {
-                Url = "https://sfsfsdfdsfsdfdsdfssdf.se"
+                Url = "https://dummyurl.se"
             };
 
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
