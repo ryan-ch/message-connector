@@ -138,13 +138,13 @@ namespace XB.Astrea.Client
 
                 var hubertResponseTransactionStatus = hubertResponse.Result.Result.Uakw4630.TransactionStatus.ToUpper();
 
-                var kafkaMessage = (hubertResponseTransactionStatus == "REJECTED")
+                var kafkaMessage = (hubertResponseTransactionStatus == AstreaClientConstants.Hubert_Rejected)
                     ? JsonConvert.SerializeObject(
                         new RejectedProcessTrail(assessmentResponse, _config.Version, parsedMt),
                         ProcessTrailDefaultJsonSettings.Settings)
                     : JsonConvert.SerializeObject(
                         new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt,
-                            hubertResponseTransactionStatus == "TIMEOUT"),
+                            hubertResponseTransactionStatus == AstreaClientConstants.Hubert_Timeout),
                         ProcessTrailDefaultJsonSettings.Settings);
 
                 _logger.LogInformation("Sending DecisionProcessTrail: " + kafkaMessage);
