@@ -42,7 +42,7 @@ namespace XB.Astrea.Client
             var finishTimestamp = DateTime.Now.AddMinutes(_config.RetryPeriodInMin);
             var currentTimestamp = DateTime.Now;
 
-            while (currentTimestamp <= finishTimestamp)
+            while (DateTime.Now <= finishTimestamp)
             {
                 try
                 {
@@ -58,7 +58,6 @@ namespace XB.Astrea.Client
                     _logger.LogError(ex, "Error caught when trying to assess message, will retry: " + mt);
                     await Task.Delay(Convert.ToInt32(_config.WaitingBeforeRetryInSec * 1000)).ConfigureAwait(false);
                 }
-                currentTimestamp = DateTime.Now;
             }
             _ = HandleTimeOutAsync(mt, currentTimestamp);
             _logger.LogError("Couldn't Handle this transaction message, stopped: " + mt);
