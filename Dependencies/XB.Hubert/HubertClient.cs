@@ -24,7 +24,7 @@ namespace XB.Hubert
             _logger = logger;
         }
 
-        public async Task<CrossbordpmtUpdate01Fcpsts01Response> SendAssessmentResultAsync(string timestamp, string guid, string transactionStatus, int rowId = 0, string sourceId = "SWIFT")
+        public async Task<CrossbordpmtUpdate01Fcpsts01Response> SendAssessmentResultAsync(string timestamp, string guid, string transactionStatus)
         {
             var hubertServiceClient =
                 new CrossbordpmtUpdate01Fcpsts01SimpleClient(_httpClient);
@@ -37,8 +37,8 @@ namespace XB.Hubert
                     {
                         CreateTimestamp = timestamp,
                         Guid = guid,
-                        RowId = rowId,
-                        SourceId = sourceId,
+                        RowId = 1,
+                        SourceId = "SWIFT",
                         TransactionStatus = transactionStatus
                     }
                 }
