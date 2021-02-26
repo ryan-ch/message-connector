@@ -134,7 +134,7 @@ namespace XB.Astrea.Client
             {
                 var hubertResponse = _hubertClient.SendAssessmentResultAsync(currentTimestamp.ToString(),
                     parsedMt.UserHeader.UniqueEndToEndTransactionReference,
-                    assessmentResponse.Results.First().RiskLevel);
+                    assessmentResponse.RiskLevel);
 
                 var hubertResponseTransactionStatus = hubertResponse.Result.Result.Uakw4630.TransactionStatus.ToUpper();
 
