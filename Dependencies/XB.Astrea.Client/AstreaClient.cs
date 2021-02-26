@@ -102,10 +102,11 @@ namespace XB.Astrea.Client
             _ = SendRequestedProcessTrail(request);
             var result = await _httpClient.PostAsync("/sas/v3/assessOrders/paymentInstruction", data).ConfigureAwait(false);
 
-            if (!result.IsSuccessStatusCode)
-                throw new Exception("Request to Astrea API could not be completed, returned code: " + result.StatusCode);
-
             var apiResponse = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            if (!result.IsSuccessStatusCode)
+                throw new Exception("Request to Astrea API could not be completed, returned code: " + result.StatusCode + ". Response from API: " + apiResponse);
+
             var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
 
             _ = SendDecisionProcessTrail(assessmentResponse, mt103, currentTimestamp);
