@@ -88,7 +88,7 @@ namespace XB.Astrea.Client
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Couldn't Send Requested ProcessTrail for request: " + JsonConvert.SerializeObject(request, ProcessTrailDefaultJsonSettings.Settings));
+                _logger.LogError(e, "Couldn't Send OfferedTimeOutProcessTrail for request: " + JsonConvert.SerializeObject(request, ProcessTrailDefaultJsonSettings.Settings));
             }
         }
 
