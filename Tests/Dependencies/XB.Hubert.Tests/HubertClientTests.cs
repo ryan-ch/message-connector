@@ -39,11 +39,11 @@ namespace XB.Hubert.Tests
                 .ReturnsAsync((HttpRequestMessage request, CancellationToken token) =>
                 {
                     HttpResponseMessage response = new HttpResponseMessage();
-                    response.Content = new StringContent(JsonConvert.SerializeObject(new CrossbordpmtUpdate01Fcpsts01Response()
+                    response.Content = new StringContent(JsonConvert.SerializeObject(new CrossbordpmtUpdate01Fcpsts01Response
                     {
-                        Result = new CrossbordpmtUpdate01Fcpsts01Tables()
+                        Result = new CrossbordpmtUpdate01Fcpsts01Tables
                         {
-                            Uakw4630 = new UAKW4630()
+                            Uakw4630 = new UAKW4630
                             {
                                 CreateTimestamp = "2020-02-12 11:38:00.000000",
                                 Guid = "ced0f305-f722-4855-bfc7-5da3bf38bebc",

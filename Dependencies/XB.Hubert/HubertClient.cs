@@ -26,7 +26,7 @@ namespace XB.Hubert
 
         public async Task<CrossbordpmtUpdate01Fcpsts01Response> SendAssessmentResultAsync(string timestamp, string guid, string transactionStatus, int rowId = 0, string sourceId = "SWIFT")
         {
-            var csUpdate01Fcpsts01SimpleClient =
+            var hubertServiceClient =
                 new CrossbordpmtUpdate01Fcpsts01SimpleClient(_httpClient);
 
             var request = new CrossbordpmtUpdate01Fcpsts01Request
@@ -44,7 +44,7 @@ namespace XB.Hubert
                 }
             };
 
-            return await csUpdate01Fcpsts01SimpleClient.PostAsync(null, null, null, _config.ClientId, request);
+            return await hubertServiceClient.PostAsync(null, null, null, _config.ClientId, request);
         }
     }
 }
