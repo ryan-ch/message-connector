@@ -14,7 +14,7 @@ namespace XB.MtParser.Tests
         public void BasicHeader_ShouldThrow_WhenConstructedWithNullOrWhiteSpaceBasicHeaderContent(string basicHeaderContent)
         {
             //Assert
-            Assert.Throws<Exception>(() => { _ = new SwiftHeaderBaseMock(basicHeaderContent, default(SwiftMessageBlockIdentifiers)); });
+            Assert.Throws<Exception>(() => { _ = new SwiftHeaderBaseMock(basicHeaderContent, default); });
         }
 
         private record SwiftHeaderBaseMock : SwiftHeaderBase

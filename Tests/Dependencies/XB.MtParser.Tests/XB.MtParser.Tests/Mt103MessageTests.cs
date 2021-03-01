@@ -22,7 +22,7 @@ namespace XB.MtParser.Tests
         public void Mt103Message_EmptyTextBlockContent_WillLogError()
         {
             // Arrange
-            var rawSwiftMessage = SwiftMessages.SwiftMessage_2.OriginalMessage.Replace(SwiftMessages.SwiftMessage_2.TextBlock, "");
+            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace(SwiftMessagesMock.SwiftMessage_2.TextBlock, "");
 
             // Act
             _ = new Mt103Message(rawSwiftMessage, _loggerMock.Object);
@@ -38,7 +38,7 @@ namespace XB.MtParser.Tests
             const string field32A = "200825SEK3500,10";
             const string field50F = "/SE2880000832790000012345\r\n1/Vårgårda Kromverk\r\n2/Lilla Korsgatan 3\r\n4/19920914\r\n6/BQ/1zWLCaVqFd3Rs/47281128569335\r\n7/AZ/ynai3oTv8DtC91iwYm87b-vXtWBhRG\r\n8/ynai3oTv8DtC91iwYm87b-vXtWBhRG";
             const string field59F = "/SE3550000000054910123123\r\n1/BOB BAKER\r\n2/Bernhards Gränd 3, 418 42 Göteborg\r\n2/TRANSVERSAL 93 53 48 INT 70\r\n3/CO/BOGOTA";
-            var rawSwiftMessage = SwiftMessages.SwiftMessage_1.OriginalMessage.Replace("200825SEK3500,00", field32A);
+            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_1.OriginalMessage.Replace("200825SEK3500,00", field32A);
 
             // Act
             var swiftMt103Message = new Mt103Message(rawSwiftMessage, _loggerMock.Object);
@@ -61,7 +61,7 @@ namespace XB.MtParser.Tests
         public void Mt103Message_InvalidField32A_WillLogError(string field32A)
         {
             // Arrange
-            var rawSwiftMessage = SwiftMessages.SwiftMessage_2.OriginalMessage.Replace(SwiftMessages.SwiftMessage_2.TextBlock, $":32A:{field32A}\r\n:50F:");
+            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace(SwiftMessagesMock.SwiftMessage_2.TextBlock, $":32A:{field32A}\r\n:50F:");
 
             // Act
             var swiftMt103Message = new Mt103Message(rawSwiftMessage, _loggerMock.Object);
@@ -79,7 +79,7 @@ namespace XB.MtParser.Tests
         {
             // Arrange
             const string field32A = "HiDateSEK1000";
-            var rawSwiftMessage = SwiftMessages.SwiftMessage_2.OriginalMessage.Replace(SwiftMessages.SwiftMessage_2.TextBlock, $":32A:{field32A}\r\n:50F:");
+            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace(SwiftMessagesMock.SwiftMessage_2.TextBlock, $":32A:{field32A}\r\n:50F:");
 
             // Act
             var swiftMt103Message = new Mt103Message(rawSwiftMessage, _loggerMock.Object);
@@ -97,7 +97,7 @@ namespace XB.MtParser.Tests
         {
             // Arrange
             const string field32A = "200825SEKSettledAmount";
-            var rawSwiftMessage = SwiftMessages.SwiftMessage_2.OriginalMessage.Replace(SwiftMessages.SwiftMessage_2.TextBlock, $":32A:{field32A}\r\n:50F:");
+            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace(SwiftMessagesMock.SwiftMessage_2.TextBlock, $":32A:{field32A}\r\n:50F:");
 
             // Act
             var swiftMt103Message = new Mt103Message(rawSwiftMessage, _loggerMock.Object);

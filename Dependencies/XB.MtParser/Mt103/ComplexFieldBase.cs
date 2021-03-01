@@ -12,7 +12,7 @@ namespace XB.MtParser.Mt103
             if (!regex.Success)
                 return string.Empty;
 
-            if (removeFromOriginalString)
+            if (removeFromOriginalString && !string.IsNullOrEmpty(newString))
                 newString = newString.Replace(regex.Groups[0].Value, "").Trim('\n', '\r');
             return regex.Groups[1].Value.TrimEnd('\n', '\r');
         }

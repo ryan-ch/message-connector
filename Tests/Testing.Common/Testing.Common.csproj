@@ -9,4 +9,8 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Dependencies\XB.MtParser\XB.MtParser.csproj" />
+  </ItemGroup>
+
 </Project>

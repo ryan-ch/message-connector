@@ -24,10 +24,8 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         public General General { get; set; }
         public List<ProcessTrailPayload> Payloads { get; set; }
 
-        protected Context SetupContext(string version)
-        {
-            return new Context($"{System}-v{version}", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), AstreaClientConstants.ProcessTrailSchemaVersion);
-        }
+        private Context SetupContext(string version) =>
+            new Context($"{System}-v{version}", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), AstreaClientConstants.ProcessTrailSchemaVersion);
 
         protected List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response, Mt103Message parsedMt, Reason reason, string actAction)
         {
@@ -171,7 +169,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
     {
         public string Id { get; init; }
         public int RiskLevel { get; init; }
-        public List<Hint> Hints { get; init; }
+        public IEnumerable<Hint> Hints { get; init; }
         public AssessExtras Extras { get; init; }
     }
 
@@ -208,8 +206,8 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         public string ExecutionDate { get; init; }
         public decimal InstructedAmount { get; init; }
         public string InstructedCurrency { get; init; }
-        public List<Account> DebitAccount { get; init; }
-        public List<Account> CreditAccount { get; init; }
+        public IEnumerable<Account> DebitAccount { get; init; }
+        public IEnumerable<Account> CreditAccount { get; init; }
         public List<References> References { get; init; }
         public List<ProcessTrailRemittanceInfo> RemittanceInfos { get; init; }
     }

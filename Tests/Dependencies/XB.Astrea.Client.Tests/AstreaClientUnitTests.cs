@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Testing.Common;
+using Testing.Common.Test_Data;
 using XB.Astrea.Client.Config;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.Kafka;
@@ -21,19 +22,6 @@ namespace XB.Astrea.Client.Tests
 {
     public class AstreaClientUnitTests
     {
-        private const string SwiftMessage = @"{1:F01ESSESES0AXXX8000025977}{2:O1030955100518IRVTUS3NAXXX76763960792102151814N}{3:{108:78}{121:E01EBC0C-0B22-322A-A8F1-097839E991F4}}{4:
-:20:RS202102158
-:23B:CRED
-:32A:210215SEK12,00
-:33B:SEK12,00
-:50K:/DE89370400440532013000
-EUB
-:59:/50601001079
-BENEF
-:70:BETORSAK
-:71A:SHA
--}{S:{MAN:UAKOUAK4600}}";
-
         private readonly AssessmentResponse _expectedResultObject = new AssessmentResponse { Identity = "abc0123", RiskLevel = "4", Results = new List<AssessmentResult>() };
 
         private readonly Mock<IMTParser> _mTParserMock;
@@ -51,8 +39,8 @@ BENEF
             _loggerMock = new Mock<ILogger<AstreaClient>>();
 
             _mTParserMock = new Mock<IMTParser>();
-            _mTParserMock.Setup(a => a.ParseSwiftMt103Message(SwiftMessage))
-                .Returns(new Mt103Message(SwiftMessage, null));
+            _mTParserMock.Setup(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage))
+                .Returns(new Mt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage, null));
 
             _configMock = new Mock<IOptions<AstreaClientOptions>>();
             _configMock.Setup(c => c.Value)
@@ -77,7 +65,7 @@ BENEF
         public async Task AssessAsync_WillReturnEmpty_IfTransactionTypeIsNotAccepted()
         {
             // Arrange
-            var message = SwiftMessage.Replace("{2:O103", "{2:O102");
+            var message = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace("{2:O103", "{2:O102");
 
             // Act
             var result = await _astreaClient.AssessAsync(message).ConfigureAwait(false);
@@ -91,10 +79,10 @@ BENEF
         {
             // Arrange
             // Act
-            var result = await _astreaClient.AssessAsync(SwiftMessage).ConfigureAwait(false);
+            var result = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
 
             // Assert
-            _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessage), Times.Once);
+            _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), Times.Once);
             _messageHandlerMock.Protected().Verify("SendAsync", Times.Once(), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
             Assert.Equal(_expectedResultObject.ToString(), result.ToString());
         }
@@ -104,14 +92,14 @@ BENEF
         {
             // Arrange
             var ex = new Exception("Test Exception");
-            _mTParserMock.Setup(a => a.ParseSwiftMt103Message(SwiftMessage))
+            _mTParserMock.Setup(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage))
                 .Throws(ex);
 
             // Act
-            var result = await _astreaClient.AssessAsync(SwiftMessage).ConfigureAwait(false);
+            var result = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
 
             // Assert
-            _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessage), Times.Exactly(2));
+            _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), Times.Exactly(2));
             _messageHandlerMock.Protected().Verify("SendAsync", Times.Never(), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
             _loggerMock.VerifyLoggerCall(LogLevel.Error, "Error caught when trying to assess message", Times.Exactly(2), ex);
             _loggerMock.VerifyLoggerCall(LogLevel.Error, "Couldn't Handle this transaction message", Times.Once());
@@ -128,14 +116,14 @@ BENEF
                 _configMock.Object, _mTParserMock.Object, _loggerMock.Object);
 
             // Act
-            var result = await astreaClient.AssessAsync(SwiftMessage).ConfigureAwait(false);
+            var result = await astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
 
             // Assert
-            _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessage), Times.Exactly(2));
+            _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), Times.Exactly(2));
             messageHandlerMock.Protected().Verify("SendAsync", Times.Exactly(2), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
             _loggerMock.VerifyLoggerCall(LogLevel.Error, "Error caught when trying to assess message", Times.Exactly(2));
             _loggerMock.VerifyLoggerCall(LogLevel.Error, "Couldn't Handle this transaction message", Times.Once());
-            _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains(JsonConvert.SerializeObject(SwiftMessage)))), Times.Exactly(2));
+            _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains(JsonConvert.SerializeObject(SwiftMessagesMock.SwiftMessage_2.OriginalMessage)))), Times.Exactly(2));
             Assert.Equal(new AssessmentResponse(), result);
         }
 
@@ -144,10 +132,10 @@ BENEF
         {
             // Arrange
             // Act
-            _ = await _astreaClient.AssessAsync(SwiftMessage).ConfigureAwait(false);
+            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
 
             // Assert
-            _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains(JsonConvert.SerializeObject(SwiftMessage)))), Times.Once);
+            _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains(JsonConvert.SerializeObject(SwiftMessagesMock.SwiftMessage_2.OriginalMessage)))), Times.Once);
             _loggerMock.VerifyLoggerCall(LogLevel.Information, "Sending RequestedProcessTrail", Times.Once());
         }
 
@@ -156,7 +144,7 @@ BENEF
         {
             // Arrange
             // Act
-            _ = await _astreaClient.AssessAsync(SwiftMessage).ConfigureAwait(false);
+            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
 
             // Assert
             _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains(_expectedResultObject.Identity))), Times.Once);
@@ -172,7 +160,7 @@ BENEF
                 .Throws(ex);
 
             // Act
-            _ = await _astreaClient.AssessAsync(SwiftMessage).ConfigureAwait(false);
+            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
 
             // Assert
             _kafkaProducerMock.Verify(a => a.Produce(It.IsAny<string>()), Times.Exactly(2));
