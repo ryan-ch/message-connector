@@ -4,8 +4,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Castle.Core.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Protected;
 using XB.HttpClientJwt.Config;
@@ -18,18 +19,16 @@ namespace XB.HttpClientJwt.Tests
         private static readonly string _sebcsUrl = "https://localhost/sebcs";
         private static readonly string _jwtUrl = "https://localhost/jwt";
 
-        private readonly Mock<ILogger<AuthenticationDelegatingHandler>> _loggerMock;
-        private readonly Mock<IOptions<HttpClientJwtOptions>> _configurationMock;
+        //private readonly Mock<IOptions<HttpClientJwtOptions>> _configurationMock;
+        private readonly Mock<Microsoft.Extensions.Configuration.IConfiguration> _configurationMock;
         private readonly HttpClientJwtOptions _httpClientJwtOptions;
        
-        private Expression _sebcsRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_sebcsUrl));
-        private Expression _jwtRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_jwtUrl));
+        private readonly Expression _sebcsRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_sebcsUrl));
+        private readonly Expression _jwtRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_jwtUrl));
 
 
         public HttpClientJwtTests()
         {
-            _loggerMock = new Mock<ILogger<AuthenticationDelegatingHandler>>();
-
             _httpClientJwtOptions = new HttpClientJwtOptions()
             {
                 Grant_Type = "Grant_Type",
@@ -40,8 +39,8 @@ namespace XB.HttpClientJwt.Tests
                 Url = _jwtUrl,
                 Username = "Username"
             };
-            _configurationMock = new Mock<IOptions<HttpClientJwtOptions>>();
-            _configurationMock.Setup(a => a.Value).Returns(_httpClientJwtOptions);
+            _configurationMock = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
+            //_configurationMock.Setup(a => a.Value).Returns(_httpClientJwtOptions);
         }
 
         [Fact]
@@ -66,7 +65,7 @@ namespace XB.HttpClientJwt.Tests
             var invoker = new HttpMessageInvoker(authenticationDelegatingHandler);
 
             //Act
-            var result = await invoker.SendAsync(request, CancellationToken.None);
+            await invoker.SendAsync(request, CancellationToken.None);
 
             //Assert
             Assert.Equal($"Bearer bearertoken123", request.Headers.Authorization.ToString());
