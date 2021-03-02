@@ -11,7 +11,7 @@ namespace XB.Hubert
         {
             services.Configure<HubertClientOptions>(configuration.GetSection(appsettingsPrefix + HubertClientOptions.ConfigurationSection));
             services.AddHttpClientJwt(configuration, appsettingsPrefix, HubertClientOptions.HttpClientIdentifier);
-            return services.AddScoped<IHubertClient, HubertClient>();
+            return services.AddTransient<IHubertClient, HubertClient>();
         }
     }
 }

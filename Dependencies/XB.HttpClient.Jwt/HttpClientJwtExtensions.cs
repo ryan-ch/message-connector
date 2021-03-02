@@ -13,7 +13,7 @@ namespace XB.HttpClientJwt
         {
             services.Configure<HttpClientJwtOptions>(configuration.GetSection(appsettingsPrefix + HttpClientJwtOptions.ConfigurationSection));
             //Todo: do we need to add AuthenticationDelegatingHandler in two places?
-            services.AddSingleton<AuthenticationDelegatingHandler>();
+            services.AddTransient<AuthenticationDelegatingHandler>();
             services.AddHttpClient(httpClientIdentifier, c =>
             {
                 c.DefaultRequestHeaders.Add("Accept", "application/json");

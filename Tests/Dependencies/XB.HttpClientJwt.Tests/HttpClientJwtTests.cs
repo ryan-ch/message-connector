@@ -139,7 +139,7 @@ namespace XB.HttpClientJwt.Tests
 
         private AuthenticationDelegatingHandler SetupDelegatingHandler(DelegatingHandler handler)
         {
-            return new AuthenticationDelegatingHandler(_loggerMock.Object, _configurationMock.Object)
+            return new AuthenticationDelegatingHandler(_configurationMock.Object)
             {
                 InnerHandler = handler
             };

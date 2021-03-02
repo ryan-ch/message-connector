@@ -16,16 +16,13 @@ namespace XB.HttpClientJwt
     //Todo: should this be moved in to common or keep it in own library?
     public class AuthenticationDelegatingHandler : DelegatingHandler
     {
-        private readonly ILogger<AuthenticationDelegatingHandler> _logger;
         private readonly HttpClientJwtOptions _httpClientJwtOptions;
 
         private string _jwt;
         private long _jwtExpire;
 
-        public AuthenticationDelegatingHandler(ILogger<AuthenticationDelegatingHandler> logger,
-            IOptions<HttpClientJwtOptions> config)
+        public AuthenticationDelegatingHandler(IOptions<HttpClientJwtOptions> config)
         {
-            _logger = logger;
             _httpClientJwtOptions = config.Value;
         }
 
@@ -33,16 +30,15 @@ namespace XB.HttpClientJwt
         {
             var response = await DoRequestWithJwt(request, cancellationToken);
 
-            //Todo: revert the if-statement?
-            if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
+            if (response.StatusCode != HttpStatusCode.Unauthorized && response.StatusCode != HttpStatusCode.Forbidden)
             {
-                _jwt = string.Empty;
-                _jwtExpire = 0;
-
-                return await DoRequestWithJwt(request, cancellationToken);
+                return response;
             }
 
-            return response;
+            _jwt = string.Empty;
+            _jwtExpire = 0;
+
+            return await DoRequestWithJwt(request, cancellationToken);
         }
 
         private async Task<HttpResponseMessage> DoRequestWithJwt(HttpRequestMessage request, CancellationToken cancellationToken)
