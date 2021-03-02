@@ -13,16 +13,13 @@ namespace XB.Hubert
     {
         private readonly HubertClientOptions _config;
         private readonly HttpClient _httpClient;
-        private readonly ILogger<HubertClient> _logger;
 
 
-        public HubertClient(IHttpClientFactory httpClientFactory, IOptions<HubertClientOptions> config, ILogger<HubertClient> logger)
+        public HubertClient(IHttpClientFactory httpClientFactory, IOptions<HubertClientOptions> config)
         {
             _config = config.Value;
             _httpClient = httpClientFactory.CreateClient(HubertClientOptions.HttpClientIdentifier);
             _httpClient.BaseAddress = new Uri(_config.Url);
-            _logger = logger;
-            //Todo: remove logger if not used
         }
 
         public async Task<CrossbordpmtUpdate01Fcpsts01Response> SendAssessmentResultAsync(string timestamp, string guid, string transactionStatus)
