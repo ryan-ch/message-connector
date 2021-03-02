@@ -21,7 +21,6 @@ namespace XB.Hubert.Tests
         {
             var configMock = new Mock<IOptions<HubertClientOptions>>();
             var httpClientMock = new Mock<HttpClient>();
-            var loggerMock = new Mock<ILogger<HubertClient>>();
             var clientFactoryMock = new Mock<IHttpClientFactory>();
             var hubertClientOptions = new HubertClientOptions()
             {
