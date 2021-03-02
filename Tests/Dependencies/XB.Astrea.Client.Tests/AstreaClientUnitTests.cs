@@ -13,6 +13,7 @@ using Testing.Common;
 using Testing.Common.Test_Data;
 using XB.Astrea.Client.Config;
 using XB.Astrea.Client.Messages.Assessment;
+using XB.Hubert;
 using XB.Kafka;
 using XB.MtParser.Interfaces;
 using XB.MtParser.Mt103;
@@ -30,6 +31,7 @@ namespace XB.Astrea.Client.Tests
         private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
         private readonly Mock<HttpMessageHandler> _messageHandlerMock;
         private readonly Mock<IOptions<AstreaClientOptions>> _configMock;
+        private readonly Mock<IHubertClient> _huberClientMock;
 
         private readonly AstreaClient _astreaClient;
 
@@ -47,9 +49,11 @@ namespace XB.Astrea.Client.Tests
                 .Returns(new AstreaClientOptions { RetryPeriodInMin = 0.03, WaitingBeforeRetryInSec = 1, AcceptableTransactionTypes = new List<string> { "103" }, RiskThreshold = 3, Version = "1.0" });
 
             (_httpClientFactoryMock, _messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject));
+            
+            _huberClientMock = new Mock<IHubertClient>();
 
             _astreaClient = new AstreaClient(_httpClientFactoryMock.Object, _kafkaProducerMock.Object,
-                _configMock.Object, _mTParserMock.Object, _loggerMock.Object);
+                _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _huberClientMock.Object);
         }
 
         [Fact]
@@ -113,7 +117,7 @@ namespace XB.Astrea.Client.Tests
             // Arrange
             var (httpClientFactoryMock, messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject), HttpStatusCode.InternalServerError);
             var astreaClient = new AstreaClient(httpClientFactoryMock.Object, _kafkaProducerMock.Object,
-                _configMock.Object, _mTParserMock.Object, _loggerMock.Object);
+                _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _huberClientMock.Object);
 
             // Act
             var result = await astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\XB.HUBERT\XB.Hubert.csproj" />
     <ProjectReference Include="..\XB.Kafka\XB.Kafka.csproj" />
     <ProjectReference Include="..\XB.MtParser\XB.MtParser.csproj" />
   </ItemGroup>

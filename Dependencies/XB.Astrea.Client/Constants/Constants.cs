@@ -20,5 +20,8 @@
         internal const string Action_PassThrough = "passthrough";
         internal const string Action_Block = "block";
         internal const string DateFormat = "yyyy-MM-ddTHH:mm:ss.fff+01:00";
+        internal const string Hubert_Timeout = "TIMEOUT";
+        internal const string Hubert_Accepted = "ACCEPTED";
+        internal const string Hubert_Rejected = "REJECTED";
     }
 }

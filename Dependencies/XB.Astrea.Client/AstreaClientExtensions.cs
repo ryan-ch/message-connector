@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Net;
 using XB.Astrea.Client.Config;
 using XB.Kafka;
+using XB.Hubert;
 
 namespace XB.Astrea.Client
 {
@@ -18,11 +20,13 @@ namespace XB.Astrea.Client
             {
                 c.BaseAddress = new Uri(configuration[appSettingsPrefix + AstreaClientOptions.ConfigurationSection + ":Url"]);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestVersion = HttpVersion.Version20;
             });
 
             return services
                 .AddScoped<IAstreaClient, AstreaClient>()
-                .AddKafkaProducer(configuration, appSettingsPrefix);
+                .AddKafkaProducer(configuration, appSettingsPrefix)
+                .AddHubert(configuration, appSettingsPrefix);
             //.AddKafkaConsumer(configuration, appSettingsPrefix)
         }
     }
