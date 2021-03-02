@@ -35,7 +35,7 @@ namespace XB.Kafka
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error when consuming topic: " + topic);
+                _logger.LogError(ex, "Error when consuming topic: {topic}", topic);
             }
             return message;
         }

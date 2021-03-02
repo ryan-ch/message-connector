@@ -37,7 +37,7 @@ namespace XB.Kafka
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Couldn't send ProcessTrail with message: " + message);
+                _logger.LogError(ex, "Couldn't send ProcessTrail with message: {message}", message);
             }
         }
     }
