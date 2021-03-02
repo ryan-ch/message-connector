@@ -59,7 +59,7 @@ namespace XB.Hubert.Tests
 
             clientFactoryMock.Setup(a => a.CreateClient(It.IsAny<string>())).Returns(httpClientMock.Object);
             configMock.Setup(a => a.Value).Returns(hubertClientOptions);
-            _hubertClient = new HubertClient(clientFactoryMock.Object, configMock.Object, loggerMock.Object);
+            _hubertClient = new HubertClient(clientFactoryMock.Object, configMock.Object);
         }
 
         [Fact]
