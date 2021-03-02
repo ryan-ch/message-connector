@@ -17,7 +17,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             if (!timeout) return;
 
             var payload = Payloads.First().Payload;
-            _ = payload.Assess.Hints.Append(new Hint("timeout", new List<string>() { "HUBERT_TIMEOUT" }));
+            payload.Assess.Hints = payload.Assess.Hints.Append(new Hint("timeout", new List<string>() { "HUBERT_TIMEOUT" }));
         }
 
         private static Reason GetReason(bool timeout)

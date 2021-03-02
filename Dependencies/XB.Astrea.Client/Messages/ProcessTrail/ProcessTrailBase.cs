@@ -169,7 +169,8 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
     {
         public string Id { get; init; }
         public int RiskLevel { get; init; }
-        public IEnumerable<Hint> Hints { get; init; }
+        // TODO: we should set Hints as init-only properties
+        public IEnumerable<Hint> Hints { get; set; }
         public AssessExtras Extras { get; init; }
     }
 
