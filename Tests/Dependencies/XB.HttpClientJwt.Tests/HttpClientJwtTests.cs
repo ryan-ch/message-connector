@@ -4,9 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Castle.Core.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 using XB.HttpClientJwt.Config;
@@ -19,8 +17,7 @@ namespace XB.HttpClientJwt.Tests
         private static readonly string _sebcsUrl = "https://localhost/sebcs";
         private static readonly string _jwtUrl = "https://localhost/jwt";
 
-        //private readonly Mock<IOptions<HttpClientJwtOptions>> _configurationMock;
-        private readonly Mock<Microsoft.Extensions.Configuration.IConfiguration> _configurationMock;
+        private readonly Mock<IOptions<HttpClientJwtOptions>> _configurationMock;
         private readonly HttpClientJwtOptions _httpClientJwtOptions;
        
         private readonly Expression _sebcsRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_sebcsUrl));
@@ -39,8 +36,7 @@ namespace XB.HttpClientJwt.Tests
                 Url = _jwtUrl,
                 Username = "Username"
             };
-            _configurationMock = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
-            //_configurationMock.Setup(a => a.Value).Returns(_httpClientJwtOptions);
+            _configurationMock.Setup(a => a.Value).Returns(_httpClientJwtOptions);
         }
 
         [Fact]
