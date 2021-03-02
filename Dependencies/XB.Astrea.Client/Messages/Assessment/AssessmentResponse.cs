@@ -7,9 +7,9 @@ namespace XB.Astrea.Client.Messages.Assessment
         public string RequestIdentity { get; init; }
         public string Identity { get; init; }
         public string RiskLevel { get; init; }
-        public List<Hint> Hints { get; init; }
+        public IEnumerable<Hint> Hints { get; init; }
         public string AssessmentStatus { get; init; }
-        public List<string> RiskyInstructions { get; init; }
+        public IEnumerable<string> RiskyInstructions { get; init; }
         public List<AssessmentResult> Results { get; init; }
     }
 
@@ -30,7 +30,9 @@ namespace XB.Astrea.Client.Messages.Assessment
     {
         public string OrderIdentity { get; init; }
         public string RiskLevel { get; init; }
-        public List<Hint> Hints { get; init; }
+        public IEnumerable<Hint> Hints { get; init; }
         public ExtraAssessmentInfo Extras { get; init; }
     }
+
+    public record Hint(string Name, IEnumerable<string> Values);
 }

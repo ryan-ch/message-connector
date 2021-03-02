@@ -55,7 +55,7 @@ namespace XB.Astrea.Client
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error caught when trying to assess message, will retry: " + mt);
+                    _logger.LogError(ex, "Error caught when trying to assess message, will retry: {mt}", mt);
                     await Task.Delay(Convert.ToInt32(_config.WaitingBeforeRetryInSec * 1000)).ConfigureAwait(false);
                 }
             }
@@ -120,12 +120,12 @@ namespace XB.Astrea.Client
             {
                 var requestedProcessTrail = new RequestedProcessTrail(request, _config.Version);
                 var kafkaMessage = JsonConvert.SerializeObject(requestedProcessTrail, ProcessTrailDefaultJsonSettings.Settings);
-                _logger.LogInformation("Sending RequestedProcessTrail: " + kafkaMessage);
+                _logger.LogInformation("Sending RequestedProcessTrail: {kafkaMessage}", kafkaMessage);
                 await _kafkaProducer.Produce(kafkaMessage).ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Couldn't Send Requested ProcessTrail for request: " + JsonConvert.SerializeObject(request, ProcessTrailDefaultJsonSettings.Settings));
+                _logger.LogError(e, "Couldn't Send Requested ProcessTrail for request: {request}", request);
             }
         }
 
@@ -148,14 +148,12 @@ namespace XB.Astrea.Client
                             hubertResponseTransactionStatus == AstreaClientConstants.Hubert_Timeout),
                         ProcessTrailDefaultJsonSettings.Settings);
 
-                _logger.LogInformation("Sending DecisionProcessTrail: " + kafkaMessage);
+                _logger.LogInformation("Sending DecisionProcessTrail: {kafkaMessage}", kafkaMessage);
                 await _kafkaProducer.Produce(kafkaMessage).ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
-                    "Couldn't Send Decision ProcessTrail for response: " +
-                    JsonConvert.SerializeObject(assessmentResponse));
+                _logger.LogError(e, "Couldn't Send Decision ProcessTrail for response: {assessmentResponse}", assessmentResponse);
             }
         }
     }

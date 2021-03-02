@@ -9,8 +9,8 @@ namespace XB.MtParser.Tests
     {
         public static IEnumerable<object[]> SwiftMessagesProvider => new[]
         {
-            new object[] { SwiftMessages.SwiftMessage_1.OriginalMessage, SwiftMessages.SwiftMessage_1.BasicHeader, SwiftMessages.SwiftMessage_1.ApplicationHeader, SwiftMessages.SwiftMessage_1.UserHeader, SwiftMessages.SwiftMessage_1.TextBlock },
-            new object[] { SwiftMessages.SwiftMessage_2.OriginalMessage, SwiftMessages.SwiftMessage_2.BasicHeader, SwiftMessages.SwiftMessage_2.ApplicationHeader, SwiftMessages.SwiftMessage_2.UserHeader, SwiftMessages.SwiftMessage_2.TextBlock },
+            new object[] { SwiftMessagesMock.SwiftMessage_1.OriginalMessage, SwiftMessagesMock.SwiftMessage_1.BasicHeader, SwiftMessagesMock.SwiftMessage_1.ApplicationHeader, SwiftMessagesMock.SwiftMessage_1.UserHeader, SwiftMessagesMock.SwiftMessage_1.TextBlock },
+            new object[] { SwiftMessagesMock.SwiftMessage_2.OriginalMessage, SwiftMessagesMock.SwiftMessage_2.BasicHeader, SwiftMessagesMock.SwiftMessage_2.ApplicationHeader, SwiftMessagesMock.SwiftMessage_2.UserHeader, SwiftMessagesMock.SwiftMessage_2.TextBlock },
         };
 
         [Theory]

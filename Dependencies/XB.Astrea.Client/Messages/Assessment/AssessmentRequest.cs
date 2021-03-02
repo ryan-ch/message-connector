@@ -36,7 +36,7 @@ namespace XB.Astrea.Client.Messages.Assessment
         {
             var paymentInstructionList = new List<PaymentInstruction>
             {
-                new PaymentInstruction()
+                new PaymentInstruction
                 {
                     Identity = mt.UserHeader.UniqueEndToEndTransactionReference,
                     PaymentType = "seb.payment.se.swift." + mt.BankOperationCode,
@@ -76,7 +76,7 @@ namespace XB.Astrea.Client.Messages.Assessment
 
     public record RegisteringParty(string AuthId, string SebId);
     public record RemittanceInfo(string Info, string Type);
-    public record InstructionContext(List<string> Debtors, string Beneficiary, string DebitAccountAvailableAmount);
+    public record InstructionContext(IEnumerable<string> Debtors, string Beneficiary, string DebitAccountAvailableAmount);
     public record Actor(string SebId, string AuthId);
     public record Principal(string SebId, string AuthId);
     public record Tags();
@@ -106,9 +106,9 @@ namespace XB.Astrea.Client.Messages.Assessment
         public DateTime InstructedDate { get; init; }
         public decimal Amount { get; init; }
         public string Currency { get; init; }
-        public List<Account> DebitAccount { get; init; }
-        public List<Account> CreditAccount { get; init; }
-        public List<RemittanceInfo> RemittanceInfo { get; init; }
+        public IEnumerable<Account> DebitAccount { get; init; }
+        public IEnumerable<Account> CreditAccount { get; init; }
+        public IEnumerable<RemittanceInfo> RemittanceInfo { get; init; }
         public InstructionContext InstructionContext { get; init; }
     }
 }

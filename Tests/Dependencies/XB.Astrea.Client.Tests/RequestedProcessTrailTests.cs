@@ -45,8 +45,8 @@ namespace XB.Astrea.Client.Tests
                 },
                 TargetState = AstreaClientConstants.EventType_Requested,
                 Tags = new Tags(),
-                Mt103Model = new Mock<Mt103Message>(SwiftMessages.SwiftMessage_2.OriginalMessage, null).Object,
-                Mt = SwiftMessages.SwiftMessage_2.OriginalMessage
+                Mt103Model = new Mock<Mt103Message>(SwiftMessagesMock.SwiftMessage_2.OriginalMessage, null).Object,
+                Mt = SwiftMessagesMock.SwiftMessage_2.OriginalMessage
 
             };
 
@@ -74,13 +74,13 @@ namespace XB.Astrea.Client.Tests
             Assert.Null(result.Payloads[0].Payload.Payment.RemittanceInfos[0]);
             Assert.Equal(new ProcessTrailRemittanceInfo(request.Mt103Model.RemittanceInformation, "swift.tag70.remittanceInfo"), result.Payloads[0].Payload.Payment.RemittanceInfos[1]);
 
-            Assert.Equal(request.PaymentInstructions[0].DebitAccount.First().Identity, result.Payloads[0].Payload.Payment.DebitAccount[0].Id);
-            Assert.Equal("other", result.Payloads[0].Payload.Payment.DebitAccount[0].IdType);
-            Assert.Equal("", result.Payloads[0].Payload.Payment.DebitAccount[0].Bic);
+            Assert.Equal(request.PaymentInstructions[0].DebitAccount.First().Identity, result.Payloads[0].Payload.Payment.DebitAccount.First().Id);
+            Assert.Equal("other", result.Payloads[0].Payload.Payment.DebitAccount.First().IdType);
+            Assert.Equal("", result.Payloads[0].Payload.Payment.DebitAccount.First().Bic);
 
-            Assert.Equal(request.PaymentInstructions[0].CreditAccount.First().Identity, result.Payloads[0].Payload.Payment.CreditAccount[0].Id);
-            Assert.Equal("other", result.Payloads[0].Payload.Payment.CreditAccount[0].IdType);
-            Assert.Equal("", result.Payloads[0].Payload.Payment.CreditAccount[0].Bic);
+            Assert.Equal(request.PaymentInstructions[0].CreditAccount.First().Identity, result.Payloads[0].Payload.Payment.CreditAccount.First().Id);
+            Assert.Equal("other", result.Payloads[0].Payload.Payment.CreditAccount.First().IdType);
+            Assert.Equal("", result.Payloads[0].Payload.Payment.CreditAccount.First().Bic);
 
             Assert.Equal(new Original(request.Mt), result.Payloads[0].Payload.Original);
         }

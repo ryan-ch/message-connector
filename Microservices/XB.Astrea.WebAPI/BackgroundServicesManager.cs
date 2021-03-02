@@ -23,7 +23,7 @@ namespace XB.Astrea.WebAPI
             if (!RegisteredBackgroundServices.Contains(bs))
                 RegisteredBackgroundServices.Add(bs);
 
-            _logger.LogInformation("BackgroundService Registered: " + bs.GetType());
+            _logger.LogInformation("BackgroundService Registered: {bs}", bs.GetType());
         }
 
         public async Task StartAll()
@@ -33,11 +33,11 @@ namespace XB.Astrea.WebAPI
                 try
                 {
                     await bs.StartAsync(new CancellationToken());
-                    _logger.LogInformation("BackgroundService started: " + bs.GetType());
+                    _logger.LogInformation("BackgroundService started: {bs}", bs.GetType());
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error when trying to start Background Service: " + bs.GetType());
+                    _logger.LogError(ex, "Error when trying to start Background Service: {bs}", bs.GetType());
                 }
             }
         }
@@ -51,11 +51,11 @@ namespace XB.Astrea.WebAPI
                     throw new KeyNotFoundException(backgroundServiceClassName + " background service was not registered");
 
                 await bs.StartAsync(new CancellationToken());
-                _logger.LogInformation("BackgroundService started: " + bs.GetType());
+                _logger.LogInformation("BackgroundService started: {bs}", bs.GetType());
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error when trying to start Background Service: " + backgroundServiceClassName);
+                _logger.LogError(ex, "Error when trying to start Background Service: {backgroundServiceClassName}", backgroundServiceClassName);
             }
         }
 
@@ -66,11 +66,11 @@ namespace XB.Astrea.WebAPI
                 try
                 {
                     await bs.StopAsync(new CancellationToken());
-                    _logger.LogInformation("BackgroundService stopped: " + bs.GetType());
+                    _logger.LogInformation("BackgroundService stopped: {bs}", bs.GetType());
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error when trying to stop Background Service: " + bs.GetType());
+                    _logger.LogError(ex, "Error when trying to stop Background Service: {bs}", bs.GetType());
                 }
             }
         }
@@ -84,11 +84,11 @@ namespace XB.Astrea.WebAPI
                     throw new KeyNotFoundException(backgroundServiceClassName + " background service was not registered");
 
                 await bs.StopAsync(new CancellationToken());
-                _logger.LogInformation("BackgroundService stoped: " + bs.GetType());
+                _logger.LogInformation("BackgroundService stoped: {bs}", bs.GetType());
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error when trying to stop Background Service: " + backgroundServiceClassName);
+                _logger.LogError(ex, "Error when trying to stop Background Service: {backgroundServiceClassName}", backgroundServiceClassName);
             }
         }
     }

@@ -1,7 +1,10 @@
 {
   "profiles": {
-    "MqTool": {
-      "commandName": "Project"
+    "LocalMq": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     },
     "RemoteMq": {
       "commandName": "Project",

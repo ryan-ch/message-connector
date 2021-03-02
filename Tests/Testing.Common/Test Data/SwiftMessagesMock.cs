@@ -2,7 +2,7 @@
 {
     public record SwiftMessageData(string OriginalMessage, string BasicHeader, string ApplicationHeader, string UserHeader, string TextBlock);
 
-    public record SwiftMessages
+    public record SwiftMessagesMock
     {
         public static readonly SwiftMessageData SwiftMessage_1 = new SwiftMessageData(
             @"{1:F01ESSESES0AXXX8000019102}{2:O1030955100518CIBCCATTAXXX76763960792012021544N}{3:{103:}{108:WA SQ9E3P}{119:}{111:001}{121:2e66e52d-5448-4742-875a-c39a844bbdc2}}{4:
