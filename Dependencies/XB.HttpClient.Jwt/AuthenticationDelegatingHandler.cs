@@ -16,16 +16,13 @@ namespace XB.HttpClientJwt
     //Todo: should this be moved in to common or keep it in own library?
     public class AuthenticationDelegatingHandler : DelegatingHandler
     {
-        //private readonly IConfiguration _configuration;
         private readonly HttpClientJwtOptions _httpClientJwtOptions;
 
         private string _jwt;
         private long _jwtExpire;
 
         public AuthenticationDelegatingHandler(IOptions<HttpClientJwtOptions> config)
-        //public AuthenticationDelegatingHandler(IConfiguration configuration)
         {
-            //_configuration = configuration;
             _httpClientJwtOptions = config.Value;
         }
 
@@ -57,18 +54,6 @@ namespace XB.HttpClientJwt
             {
                 return _jwt;
             }
-
-            //var jwtRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(_configuration.GetValue<string>("AppSettings:HttpClientJwt:Url")));
-
-            //var jwtDetails = new Dictionary<string, string>
-            //{
-            //    { "grant_type", _configuration.GetValue<string>("AppSettings:HttpClientJwt:Grant_Type") },
-            //    { "client_id", _configuration.GetValue<string>("AppSettings:HttpClientJwt:ClientId")},
-            //    { "client_secret", _configuration.GetValue<string>("AppSettings:HttpClientJwt:ClientSecret") },
-            //    { "username", _configuration.GetValue<string>("AppSettings:HttpClientJwt:Username") },
-            //    { "password", _configuration.GetValue<string>("AppSettings:HttpClientJwt:Password") },
-            //    { "scope", _configuration.GetValue<string>("AppSettings:HttpClientJwt:openid") },
-            //};
 
             var jwtRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(_httpClientJwtOptions.Url));
 

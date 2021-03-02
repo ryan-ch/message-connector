@@ -36,6 +36,7 @@ namespace XB.HttpClientJwt.Tests
                 Url = _jwtUrl,
                 Username = "Username"
             };
+            _configurationMock = new Mock<IOptions<HttpClientJwtOptions>>();
             _configurationMock.Setup(a => a.Value).Returns(_httpClientJwtOptions);
         }
 
