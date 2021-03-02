@@ -15,15 +15,17 @@ namespace XB.Astrea.Client.Messages.Assessment
 
     public record ExtraAssessmentInfo
     {
-        public string PhysicalNonPhysical { get; init; }
+        public string Physical { get; init; }
         public string OrderingCustomerAddress { get; init; }
         public string OrderingCustomerAccount { get; init; }
         public string OrderingCustomerName { get; init; }
         public string FullName { get; init; }
-        public object OrderingBankBIC { get; init; }
-        public string AccountHolderID { get; init; }
         public string SoleProprietorship { get; init; }
         public string AccountNumber { get; init; }
+        public string BeneficiaryCustomerAccount { get; init; }
+        public string BeneficiaryCustomerName { get; init; }
+        public string BeneficiaryCustomerAddress { get; init; }
+        public string CustomerID { get; init; }
     }
 
     public record AssessmentResult
