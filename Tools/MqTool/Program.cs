@@ -17,15 +17,13 @@ namespace MqTool
 :50F:/SE2880000832790000012345
 1/Vårgårda Kromverk
 2/Lilla Korsgatan 3
-4/19920914
-6/BQ/1zWLCaVqFd3Rs/47281128569335
 7/AZ/ynai3oTv8DtC91iwYm87b-vXtWBhRG
 8/ynai3oTv8DtC91iwYm87b-vXtWBhRG
 :59F:/SE3550000000054910123123
 1/BOB BAKER
 2/Bernhards Gränd 3, 418 42 Göteborg
-2/TRANSVERSAL 93 53 48 INT 70
-3/CO/BOGOTA
+4/19920914
+6/BQ/1zWLCaVqFd3Rs/47281128569335
 :71A:SHA
 :72:/REC/RETN
 -}{S:{MAN:UAKOUAK4600}}";
@@ -69,23 +67,7 @@ BENEF
                         timer.Start();
                         for (var i = 0; i < writes; i++)
                         {
-                            mqClientProducer.WriteMessage(@"{1:F01ESSESES0AXXX8000019102}{2:O1030955100518CIBCCATTAXXX7676396079" + DateTime.Now.ToString("yyMMddHHmm") + @"N}{3:{103:}{108:WA SQ9E3P}{119:}{111:001}{121:2e66e52d-5448-4742-875a-c39a844bbdc2}}{4:
-:20:GEcG
-:23B:CRED
-:32A:200825SEK3500,00
-:50F:/SE2880000832790000012345
-1/Vårgårda Kromverk
-2/Lilla Korsgatan 3
-7/AZ/ynai3oTv8DtC91iwYm87b-vXtWBhRG
-8/ynai3oTv8DtC91iwYm87b-vXtWBhRG
-:59F:/SE3550000000054910123123
-1/BOB BAKER
-2/Bernhards Gränd 3, 418 42 Göteborg
-4/19920914
-6/BQ/1zWLCaVqFd3Rs/47281128569335
-:71A:SHA
-:72:/REC/RETN
--}{S:{MAN:UAKOUAK4600}}");
+                            mqClientProducer.WriteMessage(i % 2 == 0 ? mtMessage1 : mtMessage2);
                             if (i % 100 == 0) mqClientProducer.Commit();
                         }
                         mqClientProducer.Commit();
