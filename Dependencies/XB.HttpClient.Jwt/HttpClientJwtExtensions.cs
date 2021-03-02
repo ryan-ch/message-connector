@@ -11,8 +11,7 @@ namespace XB.HttpClientJwt
         public static IServiceCollection AddHttpClientJwt(this IServiceCollection services, IConfiguration configuration,
             string appsettingsPrefix = "", string httpClientIdentifier = "default")
         {
-            services.Configure<HttpClientJwtOptions>(configuration.GetSection(appsettingsPrefix + HttpClientJwtOptions.ConfigurationSection));
-            //Todo: do we need to add AuthenticationDelegatingHandler in two places?
+            //services.Configure<HttpClientJwtOptions>(configuration.GetSection(appsettingsPrefix + HttpClientJwtOptions.ConfigurationSection));
             services.AddTransient<AuthenticationDelegatingHandler>();
             services.AddHttpClient(httpClientIdentifier, c =>
             {
