@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
-using XB.MtParser.Mt103;
 
 namespace XB.Astrea.Client.Messages.ProcessTrail
 {
@@ -33,14 +32,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                         {
                             Hints = new List<Hint>()
                             {
-                                new Hint()
-                                {
-                                    Name = "status",
-                                    Values = new List<string>()
-                                    {
-                                        "INVOKE_ASTREA_HTTP", "ASTREA:RESPONSE"
-                                    }
-                                }
+                                new Hint("status", new List<string>(){"INVOKE_ASTREA_HTTP", "ASTREA:RESPONSE"})
                             },
                             RiskLevel = 0
                         }
