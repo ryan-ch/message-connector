@@ -3,8 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net;
 using XB.Astrea.Client.Config;
-using XB.Kafka;
 using XB.Hubert;
+using XB.Kafka;
 
 namespace XB.Astrea.Client
 {

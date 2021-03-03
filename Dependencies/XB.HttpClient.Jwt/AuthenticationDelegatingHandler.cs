@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
@@ -6,9 +8,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using XB.HttpClientJwt.Config;
 
 namespace XB.HttpClientJwt
@@ -16,33 +15,26 @@ namespace XB.HttpClientJwt
     //Todo: should this be moved in to common or keep it in own library?
     public class AuthenticationDelegatingHandler : DelegatingHandler
     {
-        private readonly ILogger<AuthenticationDelegatingHandler> _logger;
         private readonly HttpClientJwtOptions _httpClientJwtOptions;
 
         private string _jwt;
         private long _jwtExpire;
 
-        public AuthenticationDelegatingHandler(ILogger<AuthenticationDelegatingHandler> logger,
-            IOptions<HttpClientJwtOptions> config)
+        public AuthenticationDelegatingHandler(IOptions<HttpClientJwtOptions> config)
         {
-            _logger = logger;
             _httpClientJwtOptions = config.Value;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var response = await DoRequestWithJwt(request, cancellationToken);
+            if (response.StatusCode != HttpStatusCode.Unauthorized && response.StatusCode != HttpStatusCode.Forbidden)
+                return response;
 
-            //Todo: revert the if-statement?
-            if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
-            {
-                _jwt = string.Empty;
-                _jwtExpire = 0;
+            _jwt = string.Empty;
+            _jwtExpire = 0;
 
-                return await DoRequestWithJwt(request, cancellationToken);
-            }
-
-            return response;
+            return await DoRequestWithJwt(request, cancellationToken);
         }
 
         private async Task<HttpResponseMessage> DoRequestWithJwt(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -55,9 +47,8 @@ namespace XB.HttpClientJwt
         private async Task<string> GetJwt(CancellationToken cancellationToken)
         {
             if (!string.IsNullOrEmpty(_jwt) || DateTimeOffset.UtcNow.ToUnixTimeSeconds() < _jwtExpire)
-            {
                 return _jwt;
-            }
+
 
             var jwtRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(_httpClientJwtOptions.Url));
 
@@ -79,10 +70,8 @@ namespace XB.HttpClientJwt
 
             var content = JObject.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
 
-            //Todo: content is never null so do we need a null check here?
-            _jwt = content?.SelectToken("access_token")?.ToString();
-            _jwtExpire = long.Parse(content?.SelectToken("expires_in")?.ToString() ?? "0", CultureInfo.InvariantCulture)
-                         + currentTime;
+            _jwt = content.SelectToken("access_token")?.ToString();
+            _jwtExpire = long.Parse(content.SelectToken("expires_in")?.ToString() ?? "0", CultureInfo.InvariantCulture) + currentTime;
 
             return _jwt;
         }

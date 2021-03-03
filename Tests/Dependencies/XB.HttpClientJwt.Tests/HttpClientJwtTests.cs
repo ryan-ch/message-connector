@@ -1,13 +1,12 @@
+using Microsoft.Extensions.Options;
+using Moq;
+using Moq.Protected;
 using System;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
-using Moq.Protected;
 using XB.HttpClientJwt.Config;
 using Xunit;
 
@@ -18,19 +17,15 @@ namespace XB.HttpClientJwt.Tests
         private static readonly string _sebcsUrl = "https://localhost/sebcs";
         private static readonly string _jwtUrl = "https://localhost/jwt";
 
-        private readonly Mock<ILogger<AuthenticationDelegatingHandler>> _loggerMock;
         private readonly Mock<IOptions<HttpClientJwtOptions>> _configurationMock;
-        private readonly HttpClientJwtOptions _httpClientJwtOptions;
-       
-        private Expression _sebcsRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_sebcsUrl));
-        private Expression _jwtRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_jwtUrl));
+
+        private readonly Expression _sebcsRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_sebcsUrl));
+        private readonly Expression _jwtRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_jwtUrl));
 
 
         public HttpClientJwtTests()
         {
-            _loggerMock = new Mock<ILogger<AuthenticationDelegatingHandler>>();
-
-            _httpClientJwtOptions = new HttpClientJwtOptions()
+            var httpClientJwtOptions = new HttpClientJwtOptions()
             {
                 Grant_Type = "Grant_Type",
                 Scope = "Scope",
@@ -41,7 +36,7 @@ namespace XB.HttpClientJwt.Tests
                 Username = "Username"
             };
             _configurationMock = new Mock<IOptions<HttpClientJwtOptions>>();
-            _configurationMock.Setup(a => a.Value).Returns(_httpClientJwtOptions);
+            _configurationMock.Setup(a => a.Value).Returns(httpClientJwtOptions);
         }
 
         [Fact]
@@ -59,14 +54,14 @@ namespace XB.HttpClientJwt.Tests
                 .Setup<Task<HttpResponseMessage>>("SendAsync", _jwtRequestMatcher,
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
-                    { Content = new StringContent("{ \"access_token\": \"bearertoken123\"}") }).Verifiable();
+                { Content = new StringContent("{ \"access_token\": \"bearertoken123\"}") }).Verifiable();
 
             var authenticationDelegatingHandler = SetupDelegatingHandler(innerMock.Object);
             var request = new HttpRequestMessage(HttpMethod.Post, _sebcsUrl);
             var invoker = new HttpMessageInvoker(authenticationDelegatingHandler);
 
             //Act
-            var result = await invoker.SendAsync(request, CancellationToken.None);
+            await invoker.SendAsync(request, CancellationToken.None);
 
             //Assert
             Assert.Equal($"Bearer bearertoken123", request.Headers.Authorization.ToString());
@@ -85,7 +80,7 @@ namespace XB.HttpClientJwt.Tests
             innerMock.Protected()
                 .SetupSequence<Task<HttpResponseMessage>>("SendAsync", _jwtRequestMatcher, ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
-                    { Content = new StringContent("{ \"access_token\": \"bearertoken1\", \"expires_in\":\"300\"}") })
+                { Content = new StringContent("{ \"access_token\": \"bearertoken1\", \"expires_in\":\"300\"}") })
                 .ThrowsAsync(new Exception("tried to fetch new query"));
 
             var authenticationDelegatingHandler = SetupDelegatingHandler(innerMock.Object);
@@ -121,9 +116,9 @@ namespace XB.HttpClientJwt.Tests
             innerMock.Protected()
                 .SetupSequence<Task<HttpResponseMessage>>("SendAsync", _jwtRequestMatcher, ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
-                    { Content = new StringContent("{ \"access_token\": \"bearertoken1\"}") })
+                { Content = new StringContent("{ \"access_token\": \"bearertoken1\"}") })
                 .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
-                    { Content = new StringContent("{ \"access_token\": \"bearertoken2\"}") });
+                { Content = new StringContent("{ \"access_token\": \"bearertoken2\"}") });
 
             var authenticationDelegatingHandler = SetupDelegatingHandler(innerMock.Object);
             var request = new HttpRequestMessage(HttpMethod.Post, _sebcsUrl);
@@ -139,7 +134,7 @@ namespace XB.HttpClientJwt.Tests
 
         private AuthenticationDelegatingHandler SetupDelegatingHandler(DelegatingHandler handler)
         {
-            return new AuthenticationDelegatingHandler(_loggerMock.Object, _configurationMock.Object)
+            return new AuthenticationDelegatingHandler(_configurationMock.Object)
             {
                 InnerHandler = handler
             };
