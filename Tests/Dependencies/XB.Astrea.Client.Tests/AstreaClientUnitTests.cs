@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
+using SEB.SEBCS.RTM.v1.Client.Uakm463;
+using SEB.SEBCS.RTM.v1.Client.Uakm463.Crossbordpmt.Update01.Fcpsts01;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -24,6 +26,9 @@ namespace XB.Astrea.Client.Tests
     public class AstreaClientUnitTests
     {
         private readonly AssessmentResponse _expectedResultObject = new AssessmentResponse { Identity = "abc0123", RiskLevel = "4", Results = new List<AssessmentResult>() };
+
+        private readonly CrossbordpmtUpdate01Fcpsts01Response _hubertResponse = new CrossbordpmtUpdate01Fcpsts01Response
+        { Result = new CrossbordpmtUpdate01Fcpsts01Tables { Uakw4630 = new UAKW4630 { TransactionStatus = "Accepted" } } };
 
         private readonly Mock<IMTParser> _mTParserMock;
         private readonly Mock<IKafkaProducer> _kafkaProducerMock;
@@ -49,8 +54,10 @@ namespace XB.Astrea.Client.Tests
                 .Returns(new AstreaClientOptions { RetryPeriodInMin = 0.03, WaitingBeforeRetryInSec = 1, AcceptableTransactionTypes = new List<string> { "103" }, RiskThreshold = 3, Version = "1.0" });
 
             (_httpClientFactoryMock, _messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject));
-            
+
             _huberClientMock = new Mock<IHubertClient>();
+            _huberClientMock.Setup(a => a.SendAssessmentResultAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(_hubertResponse);
 
             _astreaClient = new AstreaClient(_httpClientFactoryMock.Object, _kafkaProducerMock.Object,
                 _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _huberClientMock.Object);
@@ -78,7 +85,7 @@ namespace XB.Astrea.Client.Tests
             Assert.Equal(new AssessmentResponse(), result);
         }
 
-        [Fact(Skip = "Refactor")]
+        [Fact]
         public async Task AssessAsync_WillParseTheMessage_SendAssessRequestAndReturnResult()
         {
             // Arrange
@@ -91,8 +98,8 @@ namespace XB.Astrea.Client.Tests
             Assert.Equal(_expectedResultObject.ToString(), result.ToString());
         }
 
-        [Fact(Skip = "Refactor")]
-        public async Task AssessAsync_WhenErrorThrown_WillLogItAndRetry()
+        [Fact]
+        public async Task AssessAsync_WhenErrorThrownFromParser_WillLogItAndReturn()
         {
             // Arrange
             var ex = new Exception("Test Exception");
@@ -103,19 +110,19 @@ namespace XB.Astrea.Client.Tests
             var result = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
 
             // Assert
-            _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), Times.Exactly(2));
+            _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), Times.Once);
             _messageHandlerMock.Protected().Verify("SendAsync", Times.Never(), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
-            _loggerMock.VerifyLoggerCall(LogLevel.Error, "Error caught when trying to assess message", Times.Exactly(2), ex);
-            _loggerMock.VerifyLoggerCall(LogLevel.Error, "Couldn't Handle this transaction message", Times.Once());
+            _loggerMock.VerifyLoggerCall(LogLevel.Error, "Couldn't parse the mt103 message: ", Times.Once(), ex);
             _kafkaProducerMock.Verify(a => a.Produce(It.IsAny<string>()), Times.Never);
             Assert.Equal(new AssessmentResponse(), result);
         }
 
-        [Fact(Skip = "Refactor")]
+        [Fact]
         public async Task AssessAsync_WhenAstreaFail_WillLogItAndRetry()
         {
             // Arrange
-            var (httpClientFactoryMock, messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject), HttpStatusCode.InternalServerError);
+            var (httpClientFactoryMock, messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject),
+                HttpStatusCode.InternalServerError);
             var astreaClient = new AstreaClient(httpClientFactoryMock.Object, _kafkaProducerMock.Object,
                 _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _huberClientMock.Object);
 
@@ -123,15 +130,16 @@ namespace XB.Astrea.Client.Tests
             var result = await astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
 
             // Assert
-            _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), Times.Exactly(2));
+            _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), Times.Once);
             messageHandlerMock.Protected().Verify("SendAsync", Times.Exactly(2), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
             _loggerMock.VerifyLoggerCall(LogLevel.Error, "Error caught when trying to assess message", Times.Exactly(2));
             _loggerMock.VerifyLoggerCall(LogLevel.Error, "Couldn't Handle this transaction message", Times.Once());
-            _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains(JsonConvert.SerializeObject(SwiftMessagesMock.SwiftMessage_2.OriginalMessage)))), Times.Exactly(2));
+            _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains(JsonConvert.SerializeObject(SwiftMessagesMock.SwiftMessage_2.OriginalMessage)))),
+                Times.Exactly(3));
             Assert.Equal(new AssessmentResponse(), result);
         }
 
-        [Fact(Skip = "Refactor")]
+        [Fact]
         public async Task AssessAsync_WillSendRequestedProcessTrailAndLogIt()
         {
             // Arrange
@@ -143,7 +151,7 @@ namespace XB.Astrea.Client.Tests
             _loggerMock.VerifyLoggerCall(LogLevel.Information, "Sending RequestedProcessTrail", Times.Once());
         }
 
-        [Fact(Skip = "Refactor")]
+        [Fact]
         public async Task AssessAsync_WillSendDecisionProcessTrailAndLogIt()
         {
             // Arrange
@@ -155,7 +163,7 @@ namespace XB.Astrea.Client.Tests
             _loggerMock.VerifyLoggerCall(LogLevel.Information, "Sending DecisionProcessTrail", Times.Once());
         }
 
-        [Fact(Skip = "Refactor")]
+        [Fact]
         public async Task AssessAsync_WillLogError_WhenSendingProcessTrailsFail()
         {
             // Arrange
