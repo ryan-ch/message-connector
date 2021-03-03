@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,62 +36,56 @@ namespace XB.Astrea.Client
             _hubertClient = hubertClient;
         }
 
-        public async Task<AssessmentResponse> AssessAsync(string mt)
+        public async Task<AssessmentResponse> AssessAsync(string originalMessage)
         {
+            if (!ValidMessageType(originalMessage))
+                return new AssessmentResponse();
+
             var finishTimestamp = DateTime.Now.AddMinutes(_config.RetryPeriodInMin);
             var receivedAt = DateTime.Now;
+            AssessmentRequest assessmentRequest;
+            Mt103Message mt103;
+
+            try
+            {
+                mt103 = _mTParser.ParseSwiftMt103Message(originalMessage);
+                assessmentRequest = new AssessmentRequest(mt103);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Couldn't parse the mt103 message: {originalMessage}", originalMessage);
+                return new AssessmentResponse();
+            }
 
             while (DateTime.Now <= finishTimestamp)
             {
                 try
                 {
-                    // Todo: Check the performance of the next line (maybe replace with parsed object check)
-                    // Todo: Can it be I instead of O?
-                    if (!_config.AcceptableTransactionTypes.Any(format => mt.Contains("}{2:O" + format)))
-                        return new AssessmentResponse();
-
-                    return await HandleAssessAsync(mt, receivedAt).ConfigureAwait(false);
+                    return await HandleAssessAsync(assessmentRequest, mt103, receivedAt).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error caught when trying to assess message, will retry: {mt}", mt);
+                    _logger.LogError(ex, "Error caught when trying to assess message, will retry: {mt103}", mt103);
                     await Task.Delay(Convert.ToInt32(_config.WaitingBeforeRetryInSec * 1000)).ConfigureAwait(false);
                 }
             }
-            _ = HandleTimeOutAsync(mt, receivedAt);
-            _logger.LogError("Couldn't Handle this transaction message, stopped: " + mt);
+            _ = HandleTimeOutAsync(assessmentRequest, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt);
+            _logger.LogError("Couldn't Handle this transaction message, stopped: {originalMessage}", originalMessage);
 
             return new AssessmentResponse();
         }
-        //TODO: Refactor logic in this method. Should we send to Hubert? Do we need to wait for the response from Hubert? etc
-        private async Task HandleTimeOutAsync(string mt, DateTime receivedAt)
+
+        private bool ValidMessageType(string originalMessage)
         {
-            //TODO: Refactor the two lines below
-            var mt103 = _mTParser.ParseSwiftMt103Message(mt);
-            var request = new AssessmentRequest(mt103);
-            try
-            {
-                var hubertStatus =await SendToHubert(AstreaClientConstants.Hubert_Timeout, mt103, receivedAt).ConfigureAwait(false);
-                if (hubertStatus == AstreaClientConstants.Hubert_Accepted)
-                {
-                    var offeredTimeOut = new OfferedTimeOutProcessTrail(request, _config.Version);
+            foreach (var t in _config.AcceptableTransactionTypes)
+                if (originalMessage.Contains("}{2:O" + t))
+                    return true;
 
-                    var offeredTimeOutProcessTrail = JsonConvert.SerializeObject(offeredTimeOut, ProcessTrailDefaultJsonSettings.Settings);
-                    _logger.LogInformation("Sending OfferedTimeOutProcessTrail: " + offeredTimeOutProcessTrail);
-
-                    await _kafkaProducer.Produce(offeredTimeOutProcessTrail).ConfigureAwait(false);
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Couldn't Send OfferedTimeOutProcessTrail for request: " + JsonConvert.SerializeObject(request, ProcessTrailDefaultJsonSettings.Settings));
-            }
+            return false;
         }
 
-        private async Task<AssessmentResponse> HandleAssessAsync(string mt, DateTime receivedAt)
+        private async Task<AssessmentResponse> HandleAssessAsync(AssessmentRequest request, Mt103Message mt103, DateTime receivedAt)
         {
-            var mt103 = _mTParser.ParseSwiftMt103Message(mt);
-            var request = new AssessmentRequest(mt103);
             var postBody = JsonConvert.SerializeObject(request, ProcessTrailDefaultJsonSettings.Settings);
             var data = new StringContent(postBody, Encoding.UTF8, "application/json");
 
@@ -106,15 +99,35 @@ namespace XB.Astrea.Client
 
             var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
 
-            var hubertStatus = await SendToHubert(assessmentResponse.RiskLevel, mt103, receivedAt).ConfigureAwait(false);
+            var hubertStatus = await SendToHubert(assessmentResponse.RiskLevel, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt).ConfigureAwait(false);
             _ = SendDecisionProcessTrail(hubertStatus, assessmentResponse, mt103);
 
             return assessmentResponse;
         }
 
-        private async Task<string> SendToHubert(string status, Mt103Message parsedMt, DateTime receivedAt)
+        //TODO: Refactor logic in this method. Should we send to Hubert? Do we need to wait for the response from Hubert? etc
+        private async Task HandleTimeOutAsync(AssessmentRequest request, string transactionReference, DateTime receivedAt)
         {
-            var hubertResponse = await _hubertClient.SendAssessmentResultAsync(receivedAt.ToString(), parsedMt.UserHeader.UniqueEndToEndTransactionReference, status);
+            try
+            {
+                _ = SendToHubert(AstreaClientConstants.Hubert_Timeout, transactionReference, receivedAt).ConfigureAwait(false);
+
+                var offeredTimeOut = new OfferedTimeOutProcessTrail(request, _config.Version);
+
+                var offeredTimeOutProcessTrail = JsonConvert.SerializeObject(offeredTimeOut, ProcessTrailDefaultJsonSettings.Settings);
+                _logger.LogInformation("Sending OfferedTimeOutProcessTrail: {offeredTimeOutProcessTrail}", offeredTimeOutProcessTrail);
+
+                await _kafkaProducer.Produce(offeredTimeOutProcessTrail).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Couldn't Send OfferedTimeOutProcessTrail for request: {request}", request);
+            }
+        }
+
+        private async Task<string> SendToHubert(string status, string transactionReference, DateTime receivedAt)
+        {
+            var hubertResponse = await _hubertClient.SendAssessmentResultAsync(receivedAt.ToString(), transactionReference, status);
             return hubertResponse.Result.Uakw4630.TransactionStatus.ToUpper();
         }
 

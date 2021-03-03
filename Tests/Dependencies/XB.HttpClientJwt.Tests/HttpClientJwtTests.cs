@@ -14,13 +14,13 @@ namespace XB.HttpClientJwt.Tests
 {
     public class HttpClientJwtTests
     {
-        private static readonly string _sebcsUrl = "https://localhost/sebcs";
-        private static readonly string _jwtUrl = "https://localhost/jwt";
+        private const string SebCsUrl = "https://localhost/sebcs";
+        private const string JwtUrl = "https://localhost/jwt";
 
         private readonly Mock<IOptions<HttpClientJwtOptions>> _configurationMock;
 
-        private readonly Expression _sebcsRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_sebcsUrl));
-        private readonly Expression _jwtRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(_jwtUrl));
+        private readonly Expression _sebcsRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(SebCsUrl));
+        private readonly Expression _jwtRequestMatcher = ItExpr.Is((HttpRequestMessage request) => request.RequestUri == new Uri(JwtUrl));
 
 
         public HttpClientJwtTests()
@@ -32,7 +32,7 @@ namespace XB.HttpClientJwt.Tests
                 ClientId = "ClientId",
                 ClientSecret = "ClientSecret",
                 Password = "Password",
-                Url = _jwtUrl,
+                Url = JwtUrl,
                 Username = "Username"
             };
             _configurationMock = new Mock<IOptions<HttpClientJwtOptions>>();
@@ -57,7 +57,7 @@ namespace XB.HttpClientJwt.Tests
                 { Content = new StringContent("{ \"access_token\": \"bearertoken123\"}") }).Verifiable();
 
             var authenticationDelegatingHandler = SetupDelegatingHandler(innerMock.Object);
-            var request = new HttpRequestMessage(HttpMethod.Post, _sebcsUrl);
+            var request = new HttpRequestMessage(HttpMethod.Post, SebCsUrl);
             var invoker = new HttpMessageInvoker(authenticationDelegatingHandler);
 
             //Act
@@ -85,8 +85,8 @@ namespace XB.HttpClientJwt.Tests
 
             var authenticationDelegatingHandler = SetupDelegatingHandler(innerMock.Object);
 
-            var request = new HttpRequestMessage(HttpMethod.Post, _sebcsUrl);
-            var request2 = new HttpRequestMessage(HttpMethod.Post, _sebcsUrl);
+            var request = new HttpRequestMessage(HttpMethod.Post, SebCsUrl);
+            var request2 = new HttpRequestMessage(HttpMethod.Post, SebCsUrl);
 
             var invoker = new HttpMessageInvoker(authenticationDelegatingHandler);
 
@@ -121,7 +121,7 @@ namespace XB.HttpClientJwt.Tests
                 { Content = new StringContent("{ \"access_token\": \"bearertoken2\"}") });
 
             var authenticationDelegatingHandler = SetupDelegatingHandler(innerMock.Object);
-            var request = new HttpRequestMessage(HttpMethod.Post, _sebcsUrl);
+            var request = new HttpRequestMessage(HttpMethod.Post, SebCsUrl);
             var invoker = new HttpMessageInvoker(authenticationDelegatingHandler);
 
             //Act

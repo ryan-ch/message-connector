@@ -28,7 +28,21 @@ namespace XB.MtParser.Tests
             _ = new Mt103Message(rawSwiftMessage, _loggerMock.Object);
 
             // Assert
-            _loggerMock.VerifyLoggerCall(LogLevel.Error, "Text block is empty", Times.Once());
+            _loggerMock.VerifyLoggerCall(LogLevel.Error, "Can't parse Mt103 when text block is empty", Times.Once());
+        }
+
+        [Fact]
+        public void Mt103Message_IfPassedIncorrectMessageType_WillLogError()
+        {
+            // Arrange
+            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace(SwiftMessagesMock.SwiftMessage_2.ApplicationHeader, 
+                "O1020955100518IRVTUS3NAXXX76763960792102151814N");
+
+            // Act
+            _ = new Mt103Message(rawSwiftMessage, _loggerMock.Object);
+
+            // Assert
+            _loggerMock.VerifyLoggerCall(LogLevel.Error, "Can't parse the message if type is not Mt103", Times.Once());
         }
 
         [Fact]

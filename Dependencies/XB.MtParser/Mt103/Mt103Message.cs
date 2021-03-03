@@ -17,9 +17,14 @@ namespace XB.MtParser.Mt103
 
         public Mt103Message(string rawSwiftMessage, ILogger<MtParser> logger) : base(rawSwiftMessage, logger)
         {
+            if (SwiftMessageType != SwiftMessageTypes.SingleCustomerCreditTransfer)
+            {
+                Logger.LogError("Can't parse the message if type is not Mt103");
+                return;
+            }
             _textBlockContent = Blocks.FirstOrDefault(a => a.IdentifierAsInt == (int)SwiftMessageBlockIdentifiers.Text)?.Content;
             if (string.IsNullOrWhiteSpace(_textBlockContent))
-                Logger.LogError("Text block is empty");
+                Logger.LogError("Can't parse Mt103 when text block is empty");
             else
                 ExtractFields();
         }
