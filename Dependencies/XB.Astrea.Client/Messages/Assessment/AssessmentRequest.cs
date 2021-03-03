@@ -6,7 +6,7 @@ using XB.MtParser.Mt103;
 
 namespace XB.Astrea.Client.Messages.Assessment
 {
-    public class AssessmentRequest
+    public record AssessmentRequest 
     {
         public AssessmentRequest() { }
 
@@ -52,7 +52,7 @@ namespace XB.Astrea.Client.Messages.Assessment
             };
             return paymentInstructionList;
         }
-
+        
         private static Account GetDebitAccount(Mt103Message model)
         {
             var account = string.Empty;
