@@ -41,7 +41,11 @@ namespace XB.Astrea.WebAPI
                         if (string.IsNullOrEmpty(message))
                             continue;
 
-                        _ = HandleMessage(message);
+                        bool.TryParse(Environment.GetEnvironmentVariable("DryRun"), out bool dryRun);
+                        if (!dryRun)
+                            _ = HandleMessage(message);
+                        else
+                            _logger.LogInformation($"Processed message {message} in dry run mode");
                         messageReceived = true;
                     }
                     catch (Exception e)

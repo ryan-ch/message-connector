@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using XB.Astrea.Client;
-using XB.Hubert;
 using XB.IBM.MQ;
 using XB.MtParser;
 

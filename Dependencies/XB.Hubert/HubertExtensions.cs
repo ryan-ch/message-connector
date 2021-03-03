@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using XB.Hubert.Config;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using XB.HttpClientJwt;
+using XB.Hubert.Config;
 
 namespace XB.Hubert
 {
@@ -9,9 +9,9 @@ namespace XB.Hubert
     {
         public static IServiceCollection AddHubert(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
         {
-            services.Configure<HubertClientOptions>(configuration.GetSection(appsettingsPrefix + HubertClientOptions.ConfigurationSection));
-            services.AddHttpClientJwt(configuration, appsettingsPrefix, HubertClientOptions.HttpClientIdentifier);
-            return services.AddTransient<IHubertClient, HubertClient>();
+            return services.Configure<HubertClientOptions>(configuration.GetSection(appsettingsPrefix + HubertClientOptions.ConfigurationSection))
+            .AddHttpClientJwt(configuration, appsettingsPrefix, HubertClientOptions.HttpClientIdentifier)
+            .AddScoped<IHubertClient, HubertClient>();
         }
     }
 }

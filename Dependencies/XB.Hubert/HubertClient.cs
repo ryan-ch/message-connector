@@ -1,10 +1,9 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using SEB.SEBCS.RTM.v1.Client.Uakm463;
 using SEB.SEBCS.RTM.v1.Client.Uakm463.Crossbordpmt.Update01.Fcpsts01;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using XB.Hubert.Config;
 
 namespace XB.Hubert
@@ -22,10 +21,9 @@ namespace XB.Hubert
             _httpClient.BaseAddress = new Uri(_config.Url);
         }
 
-        public async Task<CrossbordpmtUpdate01Fcpsts01Response> SendAssessmentResultAsync(string timestamp, string guid, string transactionStatus)
+        public async Task<CrossbordpmtUpdate01Fcpsts01Response> SendAssessmentResultAsync(string timestamp, string id, string transactionStatus)
         {
-            var hubertServiceClient =
-                new CrossbordpmtUpdate01Fcpsts01SimpleClient(_httpClient);
+            var hubertServiceClient = new CrossbordpmtUpdate01Fcpsts01SimpleClient(_httpClient);
 
             var request = new CrossbordpmtUpdate01Fcpsts01Request
             {
@@ -34,7 +32,7 @@ namespace XB.Hubert
                     Uakw4630 = new UAKW4630
                     {
                         CreateTimestamp = timestamp,
-                        Guid = guid,
+                        Guid = id,
                         RowId = 1,
                         SourceId = "SWIFT",
                         TransactionStatus = transactionStatus
