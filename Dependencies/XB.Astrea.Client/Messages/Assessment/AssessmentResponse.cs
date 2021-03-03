@@ -24,7 +24,6 @@ namespace XB.Astrea.Client.Messages.Assessment
         public string AccountNumber { get; init; }
         public string BeneficiaryCustomerAccount { get; init; }
         public string BeneficiaryCustomerName { get; init; }
-        public string BeneficiaryCustomerAddress { get; init; }
         public string CustomerID { get; init; }
     }
 
