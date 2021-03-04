@@ -8,7 +8,7 @@ namespace XB.HttpClientJwt
     public static class HttpClientJwtExtensions
     {
         public static IServiceCollection AddHttpClientJwt(this IServiceCollection services, IConfiguration configuration,
-            string appsettingsPrefix = "", string httpClientIdentifier = "default")
+            string appsettingsPrefix, string httpClientIdentifier)
         {
             var optionValue = configuration.GetSection(appsettingsPrefix + HttpClientJwtOptions.ConfigurationSection)
                 .Get<HttpClientJwtOptions>();
