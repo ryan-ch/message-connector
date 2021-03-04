@@ -113,5 +113,12 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                     : new ProcessTrailRemittanceInfo(mt103.RemittanceInformation, AstreaClientConstants.Tag70RemittanceInfo)
             };
         }
+
+        protected string GetIdTypeByAccount(string account)
+        {
+            return account.Length >= 11 && char.IsLetter(account[0]) && char.IsLetter(account[1])
+                ? AstreaClientConstants.Iban
+                : AstreaClientConstants.Bban;
+        }
     }
 }
