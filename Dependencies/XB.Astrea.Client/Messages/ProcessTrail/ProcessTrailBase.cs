@@ -76,7 +76,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                 Time = formattedTime,
                 Bo = GetBo(response.Identity, parsedMt.SenderToReceiverInformation),
                 Refs = new List<Ref> { new Ref(response.Identity, AstreaClientConstants.ProcessTrailRefType, AstreaClientConstants.ProcessTrailRefIdType) },
-                Event = new Event(eventType, $"{parsedMt.UserHeader.UniqueEndToEndTransactionReference}|{formattedTime.ToString(AstreaClientConstants.DateFormat)}")
+                Event = new Event(eventType, $"{parsedMt.UserHeader.UniqueEndToEndTransactionReference}|{formattedTime.ToString(AstreaClientConstants.SwedishUtcDateFormat)}")
             };
         }
 

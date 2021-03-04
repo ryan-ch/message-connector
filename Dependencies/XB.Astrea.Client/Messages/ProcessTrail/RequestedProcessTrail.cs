@@ -52,7 +52,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             {
                 Time = formattedTime,
                 Bo = GetBo(request.Mt103Model.UserHeader.UniqueEndToEndTransactionReference, request.Mt103Model.SenderToReceiverInformation),
-                Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{formattedTime.ToString(AstreaClientConstants.DateFormat)}")
+                Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{formattedTime.ToString(AstreaClientConstants.SwedishUtcDateFormat)}")
             };
         }
     }

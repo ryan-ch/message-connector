@@ -59,7 +59,7 @@ namespace XB.Astrea.Client.Tests
             Assert.Equal("swift.tag121", result.General.Bo.IdType);
             Assert.Equal("seb.payments.se.incoming.xb", result.General.Bo.Type);
             Assert.Equal(new Event(AstreaClientConstants.EventType_Requested,
-                $"{request.BasketIdentity}|{new DateTime(2021, 02, 15, 18, 14, 0).ToString(AstreaClientConstants.DateFormat)}"), result.General.Event);
+                $"{request.BasketIdentity}|{new DateTime(2021, 02, 15, 18, 14, 0).ToString(AstreaClientConstants.SwedishUtcDateFormat)}"), result.General.Event);
 
             Assert.Equal(request.PaymentInstructions.Count, result.Payloads.Count);
             Assert.Equal(result.Id + "-1", result.Payloads[0].Id);

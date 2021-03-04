@@ -8,7 +8,7 @@ namespace XB.Astrea.Client.Constants
         public static readonly JsonSerializerSettings ProcessTrailDefaultJsonSettings = new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            DateFormatString = DateFormat
+            DateFormatString = SwedishUtcDateFormat
         };
 
         internal const string System = "HubertAstreaConnector";
@@ -28,7 +28,7 @@ namespace XB.Astrea.Client.Constants
         internal const string ActorRole = "agent";
         internal const string Action_PassThrough = "passthrough";
         internal const string Action_Block = "block";
-        internal const string DateFormat = "yyyy-MM-ddTHH:mm:ss.fff+01:00";
+        internal const string SwedishUtcDateFormat = "yyyy-MM-ddTHH:mm:ss.fff+01:00";
         internal const string Hubert_Timeout = "TIMEOUT";
         internal const string Hubert_Accepted = "ACCEPTED";
         internal const string Hubert_Rejected = "REJECTED";
