@@ -30,26 +30,11 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                             InstructedDate = pi.InstructedDate.ToString("yyyy-MM-dd"),
                             InstructedAmount = pi.Amount,
                             InstructedCurrency = pi.Currency,
-                            References = new List<References>
-                            {
-                                new References(request.BasketIdentity, "swift.tag121.uniqueId"),
-                                new References(request.Mt103Model.SenderReference, "swift.tag20.sendersRef"),
-                            },
-                            RemittanceInfos = string.IsNullOrEmpty(request.Mt103Model.SenderToReceiverInformation) && string.IsNullOrEmpty(request.Mt103Model.RemittanceInformation) ?
-                                              null : new List<ProcessTrailRemittanceInfo>
-                                              {
-                                                  !string.IsNullOrEmpty(request.Mt103Model.SenderToReceiverInformation) ? new ProcessTrailRemittanceInfo(request.Mt103Model.SenderToReceiverInformation, "swift.tag72.senderToReceiver") : null,
-                                                  !string.IsNullOrEmpty(request.Mt103Model.RemittanceInformation) ? new ProcessTrailRemittanceInfo(request.Mt103Model.RemittanceInformation, "swift.tag70.remittanceInfo") : null
-                                              },
-                            DebitAccount = new List<Account>
-                            {
-                                new Account(pi.DebitAccount.First().Identity, "other", "")
-                            },
-                            CreditAccount = new List<Account>
-                            {
-                                //TODO: What types are there?
-                                new Account(pi.CreditAccount.First().Identity,"other", "")
-                            }
+                            References = GetReferences(request.BasketIdentity, request.Mt103Model.SenderReference),
+                            RemittanceInfos = GetRemittanceInfos(request.Mt103Model),
+                            DebitAccount = new List<Account> { new Account(pi.DebitAccount.First().Identity, "other", "") },
+                            //TODO: What IdTypes are there?
+                            CreditAccount = new List<Account> { new Account(pi.CreditAccount.First().Identity, "other", "") }
                         },
                         Original = new Original(request.Mt)
                     }
@@ -66,12 +51,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             return new General
             {
                 Time = formattedTime,
-                Bo = new Bo
-                {
-                    Id = request.Mt103Model.UserHeader.UniqueEndToEndTransactionReference,
-                    IdType = "swift.tag121",
-                    Type = GetBoType(request.Mt103Model)
-                },
+                Bo = GetBo(request.Mt103Model.UserHeader.UniqueEndToEndTransactionReference, request.Mt103Model.SenderToReceiverInformation),
                 Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{formattedTime.ToString(AstreaClientConstants.DateFormat)}")
             };
         }

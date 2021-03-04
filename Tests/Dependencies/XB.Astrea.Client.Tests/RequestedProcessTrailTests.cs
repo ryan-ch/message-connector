@@ -68,11 +68,11 @@ namespace XB.Astrea.Client.Tests
             Assert.Equal(request.PaymentInstructions[0].Amount, result.Payloads[0].Payload.Payment.InstructedAmount);
             Assert.Equal(request.PaymentInstructions[0].Currency, result.Payloads[0].Payload.Payment.InstructedCurrency);
 
-            Assert.Equal(new References(request.BasketIdentity, "swift.tag121.uniqueId"), result.Payloads[0].Payload.Payment.References[0]);
-            Assert.Equal(new References(request.Mt103Model.SenderReference, "swift.tag20.sendersRef"), result.Payloads[0].Payload.Payment.References[1]);
+            Assert.Equal(new References(request.BasketIdentity, "swift.tag121.uniqueId"), result.Payloads[0].Payload.Payment.References.ElementAt(0));
+            Assert.Equal(new References(request.Mt103Model.SenderReference, "swift.tag20.sendersRef"), result.Payloads[0].Payload.Payment.References.ElementAt(1));
 
-            Assert.Null(result.Payloads[0].Payload.Payment.RemittanceInfos[0]);
-            Assert.Equal(new ProcessTrailRemittanceInfo(request.Mt103Model.RemittanceInformation, "swift.tag70.remittanceInfo"), result.Payloads[0].Payload.Payment.RemittanceInfos[1]);
+            Assert.Null(result.Payloads[0].Payload.Payment.RemittanceInfos.ElementAt(0));
+            Assert.Equal(new ProcessTrailRemittanceInfo(request.Mt103Model.RemittanceInformation, "swift.tag70.remittanceInfo"), result.Payloads[0].Payload.Payment.RemittanceInfos.ElementAt(1));
 
             Assert.Equal(request.PaymentInstructions[0].DebitAccount.First().Identity, result.Payloads[0].Payload.Payment.DebitAccount.First().Id);
             Assert.Equal("other", result.Payloads[0].Payload.Payment.DebitAccount.First().IdType);

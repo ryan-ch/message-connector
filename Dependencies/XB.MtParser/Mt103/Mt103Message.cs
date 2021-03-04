@@ -158,6 +158,5 @@ namespace XB.MtParser.Mt103
 
             return (parsedDate, currency, amount);
         }
-
     }
 }

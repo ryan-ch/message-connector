@@ -50,12 +50,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             return new General
             {
                 Time = formattedTime,
-                Bo = new Bo
-                {
-                    Id = assessment.Mt103Model.UserHeader.UniqueEndToEndTransactionReference,
-                    IdType = "swift.tag121",
-                    Type = GetBoType(assessment.Mt103Model)
-                },
+                Bo = GetBo(assessment.Mt103Model.UserHeader.UniqueEndToEndTransactionReference, assessment.Mt103Model.SenderToReceiverInformation),
                 Event = new Event(AstreaClientConstants.EventType_Offered, $"{assessment.BasketIdentity}|ERROR")
             };
 
