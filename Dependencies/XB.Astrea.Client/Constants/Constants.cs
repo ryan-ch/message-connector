@@ -1,16 +1,7 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-
-namespace XB.Astrea.Client.Constants
+﻿namespace XB.Astrea.Client.Constants
 {
     internal static class AstreaClientConstants
     {
-        public static readonly JsonSerializerSettings ProcessTrailDefaultJsonSettings = new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            DateFormatString = SwedishUtcDateFormat
-        };
-
         internal const string System = "HubertAstreaConnector";
         internal const string ProcessTrailSchemaVersion = "v3_3";
         internal const string BoIdType = "sys";

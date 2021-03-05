@@ -86,7 +86,7 @@ namespace XB.Astrea.Client
 
         private async Task<AssessmentResponse> HandleAssessAsync(AssessmentRequest request, Mt103Message mt103, DateTime receivedAt)
         {
-            var postBody = JsonConvert.SerializeObject(request, AstreaClientConstants.ProcessTrailDefaultJsonSettings);
+            var postBody = JsonConvert.SerializeObject(request, AstreaClientOptions.ProcessTrailDefaultJsonSettings);
             var data = new StringContent(postBody, Encoding.UTF8, "application/json");
 
             _ = SendRequestedProcessTrail(request);
@@ -114,7 +114,7 @@ namespace XB.Astrea.Client
 
                 var offeredTimeOut = new OfferedTimeOutProcessTrail(request, _config.Version);
 
-                var offeredTimeOutProcessTrail = JsonConvert.SerializeObject(offeredTimeOut, AstreaClientConstants.ProcessTrailDefaultJsonSettings);
+                var offeredTimeOutProcessTrail = JsonConvert.SerializeObject(offeredTimeOut, AstreaClientOptions.ProcessTrailDefaultJsonSettings);
                 _logger.LogInformation("Sending OfferedTimeOutProcessTrail: {offeredTimeOutProcessTrail}", offeredTimeOutProcessTrail);
 
                 await _kafkaProducer.Produce(offeredTimeOutProcessTrail).ConfigureAwait(false);
@@ -127,7 +127,7 @@ namespace XB.Astrea.Client
 
         private async Task<string> SendToHubert(string status, string transactionReference, DateTime receivedAt)
         {
-            var hubertResponse = await _hubertClient.SendAssessmentResultAsync(receivedAt.ToString("O"), transactionReference, status);
+            var hubertResponse = await _hubertClient.SendAssessmentResultAsync(receivedAt.ToString("u"), transactionReference, status);
             return hubertResponse.Result.Uakw4630.TransactionStatus.ToUpper();
         }
 
@@ -136,7 +136,7 @@ namespace XB.Astrea.Client
             try
             {
                 var requestedProcessTrail = new RequestedProcessTrail(request, _config.Version);
-                var kafkaMessage = JsonConvert.SerializeObject(requestedProcessTrail, AstreaClientConstants.ProcessTrailDefaultJsonSettings);
+                var kafkaMessage = JsonConvert.SerializeObject(requestedProcessTrail, AstreaClientOptions.ProcessTrailDefaultJsonSettings);
                 _logger.LogInformation("Sending RequestedProcessTrail: {kafkaMessage}", kafkaMessage);
                 await _kafkaProducer.Produce(kafkaMessage).ConfigureAwait(false);
             }
@@ -151,8 +151,9 @@ namespace XB.Astrea.Client
             try
             {
                 var kafkaMessage = hubertStatus == AstreaClientConstants.Hubert_Rejected
-                     ? JsonConvert.SerializeObject(new RejectedProcessTrail(assessmentResponse, _config.Version, parsedMt), AstreaClientConstants.ProcessTrailDefaultJsonSettings)
-                     : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt, hubertStatus == AstreaClientConstants.Hubert_Timeout), AstreaClientConstants.ProcessTrailDefaultJsonSettings);
+                     ? JsonConvert.SerializeObject(new RejectedProcessTrail(assessmentResponse, _config.Version, parsedMt), AstreaClientOptions.ProcessTrailDefaultJsonSettings)
+                     : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt, hubertStatus == AstreaClientConstants.Hubert_Timeout),
+                         AstreaClientOptions.ProcessTrailDefaultJsonSettings);
 
                 _logger.LogInformation("Sending DecisionProcessTrail: {kafkaMessage}", kafkaMessage);
                 await _kafkaProducer.Produce(kafkaMessage).ConfigureAwait(false);
