@@ -27,9 +27,8 @@ namespace HubertTool
             var services = new ServiceCollection();
 
             // add necessary services
-            //services.AddLogging(configure => configure.AddConsole());
             services.AddSingleton(_configuration);
-            services.AddHttpClientJwt(_configuration, "AppSettings:");
+            services.AddHttpClientJwt(_configuration, "AppSettings:", "sebcs");
             services.AddHubert(_configuration, "AppSettings:");
             
 
