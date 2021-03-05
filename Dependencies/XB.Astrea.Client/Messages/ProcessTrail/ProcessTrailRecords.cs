@@ -12,8 +12,6 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
     public record Context(string Cli, string Env, string Sch);
 
-    public record Account(string Id, string IdType, string Bic);
-
     public record References(string Reference, string Type);
 
     public record ProcessTrailActor(string Id, string Type, List<string> Roles);
@@ -31,6 +29,13 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
     public record Ref(string Id, string Type, string IdType);
 
     public record Bo(string Id, string Type, string IdType = AstreaClientConstants.Tag121);
+
+    public record Account(string Id, string Bic)
+    {
+        public string IdType => Id.Length >= 11 && char.IsLetter(Id[0]) && char.IsLetter(Id[1])
+            ? AstreaClientConstants.Iban
+            : AstreaClientConstants.Bban;
+    }
 
     public record General
     {

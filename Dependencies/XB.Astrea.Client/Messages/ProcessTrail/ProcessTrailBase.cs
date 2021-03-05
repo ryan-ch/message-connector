@@ -103,7 +103,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             if (string.IsNullOrWhiteSpace(mt103.SenderToReceiverInformation) && string.IsNullOrWhiteSpace(mt103.RemittanceInformation))
                 return null;
 
-            return new List<ProcessTrailRemittanceInfo>
+            return new[]
             {
                 string.IsNullOrWhiteSpace(mt103.SenderToReceiverInformation)
                     ? null
@@ -112,13 +112,6 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                     ? null
                     : new ProcessTrailRemittanceInfo(mt103.RemittanceInformation, AstreaClientConstants.Tag70RemittanceInfo)
             };
-        }
-
-        protected string GetIdTypeByAccount(string account)
-        {
-            return account.Length >= 11 && char.IsLetter(account[0]) && char.IsLetter(account[1])
-                ? AstreaClientConstants.Iban
-                : AstreaClientConstants.Bban;
         }
     }
 }
