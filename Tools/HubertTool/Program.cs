@@ -17,25 +17,35 @@ namespace HubertTool
             while (true)
             {
                 Console.WriteLine("Enter amount of assessments to send to Hubert: ");
-                var amount = int.Parse(Console.ReadLine());
-
-                var sTime = DateTime.Now;
-                Console.WriteLine(sTime.ToString("yyyy-MM-ddTHH:mm:ss.fff"));
-                
-                for (int i = 0; i < amount; i++)
+                int amount;
+                bool validInput = int.TryParse(Console.ReadLine(), out amount);
+                if (!validInput)
                 {
-                    string guid = Guid.NewGuid().ToString();
-                    _ = Task.Run(async () =>
-                    {
-                        var result = await hubertClient.SendAssessmentResultAsync(DateTime.Now.ToString(),
-                            guid, rnd.Next(0, 10).ToString());
-                        if (result.Result != null)
-                        {
-                            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff") + " ===== Status from Hubert: " + result.Result.Uakw4630.TransactionStatus + " Guid: " + guid);
-                        }
-                    });
+                    Console.WriteLine("User input was incorrect, please try again.");
                 }
-                Console.ReadLine();
+                else
+                {
+                    var sTime = DateTime.Now;
+                    Console.WriteLine(sTime.ToString("yyyy-MM-ddTHH:mm:ss.fff"));
+
+                    for (int i = 0; i < amount; i++)
+                    {
+                        string guid = Guid.NewGuid().ToString();
+                        _ = Task.Run(async () =>
+                        {
+                            var result = await hubertClient.SendAssessmentResultAsync(DateTime.Now.ToString(),
+                                guid, rnd.Next(0, 10).ToString());
+                            if (result.Result != null)
+                            {
+                                Console.WriteLine(DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff") +
+                                                  " ===== Status from Hubert: " +
+                                                  result.Result.Uakw4630.TransactionStatus + " Guid: " + guid);
+                            }
+                        });
+                    }
+                    Console.ReadLine();
+                }
+                
             }
         }
     }
