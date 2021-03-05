@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using XB.HttpClientJwt;
 using XB.Hubert;
+using XB.Hubert.Config;
 
 namespace HubertTool
 {
@@ -23,7 +24,7 @@ namespace HubertTool
 
             // add necessary services
             services.AddSingleton(_configuration);
-            services.AddHttpClientJwt(_configuration, "AppSettings:", "sebcs");
+            services.AddHttpClientJwt(_configuration, "AppSettings:", HubertClientOptions.HttpClientIdentifier);
             services.AddHubert(_configuration, "AppSettings:");
             
 
