@@ -23,5 +23,7 @@
         internal const string Hubert_Timeout = "TIMEOUT";
         internal const string Hubert_Accepted = "ACCEPTED";
         internal const string Hubert_Rejected = "REJECTED";
+        internal const string Hubert_TimestampFormat = "yyyy-MM-dd HH:mm:ss.ffffff";
+
     }
 }

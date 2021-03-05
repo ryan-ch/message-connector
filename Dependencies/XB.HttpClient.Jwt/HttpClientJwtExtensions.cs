@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using XB.HttpClientJwt.Config;
 
 namespace XB.HttpClientJwt
@@ -7,15 +8,16 @@ namespace XB.HttpClientJwt
     public static class HttpClientJwtExtensions
     {
         public static IServiceCollection AddHttpClientJwt(this IServiceCollection services, IConfiguration configuration,
-            string appsettingsPrefix = "", string httpClientIdentifier = "default")
+            string appsettingsPrefix, string httpClientIdentifier)
         {
-            services.Configure<HttpClientJwtOptions>(configuration.GetSection(appsettingsPrefix + HttpClientJwtOptions.ConfigurationSection));
-            //Todo: do we need to add AuthenticationDelegatingHandler in two places?
-            services.AddSingleton<AuthenticationDelegatingHandler>();
+            var optionValue = configuration.GetSection(appsettingsPrefix + HttpClientJwtOptions.ConfigurationSection)
+                .Get<HttpClientJwtOptions>();
+            var options = Options.Create(optionValue);
+
             services.AddHttpClient(httpClientIdentifier, c =>
             {
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
-            }).AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+            }).AddHttpMessageHandler(_ => new AuthenticationDelegatingHandler(options));
 
             return services;
         }

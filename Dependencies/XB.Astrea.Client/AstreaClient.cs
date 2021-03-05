@@ -127,7 +127,7 @@ namespace XB.Astrea.Client
 
         private async Task<string> SendToHubert(string status, string transactionReference, DateTime receivedAt)
         {
-            var hubertResponse = await _hubertClient.SendAssessmentResultAsync(receivedAt.ToString(), transactionReference, status);
+            var hubertResponse = await _hubertClient.SendAssessmentResultAsync(receivedAt.ToString(AstreaClientConstants.Hubert_TimestampFormat), transactionReference, status);
             return hubertResponse.Result.Uakw4630.TransactionStatus.ToUpper();
         }
 
