@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using Microsoft.Extensions.Logging;
+using System;
+using System.Globalization;
+using System.Linq;
 using XB.MtParser.Enums;
 
 namespace XB.MtParser.Swift_Message
@@ -7,12 +10,15 @@ namespace XB.MtParser.Swift_Message
     {
         private const char InputIdentifier = 'I';
         public const SwiftMessageBlockIdentifiers HeaderType = SwiftMessageBlockIdentifiers.ApplicationHeader;
+        private readonly ILogger<MtParser> _logger;
 
-        public ApplicationHeader(string basicHeaderContent) : base(basicHeaderContent, HeaderType)
+        public ApplicationHeader(string applicationHeaderContent, ILogger<MtParser> logger) : base(applicationHeaderContent, HeaderType)
         {
-            SwiftMessageType = EnumUtil.ParseEnum(basicHeaderContent.Substring(1, 3), SwiftMessageTypes.Unknown);
+            _logger = logger;
 
-            InputOutputIdentifier = basicHeaderContent.First();
+            SwiftMessageType = EnumUtil.ParseEnum(applicationHeaderContent.Substring(1, 3), SwiftMessageTypes.Unknown);
+
+            InputOutputIdentifier = applicationHeaderContent.First();
             if (InputOutputIdentifier == InputIdentifier)
                 ParseInputApplicationHeaderContent();
             else
@@ -70,13 +76,9 @@ namespace XB.MtParser.Swift_Message
         /// </summary>
         public string MessageInputReference { get; private set; }
         /// <summary>
-        /// The output date, local to the receiver
+        /// The output date including the output time, local to the receiver
         /// </summary>
-        public string OutputDate { get; private set; }
-        /// <summary>
-        /// The output time, local to the receiver
-        /// </summary>
-        public string OutputTime { get; private set; }
+        public DateTime OutputDate { get; private set; }
 
         public string LTAddress => string.IsNullOrEmpty(MessageInputReference) ? string.Empty : MessageInputReference.Substring(6, 12);
 
@@ -94,8 +96,9 @@ namespace XB.MtParser.Swift_Message
         {
             InputTime = HeaderContent.Substring(4, 4);
             MessageInputReference = HeaderContent.Substring(8, 28);
-            OutputDate = HeaderContent.Substring(36, 6);
-            OutputTime = HeaderContent.Substring(42, 4);
+            if (!DateTime.TryParseExact($"{HeaderContent.Substring(36, 6)}{HeaderContent.Substring(42, 4)}", "yyMMddHHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime outputdate))
+                _logger.LogError("ApplicationHeader: Unable to parse output date correctly");
+            OutputDate = outputdate;
             Priority = HeaderContent.Substring(46, 1);
         }
     }

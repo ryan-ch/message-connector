@@ -70,7 +70,7 @@ namespace XB.MtParser.Swift_Message
                 return headerType switch
                 {
                     SwiftMessageBlockIdentifiers.BasicHeader => new BasicHeader(block),
-                    SwiftMessageBlockIdentifiers.ApplicationHeader => new ApplicationHeader(block),
+                    SwiftMessageBlockIdentifiers.ApplicationHeader => new ApplicationHeader(block, Logger),
                     SwiftMessageBlockIdentifiers.UserHeader => new UserHeader(block),
                     _ => throw new ArgumentOutOfRangeException(nameof(headerType), headerType, "Unknown header type: " + headerType.ToString("G"))
                 };

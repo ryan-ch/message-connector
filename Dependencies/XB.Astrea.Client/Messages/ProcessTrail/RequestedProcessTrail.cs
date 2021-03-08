@@ -61,18 +61,16 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
         private General SetupGeneral(AssessmentRequest request)
         {
-            var formattedTime = DateTime.ParseExact(request.Mt103Model.ApplicationHeader.OutputDate + request.Mt103Model.ApplicationHeader.OutputTime,
-                "yyMMddHHmm", CultureInfo.InvariantCulture);
             return new General
             {
-                Time = formattedTime,
+                Time = request.Mt103Model.ApplicationHeader.OutputDate,
                 Bo = new Bo
                 {
                     Id = request.Mt103Model.UserHeader.UniqueEndToEndTransactionReference,
                     IdType = "swift.tag121",
                     Type = GetBoType(request.Mt103Model)
                 },
-                Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{formattedTime.ToString(AstreaClientConstants.DateFormat)}")
+                Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{request.Mt103Model.ApplicationHeader.OutputDate.ToString(AstreaClientConstants.DateFormat)}")
             };
         }
     }

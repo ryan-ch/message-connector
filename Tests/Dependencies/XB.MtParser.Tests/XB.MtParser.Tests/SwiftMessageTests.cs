@@ -23,7 +23,7 @@ namespace XB.MtParser.Tests
 
             //Assert
             var expectedBasicHeader = new BasicHeader(basicHeaderContent);
-            var expectedApplicationHeader = new ApplicationHeader(applicationHeaderContent);
+            var expectedApplicationHeader = new ApplicationHeader(applicationHeaderContent, null);
             var expectedUserHeader = new UserHeader(userHeaderContent);
             Assert.Equal(rawSwiftMessage, swiftMessage.OriginalSwiftMessage);
             Assert.Equal(expectedBasicHeader, swiftMessage.BasicHeader);
