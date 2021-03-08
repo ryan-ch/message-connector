@@ -1,12 +1,24 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Moq;
+using System;
+using System.Globalization;
+using Xunit;
+using Testing.Common;
 using XB.MtParser.Enums;
 using XB.MtParser.Swift_Message;
-using Xunit;
+
 
 namespace XB.MtParser.Tests
 {
     public class ApplicationHeaderTests
     {
+        private readonly Mock<ILogger<MtParser>> _loggerMock;
+
+        public ApplicationHeaderTests()
+        {
+            _loggerMock = new Mock<ILogger<MtParser>>();
+        }
+
         [Theory]
         [InlineData('I', "103", "SOGEFRPPZXXX", "U", "3", "003")]        
         public void ApplicationHeader_ShouldInitializeWithCorrectValues_WithInputApplicationHeaderContent(char ioIdentifier, string swiftMessageType, string destinationAddress, string priority, string deliveryMonitoring, string obsolescencePeriod)
@@ -15,7 +27,7 @@ namespace XB.MtParser.Tests
             var applicationHeaderContent = $"{ioIdentifier}{swiftMessageType}{destinationAddress}{priority}{deliveryMonitoring}{obsolescencePeriod}";
 
             //Act
-            var applicationHeader = new ApplicationHeader(applicationHeaderContent);
+            var applicationHeader = new ApplicationHeader(applicationHeaderContent, _loggerMock.Object);
 
             //Assert
             Assert.Equal(ioIdentifier, applicationHeader.InputOutputIdentifier);
@@ -27,8 +39,7 @@ namespace XB.MtParser.Tests
             //Output specific properties
             Assert.Null(applicationHeader.InputTime);
             Assert.Null(applicationHeader.MessageInputReference);
-            Assert.Null(applicationHeader.OutputDate);
-            Assert.Null(applicationHeader.OutputTime);
+            Assert.Equal(DateTime.MinValue, applicationHeader.OutputDate);
             Assert.Equal(string.Empty, applicationHeader.LTAddress);
             Assert.Equal(string.Empty, applicationHeader.ISOCountryCode);
         }
@@ -39,17 +50,17 @@ namespace XB.MtParser.Tests
         {
             //Arrange
             var applicationHeaderContent = $"{ioIdentifier}{swiftMessageType}{inputTime}{messageInputReference}{outputDate}{outputTime}{priority}";
+            var expectedOutputDate = DateTime.ParseExact($"{outputDate}{outputTime}", "yyMMddHHmm", CultureInfo.InvariantCulture, DateTimeStyles.None);
 
             //Act
-            var applicationHeader = new ApplicationHeader(applicationHeaderContent);
+            var applicationHeader = new ApplicationHeader(applicationHeaderContent, _loggerMock.Object);
 
             //Assert
             Assert.Equal(ioIdentifier, applicationHeader.InputOutputIdentifier);
             Assert.Equal(Convert.ToInt32(swiftMessageType), (int)applicationHeader.SwiftMessageType);
             Assert.Equal(inputTime, applicationHeader.InputTime);
             Assert.Equal(messageInputReference, applicationHeader.MessageInputReference);
-            Assert.Equal(outputDate, applicationHeader.OutputDate);
-            Assert.Equal(outputTime, applicationHeader.OutputTime);
+            Assert.Equal(expectedOutputDate, applicationHeader.OutputDate);
             Assert.Equal(priority, applicationHeader.Priority);
             Assert.Equal(messageInputReference.Substring(6, 12), applicationHeader.LTAddress);
             Assert.Equal(messageInputReference.Substring(10, 2), applicationHeader.ISOCountryCode);
@@ -66,10 +77,23 @@ namespace XB.MtParser.Tests
             const string unacceptedMessageTypeApplicationHeaderContent = "I105SOGEFRPPZXXXU3003";
 
             //Act
-            var applicationHeader = new ApplicationHeader(unacceptedMessageTypeApplicationHeaderContent);
+            var applicationHeader = new ApplicationHeader(unacceptedMessageTypeApplicationHeaderContent, _loggerMock.Object);
 
             //Assert
             Assert.Equal(SwiftMessageTypes.Unknown, applicationHeader.SwiftMessageType);
+        }
+
+        [Fact]
+        public void ApplicationHeader_ShouldLogError_WithInvalidApplicationHeaderInput()
+        {
+            //Arrange
+            const string invalidOutputDateTimeApplicationHeaderContent = "O1030955100518IRVTUS3NAXXX7676396079210215ABCDN";
+
+            //Act
+            var applicationHeader = new ApplicationHeader(invalidOutputDateTimeApplicationHeaderContent, _loggerMock.Object);
+
+            //Assert
+            _loggerMock.VerifyLoggerCall(LogLevel.Error, $"ApplicationHeader: Unable to parse output date correctly", Times.Once());
         }
     }
 }

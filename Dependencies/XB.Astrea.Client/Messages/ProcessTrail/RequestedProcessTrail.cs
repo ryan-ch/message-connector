@@ -46,13 +46,11 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
         private General SetupGeneral(AssessmentRequest request)
         {
-            var formattedTime = DateTime.ParseExact(request.Mt103Model.ApplicationHeader.OutputDate + request.Mt103Model.ApplicationHeader.OutputTime,
-                "yyMMddHHmm", CultureInfo.InvariantCulture);
             return new General
             {
-                Time = formattedTime,
+                Time = request.Mt103Model.ApplicationHeader.OutputDate,
                 Bo = GetBo(request.Mt103Model.UserHeader.UniqueEndToEndTransactionReference, request.Mt103Model.SenderToReceiverInformation),
-                Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{formattedTime.ToString(AstreaClientConstants.SwedishUtcDateFormat)}")
+                Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{request.Mt103Model.ApplicationHeader.OutputDate.ToString(AstreaClientConstants.DateFormat)}")
             };
         }
     }

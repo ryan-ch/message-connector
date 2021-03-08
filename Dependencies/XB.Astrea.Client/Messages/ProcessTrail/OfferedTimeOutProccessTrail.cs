@@ -45,15 +45,12 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
         protected General SetupGeneral(AssessmentRequest assessment)
         {
-            var formattedTime = DateTime.ParseExact(assessment.Mt103Model.ApplicationHeader.OutputDate + assessment.Mt103Model.ApplicationHeader.OutputTime,
-                "yyMMddHHmm", CultureInfo.InvariantCulture);
             return new General
             {
-                Time = formattedTime,
+                Time = assessment.Mt103Model.ApplicationHeader.OutputDate,
                 Bo = GetBo(assessment.Mt103Model.UserHeader.UniqueEndToEndTransactionReference, assessment.Mt103Model.SenderToReceiverInformation),
                 Event = new Event(AstreaClientConstants.EventType_Offered, $"{assessment.BasketIdentity}|ERROR")
             };
-
         }
     }
 }
