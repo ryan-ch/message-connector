@@ -75,7 +75,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             {
                 Time = formattedTime,
                 Bo = GetBo(response.Identity, parsedMt.SenderToReceiverInformation),
-                Refs = new List<Ref> { new Ref(response.Identity, AstreaClientConstants.ProcessTrailRefType, AstreaClientConstants.ProcessTrailRefIdType) },
+                Refs = new[] { new Ref(response.Identity, AstreaClientConstants.ProcessTrailRefType, AstreaClientConstants.ProcessTrailRefIdType) },
                 Event = new Event(eventType, $"{parsedMt.UserHeader.UniqueEndToEndTransactionReference}|{formattedTime.ToString(AstreaClientConstants.SwedishUtcDateFormat)}")
             };
         }
@@ -89,29 +89,23 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             return new Bo(identity, type);
         }
 
-        protected IEnumerable<References> GetReferences(string identity, string senderReference)
-        {
-            return new[]
+        protected IEnumerable<References> GetReferences(string identity, string senderReference) =>
+            new[]
             {
                 new References(identity, AstreaClientConstants.Tag121Id),
                 new References(senderReference, AstreaClientConstants.Tag20SenderRef)
             };
-        }
 
         protected IEnumerable<ProcessTrailRemittanceInfo> GetRemittanceInfos(Mt103Message mt103)
         {
-            if (string.IsNullOrWhiteSpace(mt103.SenderToReceiverInformation) && string.IsNullOrWhiteSpace(mt103.RemittanceInformation))
-                return null;
+            var remittanceInfos = new List<ProcessTrailRemittanceInfo>();
 
-            return new[]
-            {
-                string.IsNullOrWhiteSpace(mt103.SenderToReceiverInformation)
-                    ? null
-                    : new ProcessTrailRemittanceInfo(mt103.SenderToReceiverInformation, AstreaClientConstants.Tag72SenderToReceiver),
-                string.IsNullOrWhiteSpace(mt103.RemittanceInformation)
-                    ? null
-                    : new ProcessTrailRemittanceInfo(mt103.RemittanceInformation, AstreaClientConstants.Tag70RemittanceInfo)
-            };
+            if (!string.IsNullOrWhiteSpace(mt103.SenderToReceiverInformation))
+                remittanceInfos.Add(new ProcessTrailRemittanceInfo(mt103.SenderToReceiverInformation, AstreaClientConstants.Tag72SenderToReceiver));
+            if (!string.IsNullOrWhiteSpace(mt103.RemittanceInformation))
+                remittanceInfos.Add(new ProcessTrailRemittanceInfo(mt103.RemittanceInformation, AstreaClientConstants.Tag70RemittanceInfo));
+
+            return remittanceInfos;
         }
     }
 }
