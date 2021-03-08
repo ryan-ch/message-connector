@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using XB.IBM.MQ.Interfaces;
 using XB.MtParser.Interfaces;
@@ -101,6 +102,7 @@ BENEF
                         timer.Stop();
                         break;
                     case "4":
+                        // File should contain swift mt103 messages separated by a single empty line
                         Console.Write("Enter filename/path: ");
                         var path = Console.ReadLine();
                         timer.Start();
