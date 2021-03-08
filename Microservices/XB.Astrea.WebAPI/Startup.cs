@@ -4,9 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Serilog;
-using Serilog.Events;
-using Serilog.Exceptions;
 using System;
 using XB.Astrea.WebAPI.Extensions;
 using XGalaxy.Common.Logging;
@@ -21,14 +18,7 @@ namespace XB.Astrea.WebAPI
         {
             Configuration = configuration;
             _ = bool.TryParse(Environment.GetEnvironmentVariable("Debugging"), out var debugging);
-            var config = new LoggerConfiguration()
-                .Enrich.WithMachineName()
-                .Enrich.WithExceptionDetails()
-                .WriteTo.File("C:/logs/astrea-connector-logs.txt", restrictedToMinimumLevel: LogEventLevel.Error, outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] Level:{Level:u3} Message:{Message:lj} MachineName:{MachineName} {NewLine}{Exception}{NewLine}")
-                .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] Level:{Level:u3} Message:{Message:lj} MachineName:{MachineName} {NewLine}{Exception}{NewLine}");
-
-            Log.Logger = config.CreateLogger();
-            //SerilogConfiguration.ConfigureLogging("Astrea-Connector", debugging);
+            SerilogConfiguration.ConfigureLogging("Astrea-Connector", debugging);
         }
 
         public void ConfigureServices(IServiceCollection services)
