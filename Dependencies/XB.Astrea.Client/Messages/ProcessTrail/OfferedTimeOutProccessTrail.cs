@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
 

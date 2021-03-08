@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
 using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
@@ -50,7 +48,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             {
                 Time = request.Mt103Model.ApplicationHeader.OutputDate,
                 Bo = GetBo(request.Mt103Model.UserHeader.UniqueEndToEndTransactionReference, request.Mt103Model.SenderToReceiverInformation),
-                Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{request.Mt103Model.ApplicationHeader.OutputDate.ToString(AstreaClientConstants.DateFormat)}")
+                Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{request.Mt103Model.ApplicationHeader.OutputDate.ToString(AstreaClientConstants.SwedishUtcDateFormat)}")
             };
         }
     }

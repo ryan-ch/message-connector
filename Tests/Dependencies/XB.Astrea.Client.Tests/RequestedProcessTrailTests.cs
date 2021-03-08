@@ -23,7 +23,7 @@ namespace XB.Astrea.Client.Tests
                 BasketIdentity = "dummy basket identity",
                 PaymentInstructions = new List<PaymentInstruction>
                 {
-                    new PaymentInstruction()
+                    new PaymentInstruction
                     {
                         Identity = "dummy payment instruction identitiy",
                         PaymentType = "dummy payment type",
@@ -47,7 +47,6 @@ namespace XB.Astrea.Client.Tests
                 Tags = new Tags(),
                 Mt103Model = new Mock<Mt103Message>(SwiftMessagesMock.SwiftMessage_2.OriginalMessage, null).Object,
                 Mt = SwiftMessagesMock.SwiftMessage_2.OriginalMessage
-
             };
 
             // Act
@@ -71,8 +70,8 @@ namespace XB.Astrea.Client.Tests
             Assert.Equal(new References(request.BasketIdentity, "swift.tag121.uniqueId"), result.Payloads[0].Payload.Payment.References.ElementAt(0));
             Assert.Equal(new References(request.Mt103Model.SenderReference, "swift.tag20.sendersRef"), result.Payloads[0].Payload.Payment.References.ElementAt(1));
 
-            Assert.Null(result.Payloads[0].Payload.Payment.RemittanceInfos.ElementAt(0));
-            Assert.Equal(new ProcessTrailRemittanceInfo(request.Mt103Model.RemittanceInformation, "swift.tag70.remittanceInfo"), result.Payloads[0].Payload.Payment.RemittanceInfos.ElementAt(1));
+            Assert.Single(result.Payloads[0].Payload.Payment.RemittanceInfos);
+            Assert.Equal(new ProcessTrailRemittanceInfo(request.Mt103Model.RemittanceInformation, "swift.tag70.remittanceInfo"), result.Payloads[0].Payload.Payment.RemittanceInfos.First());
 
             Assert.Equal(request.PaymentInstructions[0].DebitAccount.First().Identity, result.Payloads[0].Payload.Payment.DebitAccount.First().Id);
             Assert.Equal(AstreaClientConstants.Iban, result.Payloads[0].Payload.Payment.DebitAccount.First().IdType);

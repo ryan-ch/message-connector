@@ -2,10 +2,10 @@
 using Moq;
 using System;
 using System.Globalization;
-using Xunit;
 using Testing.Common;
 using XB.MtParser.Enums;
 using XB.MtParser.Swift_Message;
+using Xunit;
 
 
 namespace XB.MtParser.Tests

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.MtParser.Mt103;
@@ -75,7 +74,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                 Time = parsedMt.ApplicationHeader.OutputDate,
                 Bo = GetBo(response.Identity, parsedMt.SenderToReceiverInformation),
                 Refs = new[] { new Ref(response.Identity, AstreaClientConstants.ProcessTrailRefType, AstreaClientConstants.ProcessTrailRefIdType) },
-                Event = new Event(eventType, $"{parsedMt.UserHeader.UniqueEndToEndTransactionReference}|{parsedMt.ApplicationHeader.OutputDate.ToString(AstreaClientConstants.DateFormat)}")
+                Event = new Event(eventType, $"{parsedMt.UserHeader.UniqueEndToEndTransactionReference}|{parsedMt.ApplicationHeader.OutputDate.ToString(AstreaClientConstants.SwedishUtcDateFormat)}")
             };
         }
 
