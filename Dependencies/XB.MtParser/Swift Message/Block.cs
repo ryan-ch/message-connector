@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace XB.MtParser.Models
+namespace XB.MtParser.Swift_Message
 {
     public record Block
     {
