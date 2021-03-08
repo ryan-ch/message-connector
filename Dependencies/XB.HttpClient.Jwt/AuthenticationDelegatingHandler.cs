@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,14 @@ namespace XB.HttpClientJwt
     //Todo: should this be moved in to common or keep it in own library?
     public class AuthenticationDelegatingHandler : DelegatingHandler
     {
+        private static string _jwt;
+        private static long _jwtExpire;
         private readonly HttpClientJwtOptions _httpClientJwtOptions;
+        private readonly ILogger<AuthenticationDelegatingHandler> _logger;
 
-        private string _jwt;
-        private long _jwtExpire;
-
-        public AuthenticationDelegatingHandler(IOptions<HttpClientJwtOptions> config)
+        public AuthenticationDelegatingHandler(IOptions<HttpClientJwtOptions> config, ILogger<AuthenticationDelegatingHandler> logger)
         {
+            _logger = logger;
             _httpClientJwtOptions = config.Value;
         }
 
@@ -39,16 +41,23 @@ namespace XB.HttpClientJwt
 
         private async Task<HttpResponseMessage> DoRequestWithJwt(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var token = await GetJwt(cancellationToken);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            try
+            {
+                var token = await GetJwt(cancellationToken);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unable to generate JWT for requests");
+                throw;
+            }
             return await base.SendAsync(request, cancellationToken);
         }
 
         private async Task<string> GetJwt(CancellationToken cancellationToken)
         {
-            if (!string.IsNullOrEmpty(_jwt) || DateTimeOffset.UtcNow.ToUnixTimeSeconds() < _jwtExpire)
+            if (!string.IsNullOrEmpty(_jwt) && DateTimeOffset.UtcNow.ToUnixTimeSeconds() < _jwtExpire)
                 return _jwt;
-
 
             var jwtRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(_httpClientJwtOptions.Url));
 
@@ -63,16 +72,14 @@ namespace XB.HttpClientJwt
             };
 
             jwtRequest.Content = new FormUrlEncodedContent(jwtDetails);
-
-            var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
             var response = await base.SendAsync(jwtRequest, cancellationToken);
-
             var content = JObject.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
 
             _jwt = content.SelectToken("access_token")?.ToString();
-            _jwtExpire = long.Parse(content.SelectToken("expires_in")?.ToString() ?? "0", CultureInfo.InvariantCulture) + currentTime;
+            if (string.IsNullOrWhiteSpace(_jwt))
+                throw new Exception("Unexpected empty token");
 
+            _jwtExpire = long.Parse(content.SelectToken("expires_in")?.ToString() ?? "0", CultureInfo.InvariantCulture) + DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             return _jwt;
         }
     }
