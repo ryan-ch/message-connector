@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using XB.MtParser.Enums;
-using XB.MtParser.Models;
 
 namespace XB.MtParser.Swift_Message
 {

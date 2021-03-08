@@ -1,6 +1,7 @@
 ﻿using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Testing.Common.Test_Data;
 using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
@@ -52,7 +53,7 @@ namespace XB.Astrea.Client.Tests
             Assert.Equal(AstreaClientConstants.Action_Block, rejectedProcessTrail.Payloads[0].Payload.Act.RecommendedAction);
             Assert.Equal(AstreaClientConstants.Action_Block, rejectedProcessTrail.Payloads[0].Payload.Act.ExecutedAction);
 
-            Assert.Equal(assessmentResponse.Results[0].OrderIdentity, rejectedProcessTrail.Payloads[0].Payload.Payment.References[0].Reference);
+            Assert.Equal(assessmentResponse.Results[0].OrderIdentity, rejectedProcessTrail.Payloads[0].Payload.Payment.References.First().Reference);
 
             Assert.Equal(assessmentResponse.Results[0].Extras.AccountNumber, rejectedProcessTrail.Payloads[0].Payload.Assess.Extras.BeneficiaryCustomerAccount);
             Assert.Equal(assessmentResponse.Results[0].Extras.FullName, rejectedProcessTrail.Payloads[0].Payload.Assess.Extras.BeneficiaryCustomerName);
