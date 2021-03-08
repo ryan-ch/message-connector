@@ -45,8 +45,8 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         {
             return new General
             {
-                Time = assessment.Mt103Model.ApplicationHeader.OutputDate,
-                Bo = GetBo(assessment.Mt103Model.UserHeader.UniqueEndToEndTransactionReference, assessment.Mt103Model.SenderToReceiverInformation),
+                Time = assessment.Mt103Model.ApplicationHeader?.OutputDate,
+                Bo = GetBo(assessment.Mt103Model.UserHeader?.UniqueEndToEndTransactionReference, assessment.Mt103Model.SenderToReceiverInformation),
                 Event = new Event(AstreaClientConstants.EventType_Offered, $"{assessment.BasketIdentity}|ERROR")
             };
         }

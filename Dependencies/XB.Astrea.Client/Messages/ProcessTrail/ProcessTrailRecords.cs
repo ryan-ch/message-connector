@@ -40,7 +40,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
     public record General
     {
         public Bo Bo { get; init; }
-        public DateTime Time { get; init; }
+        public DateTime? Time { get; init; }
         public IEnumerable<Ref> Refs { get; init; }
         public Event Event { get; init; }
         public Location Location { get; init; }

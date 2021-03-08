@@ -69,7 +69,7 @@ namespace XB.Astrea.Client
                     await Task.Delay(Convert.ToInt32(_config.WaitingBeforeRetryInSec * 1000)).ConfigureAwait(false);
                 }
             }
-            _ = HandleTimeOutAsync(assessmentRequest, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt);
+            _ = HandleTimeOutAsync(assessmentRequest, mt103.UserHeader?.UniqueEndToEndTransactionReference, receivedAt);
             _logger.LogError("Couldn't Handle this transaction message, stopped: {originalMessage}", originalMessage);
 
             return new AssessmentResponse();
@@ -99,7 +99,7 @@ namespace XB.Astrea.Client
 
             var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
 
-            var hubertStatus = await SendToHubert(assessmentResponse.RiskLevel, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt).ConfigureAwait(false);
+            var hubertStatus = await SendToHubert(assessmentResponse.RiskLevel, mt103.UserHeader?.UniqueEndToEndTransactionReference, receivedAt).ConfigureAwait(false);
             _ = SendDecisionProcessTrail(hubertStatus, assessmentResponse, mt103);
 
             return assessmentResponse;

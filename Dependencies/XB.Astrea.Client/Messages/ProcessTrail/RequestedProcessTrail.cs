@@ -46,9 +46,9 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         {
             return new General
             {
-                Time = request.Mt103Model.ApplicationHeader.OutputDate,
-                Bo = GetBo(request.Mt103Model.UserHeader.UniqueEndToEndTransactionReference, request.Mt103Model.SenderToReceiverInformation),
-                Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{request.Mt103Model.ApplicationHeader.OutputDate.ToString(AstreaClientConstants.SwedishUtcDateFormat)}")
+                Time = request.Mt103Model.ApplicationHeader?.OutputDate,
+                Bo = GetBo(request.Mt103Model.UserHeader?.UniqueEndToEndTransactionReference, request.Mt103Model.SenderToReceiverInformation),
+                Event = new Event(AstreaClientConstants.EventType_Requested, $"{request.BasketIdentity}|{request.Mt103Model.ApplicationHeader?.OutputDate.ToString(AstreaClientConstants.SwedishUtcDateFormat)}")
             };
         }
     }

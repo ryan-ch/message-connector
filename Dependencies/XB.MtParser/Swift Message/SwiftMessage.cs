@@ -22,7 +22,7 @@ namespace XB.MtParser.Swift_Message
             ApplicationHeader = ExtractHeader(ApplicationHeader.HeaderType) as ApplicationHeader;
             UserHeader = ExtractHeader(UserHeader.HeaderType) as UserHeader;
 
-            SwiftMessageType = ApplicationHeader.SwiftMessageType;
+            SwiftMessageType = ApplicationHeader == null ? SwiftMessageTypes.Unknown : ApplicationHeader.SwiftMessageType;
         }
 
 
