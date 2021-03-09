@@ -65,7 +65,7 @@ namespace XB.MtParser.Tests
             var loggerMock = new Mock<ILogger<MtParser>>();
             //Act
             //Assert
-            var exception = Assert.Throws<Exception>(() => { var swiftMessage = new SwiftMessage(string.Empty, loggerMock.Object); });
+            var exception = Assert.Throws<Exception>(() => { new SwiftMessage(string.Empty, loggerMock.Object); });
             Assert.Contains("Header is empty", exception.Message);
         }
     }
