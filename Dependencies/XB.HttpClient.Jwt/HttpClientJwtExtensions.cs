@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using XB.HttpClientJwt.Config;
 
 namespace XB.HttpClientJwt
@@ -8,16 +7,12 @@ namespace XB.HttpClientJwt
     public static class HttpClientJwtExtensions
     {
         public static IServiceCollection AddHttpClientJwt(this IServiceCollection services, IConfiguration configuration,
-            string appsettingsPrefix, string httpClientIdentifier)
+            string appsettingsPrefix = "", string httpClientIdentifier = "default")
         {
-            var optionValue = configuration.GetSection(appsettingsPrefix + HttpClientJwtOptions.ConfigurationSection)
-                .Get<HttpClientJwtOptions>();
-            var options = Options.Create(optionValue);
-
-            services.AddHttpClient(httpClientIdentifier, c =>
-            {
-                c.DefaultRequestHeaders.Add("Accept", "application/json");
-            }).AddHttpMessageHandler(_ => new AuthenticationDelegatingHandler(options));
+            services.Configure<HttpClientJwtOptions>(configuration.GetSection(appsettingsPrefix + HttpClientJwtOptions.ConfigurationSection))
+                .AddTransient<AuthenticationDelegatingHandler>()
+                .AddHttpClient(httpClientIdentifier, c => { c.DefaultRequestHeaders.Add("Accept", "application/json"); })
+                .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
 
             return services;
         }

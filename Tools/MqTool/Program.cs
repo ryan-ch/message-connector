@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
 using XB.IBM.MQ.Interfaces;
 using XB.MtParser.Interfaces;
 
@@ -97,7 +101,35 @@ BENEF
                         }
                         timer.Stop();
                         break;
+                    case "4":
+                        // File should contain swift mt103 messages separated by a single empty line
+                        Console.Write("Enter filename/path: ");
+                        var path = Console.ReadLine();
+                        timer.Start();
+                        var fileContents = File.ReadAllLines(path);
+                        var sb = new StringBuilder();
+                        var messages = new List<string>();
 
+                        foreach (var line in fileContents)
+                        {
+                            if (string.IsNullOrEmpty(line))
+                            {
+                                messages.Add(sb.ToString());
+                                sb.Clear();
+                                continue;
+                            }
+                            sb.Append(line);
+                        }
+                        Console.Write($"There are {messages.Count} messages in {path}. How many messages do you want to send?: ");
+                        var count = 0;
+                        foreach (var message in messages.Take(int.Parse(Console.ReadLine())))
+                        {
+                            mqClientProducer.WriteMessage(message);
+                            if (count++ % 100 == 0) mqClientProducer.Commit();
+                        }
+                        mqClientProducer.Commit();
+                        timer.Stop();
+                        break;
                     case "0":
                         continueProgram = false;
                         break;
