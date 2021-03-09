@@ -13,7 +13,7 @@ namespace XB.Astrea.Client.Messages.Assessment
         public AssessmentRequest(Mt103Message mt103)
         {
             OrderIdentity = Guid.NewGuid().ToString();
-            BasketIdentity = mt103.UserHeader?.UniqueEndToEndTransactionReference;
+            BasketIdentity = mt103.UserHeader.UniqueEndToEndTransactionReference;
             PaymentInstructions = SetupPaymentInstruction(mt103);
             TargetState = AstreaClientConstants.EventType_Requested;
             Tags = new Tags();
@@ -38,7 +38,7 @@ namespace XB.Astrea.Client.Messages.Assessment
             {
                 new PaymentInstruction
                 {
-                    Identity = mt.UserHeader?.UniqueEndToEndTransactionReference,
+                    Identity = mt.UserHeader.UniqueEndToEndTransactionReference,
                     PaymentType = "seb.payment.se.swift." + mt.BankOperationCode,
                     RegistrationTime = DateTime.Now,
                     InstructedDate = mt.ValueDate,
@@ -57,7 +57,7 @@ namespace XB.Astrea.Client.Messages.Assessment
         {
             var account = string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(model.OrderingCustomer?.Account))
+            if (!string.IsNullOrWhiteSpace(model.OrderingCustomer.Account))
                 account = model.OrderingCustomer.Account;
 
             return new Account(account);
@@ -67,7 +67,7 @@ namespace XB.Astrea.Client.Messages.Assessment
         {
             var account = string.Empty;
 
-            if (!string.IsNullOrEmpty(model.BeneficiaryCustomer?.Account))
+            if (!string.IsNullOrEmpty(model.BeneficiaryCustomer.Account))
                 account = model.BeneficiaryCustomer.Account;
 
             return new Account(account);

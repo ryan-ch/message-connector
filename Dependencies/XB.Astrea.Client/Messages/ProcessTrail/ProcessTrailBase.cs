@@ -71,10 +71,10 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         {
             return new General
             {
-                Time = parsedMt.ApplicationHeader?.OutputDate,
+                Time = parsedMt.ApplicationHeader.OutputDate,
                 Bo = GetBo(response.Identity, parsedMt.SenderToReceiverInformation),
                 Refs = new[] { new Ref(response.Identity, AstreaClientConstants.ProcessTrailRefType, AstreaClientConstants.ProcessTrailRefIdType) },
-                Event = new Event(eventType, $"{parsedMt.UserHeader?.UniqueEndToEndTransactionReference}|{parsedMt.ApplicationHeader?.OutputDate.ToString(AstreaClientConstants.SwedishUtcDateFormat)}")
+                Event = new Event(eventType, $"{parsedMt.UserHeader.UniqueEndToEndTransactionReference}|{parsedMt.ApplicationHeader.OutputDate.ToString(AstreaClientConstants.SwedishUtcDateFormat)}")
             };
         }
 
