@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using Moq;
+using System;
+using System.Collections.Generic;
 using Testing.Common.Test_Data;
 using XB.MtParser.Swift_Message;
 using Xunit;
@@ -53,6 +56,17 @@ namespace XB.MtParser.Tests
             {
                 Assert.Equal(blockList[i], swiftMessage.Blocks[i].Content);
             }
+        }
+
+        [Fact]
+        public void SwiftMessage_ShouldThrowExceptionWhenHeadersAreMissing()
+        {
+            //Arrange
+            var loggerMock = new Mock<ILogger<MtParser>>();
+            //Act
+            //Assert
+            var exception = Assert.Throws<Exception>(() => new SwiftMessage(string.Empty, loggerMock.Object));
+            Assert.Contains("Header is empty", exception.Message);
         }
     }
 }
