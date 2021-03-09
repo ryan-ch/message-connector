@@ -77,7 +77,7 @@ namespace XB.MtParser.Swift_Message
             catch (Exception ex)
             {
                 Logger.LogError(ex, $"Couldn't extract {headerType:G} details from block: |{block}|");
-                return null;
+                throw;
             }
         }
     }
