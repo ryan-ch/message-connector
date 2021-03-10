@@ -14,6 +14,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <Content Include="appsettings.Remote.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -25,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Dependencies\XB.Astrea\XB.Astrea.Client.csproj" />
     <ProjectReference Include="..\..\Dependencies\XB.IBM.MQ\XB.IBM.MQ.csproj" />
+    <ProjectReference Include="..\..\Dependencies\XB.MtParser\XB.MtParser.csproj" />
   </ItemGroup>
 
 </Project>

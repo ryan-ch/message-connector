@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using IBM.XMS;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using XB.IBM.MQ.Config;
 using XB.IBM.MQ.Implementations;
@@ -8,11 +9,11 @@ namespace XB.IBM.MQ
 {
     public static class MqClientExtensions
     {
-        public static IServiceCollection AddMQ(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
+        public static IServiceCollection AddMq(this IServiceCollection services, IConfiguration configuration, string appSettingsPrefix = "")
         {
-            services.Configure<MqOptions>(configuration.GetSection(appsettingsPrefix + MqOptions.ConfigurationSection));
-
+            services.Configure<MqOptions>(configuration.GetSection(appSettingsPrefix + MqOptions.ConfigurationSection));
             return services
+                .AddSingleton(_ => XMSFactoryFactory.GetInstance(XMSC.CT_WMQ).CreateConnectionFactory())
                 .AddMqConsumer()
                 .AddMqProducer();// do we need this?
         }

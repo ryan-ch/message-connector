@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "LocalMq": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "RemoteMq": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Remote"
+      }
+    }
+  }
+}

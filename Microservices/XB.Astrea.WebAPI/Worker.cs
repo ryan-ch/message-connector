@@ -11,6 +11,8 @@ namespace XB.Astrea.WebAPI
 {
     public class Worker : BackgroundService
     {
+        private const int waitTimeMs = 1000;
+
         private readonly ILogger<Worker> _logger;
         private readonly IMqConsumer _mqConsumer;
         private readonly IServiceProvider _services;
@@ -20,37 +22,58 @@ namespace XB.Astrea.WebAPI
             _logger = logger;
             _mqConsumer = mqConsumer;
             _services = services;
+
+            using var scope = _services.CreateScope();
+            var backgroundServiceController = scope.ServiceProvider.GetRequiredService<BackgroundServicesManager>();
+            backgroundServiceController.RegisterBackgroundService(this);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            return Task.Run(() =>
             {
-                try
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    string message = _mqConsumer.ReceiveMessage();
-                    if (!string.IsNullOrEmpty(message))
-                        _ = HandleMessage(message);
+                    var messageReceived = false;
+                    try
+                    {
+                        var message = _mqConsumer.ReceiveMessage(waitTimeMs);
+                        if (string.IsNullOrEmpty(message))
+                            continue;
+
+                        bool.TryParse(Environment.GetEnvironmentVariable("DryRun"), out bool dryRun);
+                        if (!dryRun)
+                            _ = HandleMessage(message);
+                        else
+                            _logger.LogInformation($"Processed message {message} in dry run mode");
+                        messageReceived = true;
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e, e.Message);
+                    }
+                    finally
+                    {
+                        if (messageReceived)
+                            _mqConsumer.Commit();
+                    }
                 }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, e.Message);
-                }
-                finally
-                {
-                    _mqConsumer.Commit();
-                }
-            }
-            return Task.CompletedTask;
+                return Task.CompletedTask;
+            }, stoppingToken);
         }
 
-        private Task HandleMessage(string message)
+        private async Task HandleMessage(string message)
         {
-            _logger.LogInformation(message);
-
-            using var scope = _services.CreateScope();
-            var scopedAstreaClient = scope.ServiceProvider.GetRequiredService<IAstreaClient>();
-            return scopedAstreaClient.AssessAsync(message);
+            try
+            {
+                using var scope = _services.CreateScope();
+                var scopedAstreaClient = scope.ServiceProvider.GetRequiredService<IAstreaClient>();
+                await scopedAstreaClient.AssessAsync(message).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+            }
         }
     }
 }

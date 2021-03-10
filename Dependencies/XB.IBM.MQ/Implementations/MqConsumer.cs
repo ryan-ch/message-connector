@@ -8,18 +8,23 @@ namespace XB.IBM.MQ.Implementations
 {
     public class MqConsumer : MqBase, IMqConsumer
     {
-        public IMessageConsumer Consumer { get; }
+        private readonly IMessageConsumer _consumer;
 
-        public MqConsumer(IOptions<MqOptions> configurations, ILoggerFactory loggerFactory)
-            : base(configurations.Value.ReaderConfig, loggerFactory)
+        public MqConsumer(IOptions<MqOptions> configurations, ILogger<MqConsumer> logger, IConnectionFactory connectionFactory)
+            : base(configurations.Value.ReaderConfig, logger, connectionFactory)
         {
-            Consumer = SessionWmq.CreateConsumer(Destination);
+            _consumer = SessionWmq.CreateConsumer(Destination);
         }
 
-        public string ReceiveMessage()
+        public string ReceiveMessage(long waitTimeMs = 0)
         {
-            var message = Consumer.Receive() as ITextMessage;
+            var message = _consumer.Receive(waitTimeMs) as ITextMessage;
             return message?.Text;
+        }
+
+        ~MqConsumer()
+        {
+            _consumer.Close();
         }
     }
 }

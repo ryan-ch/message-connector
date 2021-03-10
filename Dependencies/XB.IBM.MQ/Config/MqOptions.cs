@@ -17,9 +17,9 @@
         public string MqHostname { get; init; }
         public int MqPort { get; init; }
         public string MqSslPath { get; init; }
+        public string MqKeyRepo { get; set; }
         public string MqSslCipher { get; init; }
-        public string MqPeerName { get; init; }
-        public string MqUserName { get; init; }
+        public string MqUsername { get; init; }
         public string MqPassword { get; init; }
     }
 }

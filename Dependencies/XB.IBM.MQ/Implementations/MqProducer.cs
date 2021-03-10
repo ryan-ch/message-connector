@@ -8,19 +8,23 @@ namespace XB.IBM.MQ.Implementations
 {
     public class MqProducer : MqBase, IMqProducer
     {
-        public IMessageProducer Producer { get; }
+        private readonly IMessageProducer _producer;
 
-        public MqProducer(IOptions<MqOptions> configurations, ILoggerFactory loggerFactory)
-            : base(configurations.Value.WriterConfig, loggerFactory)
+        public MqProducer(IOptions<MqOptions> configurations, ILogger<MqProducer> logger, IConnectionFactory connectionFactory)
+            : base(configurations.Value.WriterConfig, logger, connectionFactory)
         {
-            Producer = SessionWmq.CreateProducer(Destination);
+            _producer = SessionWmq.CreateProducer(Destination);
         }
 
         public void WriteMessage(string message)
         {
-            var textMessage = SessionWmq.CreateTextMessage();
-            textMessage.Text = message;
-            Producer.Send(textMessage);
+            var textMessage = SessionWmq.CreateTextMessage(message);
+            _producer.Send(textMessage);
+        }
+
+        ~MqProducer()
+        {
+            _producer.Close();
         }
     }
 }
