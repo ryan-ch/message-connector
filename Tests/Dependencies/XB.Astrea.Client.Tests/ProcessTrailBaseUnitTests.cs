@@ -57,17 +57,16 @@ namespace XB.Astrea.Client.Tests
         {
             // Arrange
             const string act = "Fake Act";
-            var reason = new Reason("ReasonCode", "ReasonText");
 
             // Act
-            var payloads = _processTrailBaseMock.SetupPayloads(_assessmentResponse, Mt103MessagesMock.Mt103Message_02, reason, act);
+            var payloads = _processTrailBaseMock.SetupPayloads(_assessmentResponse, Mt103MessagesMock.Mt103Message_02, act, "randomStatus");
 
             // Assert
             for (var i = 0; i < payloads.Count; i++)
             {
                 Assert.EndsWith("-1", payloads[i].Id);
                 Assert.Equal(new Act(act, act), payloads[i].Payload.Act);
-                Assert.Equal(reason, payloads[i].Payload.Reason);
+                Assert.Null(payloads[i].Payload.Reason);
                 Assert.Equal(2, payloads[i].Payload.Payment.References.Count());
                 Assert.Single(payloads[i].Payload.Payment.RemittanceInfos);
                 Assert.Equal(_assessmentResponse.Results[i].OrderIdentity, payloads[i].Payload.Assess.Id);
@@ -82,6 +81,41 @@ namespace XB.Astrea.Client.Tests
                     payloads[i].Payload.Assess.Extras);
                 Assert.Equal(new Original(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), payloads[i].Payload.Original);
             }
+        }
+
+        [Fact]
+        public void SetupPayloads_WillInitiateReasonAndHints_BasedOnHubertStatus()
+        {
+            // Arrange Hubert Accepted
+            const string act = "Fake Act";
+            var hubertStatus = AstreaClientConstants.Hubert_Accepted;
+
+            // Act
+            var payloads = _processTrailBaseMock.SetupPayloads(_assessmentResponse, Mt103MessagesMock.Mt103Message_02, act, hubertStatus);
+
+            // Assert
+            payloads.ForEach(p => Assert.Null(p.Payload.Reason));
+
+            // Arrange Hubert Rejected
+            hubertStatus = AstreaClientConstants.Hubert_Rejected;
+
+            // Act
+            payloads = _processTrailBaseMock.SetupPayloads(_assessmentResponse, Mt103MessagesMock.Mt103Message_02, act, hubertStatus);
+
+            // Assert
+            payloads.ForEach(p => Assert.Equal(new Reason("fcp-access", "HUB_MT103_REJECTED"), p.Payload.Reason));
+
+            // Arrange Hubert Timeout
+            hubertStatus = AstreaClientConstants.Hubert_Timeout;
+
+            // Act
+            payloads = _processTrailBaseMock.SetupPayloads(_assessmentResponse, Mt103MessagesMock.Mt103Message_02, act, hubertStatus);
+
+            // Assert
+            payloads.ForEach(p => {
+                Assert.Equal(new Reason("timeout", "Timeout approval decision received in response"), p.Payload.Reason);
+                Assert.Contains(p.Payload.Assess.Hints, h => h.Name == "timeout" && h.Values.Contains("HUBERT_TIMEOUT"));
+            });
         }
 
         [Fact]
@@ -180,8 +214,8 @@ namespace XB.Astrea.Client.Tests
         {
             public ProcessTrailBaseMock(string appVersion) : base(appVersion) { }
 
-            public new List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response, Mt103Message parsedMt, Reason reason, string actAction) =>
-                base.SetupPayloads(response, parsedMt, reason, actAction);
+            public new List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response, Mt103Message parsedMt, string actAction, string hubertStatus) =>
+                base.SetupPayloads(response, parsedMt, actAction, hubertStatus);
 
             public new General SetupGeneral(string eventType, AssessmentResponse response, Mt103Message parsedMt) =>
                 base.SetupGeneral(eventType, response, parsedMt);

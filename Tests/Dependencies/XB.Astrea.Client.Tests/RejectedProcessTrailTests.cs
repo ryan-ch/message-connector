@@ -41,7 +41,7 @@ namespace XB.Astrea.Client.Tests
             var mockedMt103 = new Mock<Mt103Message>(SwiftMessagesMock.SwiftMessage_2.OriginalMessage, null);
 
             // Act
-            var rejectedProcessTrail = new RejectedProcessTrail(assessmentResponse, string.Empty, mockedMt103.Object);
+            var rejectedProcessTrail = new RejectedProcessTrail(assessmentResponse, string.Empty, mockedMt103.Object, AstreaClientConstants.Hubert_Rejected);
 
             // Assert
             Assert.Equal(AstreaClientConstants.EventType_Rejected, rejectedProcessTrail.General.Event.Type);

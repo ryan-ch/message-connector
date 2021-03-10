@@ -71,8 +71,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
     {
         public string Id { get; init; }
         public int RiskLevel { get; init; }
-        //Todo: refactor to init 
-        public IEnumerable<Hint> Hints { get; set; }
+        public IEnumerable<Hint> Hints { get; init; }
         public AssessExtras Extras { get; init; }
     }
 
