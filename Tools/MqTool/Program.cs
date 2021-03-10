@@ -14,7 +14,7 @@ namespace MqTool
     {
         public static void Main()
         {
-            string mtMessage1 = @"{1:F01ESSESES0AXXX8000019102}{2:O1030955100518CIBCCATTAXXX7676396079" + DateTime.Now.ToString("yyMMddHHmm") + @"N}{3:{103:}{108:WA SQ9E3P}{119:}{111:001}{121:"+ Guid.NewGuid().ToString() +@"}}{4:
+            string mtMessage1 = @"{1:F01ESSESES0AXXX8000019102}{2:O1030955100518CIBCCATTAXXX7676396079" + DateTime.Now.ToString("yyMMddHHmm") + @"N}{3:{103:}{108:WA SQ9E3P}{119:}{111:001}{121:"+ Guid.NewGuid() +@"}}{4:
 :20:GEcG
 :23B:CRED
 :32A:200825SEK3500,00
@@ -33,7 +33,7 @@ namespace MqTool
 :71A:SHA
 :72:/REC/RETN
 -}{S:{MAN:UAKOUAK4600}}";
-            string mtMessage2 = @"{1:F01ESSESES0AXXX8000025977}{2:O1030955100518IRVTUS3NAXXX7676396079" + DateTime.Now.ToString("yyMMddHHmm") + @"N}{3:{108:78}{121:" + Guid.NewGuid().ToString() + @"}}{4:
+            string mtMessage2 = @"{1:F01ESSESES0AXXX8000025977}{2:O1030955100518IRVTUS3NAXXX7676396079" + DateTime.Now.ToString("yyMMddHHmm") + @"N}{3:{108:78}{121:" + Guid.NewGuid() + @"}}{4:
 :20:RS202102158
 :23B:CRED
 :32A:210215SEK12,00

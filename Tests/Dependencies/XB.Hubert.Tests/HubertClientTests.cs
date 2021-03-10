@@ -4,6 +4,7 @@ using Moq.Protected;
 using Newtonsoft.Json;
 using SEB.SEBCS.RTM.v1.Client.Uakm463;
 using SEB.SEBCS.RTM.v1.Client.Uakm463.Crossbordpmt.Update01.Fcpsts01;
+using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,9 +54,9 @@ namespace XB.Hubert.Tests
         [Fact]
         public void SendAssessmentResponse_WillCreateAndSendRequest()
         {
-            const string timestamp = "";
             const string guid = "ced0f305-f722-4855-bfc7-5da3bf38bebc";
             const string transactionStatus = "";
+            var timestamp = DateTime.Now;
 
             var response = _hubertClient.SendAssessmentResultAsync(timestamp, guid, transactionStatus).Result;
 

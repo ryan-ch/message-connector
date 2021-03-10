@@ -148,7 +148,7 @@ namespace XB.HttpClientJwt.Tests
         {
             //Arrange
             var logMock = new Mock<ILogger<AuthenticationDelegatingHandler>>();
-            var exception = new Exception("Errror Can't Generate JWT");
+            var exception = new Exception("Error Can't Generate JWT");
             var innerMock = new Mock<DelegatingHandler>();
             innerMock.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync", _jwtRequestMatcher, ItExpr.IsAny<CancellationToken>())

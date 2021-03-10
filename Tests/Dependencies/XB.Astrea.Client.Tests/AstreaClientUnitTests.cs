@@ -56,7 +56,7 @@ namespace XB.Astrea.Client.Tests
             (_httpClientFactoryMock, _messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject));
 
             _huberClientMock = new Mock<IHubertClient>();
-            _huberClientMock.Setup(a => a.SendAssessmentResultAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            _huberClientMock.Setup(a => a.SendAssessmentResultAsync(It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(_hubertResponse);
 
             _astreaClient = new AstreaClient(_httpClientFactoryMock.Object, _kafkaProducerMock.Object,

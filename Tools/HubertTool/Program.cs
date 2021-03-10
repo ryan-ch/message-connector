@@ -5,7 +5,7 @@ using XB.Hubert;
 
 namespace HubertTool
 {
-    class Program
+    internal class Program
     {
         private static async Task Main(string[] args)
         {
@@ -13,12 +13,11 @@ namespace HubertTool
             var hubertClient = startup.Provider.GetRequiredService<IHubertClient>();
 
             Random rnd = new Random();
-            
+
             while (true)
             {
                 Console.WriteLine("Enter amount of assessments to send to Hubert: ");
-                int amount;
-                bool validInput = int.TryParse(Console.ReadLine(), out amount);
+                bool validInput = int.TryParse(Console.ReadLine(), out int amount);
                 if (!validInput)
                 {
                     Console.WriteLine("User input was incorrect, please try again.");
@@ -33,7 +32,7 @@ namespace HubertTool
                         string guid = Guid.NewGuid().ToString();
                         _ = Task.Run(async () =>
                         {
-                            var result = await hubertClient.SendAssessmentResultAsync(DateTime.Now.ToString(),
+                            var result = await hubertClient.SendAssessmentResultAsync(DateTime.Now,
                                 guid, rnd.Next(0, 10).ToString());
                             if (result.Result != null)
                             {
@@ -45,7 +44,7 @@ namespace HubertTool
                     }
                     Console.ReadLine();
                 }
-                
+
             }
         }
     }
