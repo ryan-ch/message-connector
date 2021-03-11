@@ -6,15 +6,15 @@ namespace XB.Kafka
 {
     public static class KafkaExtensions
     {
-        public static IServiceCollection AddKafkaProducer(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
+        public static IServiceCollection AddKafkaProducer(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<KafkaProducerConfig>(configuration.GetSection(appsettingsPrefix + KafkaProducerConfig.ConfigurationSection));
+            services.Configure<KafkaProducerConfig>(configuration.GetSection(KafkaProducerConfig.ConfigurationSection));
             return services.AddSingleton<IKafkaProducer, KafkaProducer>();
         }
 
-        public static IServiceCollection AddKafkaConsumer(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
+        public static IServiceCollection AddKafkaConsumer(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<KafkaConsumerConfig>(configuration.GetSection(appsettingsPrefix + KafkaConsumerConfig.ConfigurationSection));
+            services.Configure<KafkaConsumerConfig>(configuration.GetSection(KafkaConsumerConfig.ConfigurationSection));
             return services.AddSingleton<IKafkaConsumer, KafkaConsumer>();
         }
     }

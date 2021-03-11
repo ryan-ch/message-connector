@@ -11,22 +11,21 @@ namespace HubertTool
 
     public class Startup
     {
-        private readonly IConfiguration _configuration;
         public IServiceProvider Provider { get; }
         public Startup()
         {
-            _configuration = new ConfigurationBuilder()
+            IConfiguration configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile($"appsettings.Development.json", optional: true)
+                .AddJsonFile("appsettings.Development.json", optional: true)
                 .Build();
 
             var services = new ServiceCollection();
 
             // add necessary services
-            services.AddSingleton(_configuration);
-            services.AddHttpClientJwt(_configuration, "AppSettings:", HubertClientOptions.HttpClientIdentifier);
-            services.AddHubert(_configuration, "AppSettings:");
-            
+            services.AddSingleton(configuration);
+            services.AddHttpClientJwt(configuration, HubertClientOptions.HttpClientIdentifier);
+            services.AddHubert(configuration);
+
 
             // build the pipeline
             Provider = services.BuildServiceProvider();

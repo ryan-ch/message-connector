@@ -16,19 +16,19 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         {
             var payloads = new List<ProcessTrailPayload>();
 
-            request.PaymentInstructions.ForEach(pi =>
-                payloads.Add(new ProcessTrailPayload()
+            request.PaymentInstructions.ForEach(_ =>
+                payloads.Add(new ProcessTrailPayload
                 {
                     Id = Id + "-1",
-                    Payload = new EnvelopPayload()
+                    Payload = new EnvelopPayload
                     {
                         Payment = null,
                         Reason = new Reason("error", "Error in astrea response"),
-                        Original = new Original(request.Mt.ToString()),
+                        Original = new Original(request.Mt),
                         Act = new Act("passThrough", "passThrough"),
-                        Assess = new Assess()
+                        Assess = new Assess
                         {
-                            Hints = new List<Hint>()
+                            Hints = new List<Hint>
                             {
                                 new Hint("status", new List<string>(){"INVOKE_ASTREA_HTTP", "ASTREA:RESPONSE"})
                             },
@@ -36,7 +36,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                         }
                     }
                 })
-            ); ;
+            );
 
             return payloads;
         }

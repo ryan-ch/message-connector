@@ -12,22 +12,22 @@ namespace XB.Astrea.Client
     {
         internal const string HttpClientName = "astrea";
 
-        public static IServiceCollection AddAstreaClient(this IServiceCollection services, IConfiguration configuration, string appSettingsPrefix = "")
+        public static IServiceCollection AddAstreaClient(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<AstreaClientOptions>(configuration.GetSection(appSettingsPrefix + AstreaClientOptions.ConfigurationSection));
+            services.Configure<AstreaClientOptions>(configuration.GetSection(AstreaClientOptions.ConfigurationSection));
 
             services.AddHttpClient(HttpClientName, c =>
             {
-                c.BaseAddress = new Uri(configuration[appSettingsPrefix + AstreaClientOptions.ConfigurationSection + ":Url"]);
+                c.BaseAddress = new Uri(configuration[AstreaClientOptions.ConfigurationSection + ":Url"]);
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
                 c.DefaultRequestVersion = HttpVersion.Version20;
             });
 
             return services
                 .AddScoped<IAstreaClient, AstreaClient>()
-                .AddKafkaProducer(configuration, appSettingsPrefix)
-                .AddHubert(configuration, appSettingsPrefix);
-            //.AddKafkaConsumer(configuration, appSettingsPrefix)
+                .AddKafkaProducer(configuration)
+                .AddHubert(configuration);
+            //.AddKafkaConsumer(configuration)
         }
     }
 }

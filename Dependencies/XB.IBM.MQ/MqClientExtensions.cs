@@ -9,9 +9,9 @@ namespace XB.IBM.MQ
 {
     public static class MqClientExtensions
     {
-        public static IServiceCollection AddMq(this IServiceCollection services, IConfiguration configuration, string appSettingsPrefix = "")
+        public static IServiceCollection AddMq(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<MqOptions>(configuration.GetSection(appSettingsPrefix + MqOptions.ConfigurationSection));
+            services.Configure<MqOptions>(configuration.GetSection(MqOptions.ConfigurationSection));
             return services
                 .AddSingleton(_ => XMSFactoryFactory.GetInstance(XMSC.CT_WMQ).CreateConnectionFactory())
                 .AddMqConsumer()

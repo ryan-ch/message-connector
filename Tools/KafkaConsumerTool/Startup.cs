@@ -9,28 +9,26 @@ namespace KafkaConsumerTool
 {
     public class Startup
     {
-        private readonly IConfiguration _configuration;
         public IServiceProvider Provider { get; }
 
         public Startup()
         {
-
-            _configuration = new ConfigurationBuilder()
+            IConfiguration configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile($"appsettings.Development.json", optional: true)
+                .AddJsonFile("appsettings.Development.json", optional: true)
                 .Build();
 
             var services = new ServiceCollection();
 
             // add necessary services
             services.AddLogging(configure => configure.AddConsole());
-            services.AddSingleton(_configuration);
-            services.AddKafkaConsumer(_configuration, "AppSettings:");
-            
+            services.AddSingleton(configuration);
+            services.AddKafkaConsumer(configuration);
+
             // build the pipeline
             Provider = services.BuildServiceProvider();
 
-            
+
         }
     }
 }

@@ -7,10 +7,10 @@ namespace XB.Hubert
 {
     public static class HubertExtensions
     {
-        public static IServiceCollection AddHubert(this IServiceCollection services, IConfiguration configuration, string appsettingsPrefix = "")
+        public static IServiceCollection AddHubert(this IServiceCollection services, IConfiguration configuration)
         {
-            return services.Configure<HubertClientOptions>(configuration.GetSection(appsettingsPrefix + HubertClientOptions.ConfigurationSection))
-            .AddHttpClientJwt(configuration, appsettingsPrefix, HubertClientOptions.HttpClientIdentifier)
+            return services.Configure<HubertClientOptions>(configuration.GetSection(HubertClientOptions.ConfigurationSection))
+            .AddHttpClientJwt(configuration, HubertClientOptions.HttpClientIdentifier)
             .AddScoped<IHubertClient, HubertClient>();
         }
     }
