@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.MtParser.Mt103;
@@ -26,13 +27,15 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         private Context SetupContext(string version) =>
             new Context($"{System}-v{version}", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), AstreaClientConstants.ProcessTrailSchemaVersion);
 
-        protected List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response, Mt103Message parsedMt, Reason reason, string actAction)
+        protected List<ProcessTrailPayload> SetupPayloads(AssessmentResponse response, Mt103Message parsedMt, string actAction, string hubertStatus)
         {
             var payloads = new List<ProcessTrailPayload>();
+            var reason = GetReason(hubertStatus);
 
             response.Results.ForEach(assessmentResult =>
             {
                 _ = int.TryParse(assessmentResult.RiskLevel, out int riskLevel);
+
                 payloads.Add(new ProcessTrailPayload
                 {
                     Id = Id + "-1",
@@ -51,7 +54,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                         {
                             Id = assessmentResult.OrderIdentity,
                             RiskLevel = riskLevel,
-                            Hints = assessmentResult.Hints,
+                            Hints = hubertStatus == AstreaClientConstants.Hubert_Timeout ? assessmentResult.Hints.Concat(new[] { new Hint("timeout", new[] { "HUBERT_TIMEOUT" }) }) : assessmentResult.Hints,
                             Extras = new AssessExtras
                             {
                                 BeneficiaryCustomerAccount = assessmentResult.Extras.AccountNumber,
@@ -104,6 +107,16 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                 remittanceInfos.Add(new ProcessTrailRemittanceInfo(mt103.RemittanceInformation, AstreaClientConstants.Tag70RemittanceInfo));
 
             return remittanceInfos;
+        }
+        
+        private Reason GetReason(string hubertStatus)
+        {
+            return hubertStatus switch
+            {
+                AstreaClientConstants.Hubert_Rejected => new Reason("fcp-access", "HUB_MT103_REJECTED"),
+                AstreaClientConstants.Hubert_Timeout => new Reason("timeout", "Timeout approval decision received in response"),
+                _ => null
+            };
         }
     }
 }

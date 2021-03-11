@@ -46,7 +46,7 @@ namespace XB.Astrea.Client.Tests
             };
 
             //Act
-            var offeredProcessTrail = new OfferedProcessTrail(assessmentResponse, string.Empty, _mockedMt103.Object);
+            var offeredProcessTrail = new OfferedProcessTrail(assessmentResponse, string.Empty, _mockedMt103.Object, AstreaClientConstants.Hubert_Accepted);
 
             //Assert
             Assert.Equal(AstreaClientConstants.EventType_Offered, offeredProcessTrail.General.Event.Type);

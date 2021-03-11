@@ -6,10 +6,10 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 {
     public class RejectedProcessTrail : ProcessTrailBase
     {
-        public RejectedProcessTrail(AssessmentResponse response, string appVersion, Mt103Message parsedMt) : base(appVersion)
+        public RejectedProcessTrail(AssessmentResponse response, string appVersion, Mt103Message parsedMt, string hubertStatus = AstreaClientConstants.Hubert_Rejected) : base(appVersion)
         {
             General = SetupGeneral(AstreaClientConstants.EventType_Rejected, response, parsedMt);
-            Payloads = SetupPayloads(response, parsedMt, new Reason("fcp-access", "HUB_MT103_REJECTED"), AstreaClientConstants.Action_Block);
+            Payloads = SetupPayloads(response, parsedMt, AstreaClientConstants.Action_Block, hubertStatus);
         }
     }
 }
