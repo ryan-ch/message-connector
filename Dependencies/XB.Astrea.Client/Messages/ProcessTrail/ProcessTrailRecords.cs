@@ -30,7 +30,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
     public record Bo(string Id, string Type, string IdType = AstreaClientConstants.Tag121);
 
-    public record Account(string Id, string Bic)
+    public record Account(string Id)
     {
         public string IdType => Id.Length >= 11 && char.IsLetter(Id[0]) && char.IsLetter(Id[1])
             ? AstreaClientConstants.Iban
@@ -104,7 +104,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
     public record Payment
     {
-        public string InstructedDate { get; init; }
+        public string InstructedDate { get; init; } = "";
         public string ExecutionDate { get; init; }
         public decimal InstructedAmount { get; init; }
         public string InstructedCurrency { get; init; }
