@@ -35,7 +35,7 @@ namespace XB.MtParser.Tests
         public void Mt103Message_IfPassedIncorrectMessageType_WillLogError()
         {
             // Arrange
-            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace(SwiftMessagesMock.SwiftMessage_2.ApplicationHeader, 
+            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace(SwiftMessagesMock.SwiftMessage_2.ApplicationHeader,
                 "O1020955100518IRVTUS3NAXXX76763960792102151814N");
 
             // Act
@@ -62,37 +62,60 @@ namespace XB.MtParser.Tests
             Assert.Equal(OperationTypes.CRED, swiftMt103Message.BankOperationCode);
             Assert.Equal(new DateTime(2020, 8, 25), swiftMt103Message.ValueDate);
             Assert.Equal("SEK", swiftMt103Message.Currency);
-            Assert.Equal((decimal)3500.10, swiftMt103Message.SettledAmount);
+            Assert.Equal(3500.10m, swiftMt103Message.SettledAmount);
             Assert.Equal(new OrderingCustomer(string.Empty, field50F, string.Empty), swiftMt103Message.OrderingCustomer);
             Assert.Equal(new BeneficiaryCustomer(string.Empty, string.Empty, field59F), swiftMt103Message.BeneficiaryCustomer);
             Assert.Equal(string.Empty, swiftMt103Message.RemittanceInformation);
             Assert.Equal("/REC/RETN", swiftMt103Message.SenderToReceiverInformation);
         }
 
-        [Theory]
-        [InlineData("")]
-        [InlineData("200825SEK")]
-        public void Mt103Message_InvalidField32A_WillLogError(string field32A)
+        [Fact]
+        public void Mt103Message_WhenField32AEndsWithComma_WillHandleItCorrectly()
         {
             // Arrange
-            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace(SwiftMessagesMock.SwiftMessage_2.TextBlock, $":32A:{field32A}\r\n:50F:");
+            const string field32A = "200825SEK2500,";
+            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_1.OriginalMessage.Replace("200825SEK3500,00", field32A);
 
             // Act
             var swiftMt103Message = new Mt103Message(rawSwiftMessage, _loggerMock.Object);
 
             // Assert
-            _loggerMock.VerifyLoggerCall(LogLevel.Error, $"Invalid field 32A with value: {field32A}", Times.Once());
-
-            Assert.Equal(DateTime.MinValue, swiftMt103Message.ValueDate);
-            Assert.Null(swiftMt103Message.Currency);
-            Assert.Equal(0, swiftMt103Message.SettledAmount);
+            Assert.Equal(2500, swiftMt103Message.SettledAmount);
         }
 
-        [Fact]
-        public void Mt103Message_InvalidField32AValueDate_WillLogError()
+        [Theory]
+        [InlineData("")]
+        [InlineData("200825SEK")]
+        [InlineData("0825SEK2500,12")]
+        [InlineData("A200825SEK2500,00")]
+        [InlineData("200825SEK2500")]
+        [InlineData("200825SEK2500.20")]
+        [InlineData("200825SEK2,5,10")]
+        [InlineData("200825SEK2,500,")]
+        [InlineData("200825SEK2,5,0,0")]
+        [InlineData("130214EUR1641,01MISS MANGO")]
+        [InlineData("160310NOK85,927.50")]
+        public void Mt103Message_WhenField32AFormattedIncorrectly_WillLogErrorAndReturnDefault(string field32A)
         {
             // Arrange
-            const string field32A = "HiDateSEK1000";
+            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_1.OriginalMessage.Replace("200825SEK3500,00", field32A);
+
+            // Act
+            var swiftMt103Message = new Mt103Message(rawSwiftMessage, _loggerMock.Object);
+
+            // Assert
+            _loggerMock.VerifyLoggerCall(LogLevel.Error, "Field 32A is not formatted correctly: " + field32A, Times.Once());
+            Assert.Equal(0, swiftMt103Message.SettledAmount);
+            Assert.Equal(DateTime.MinValue, swiftMt103Message.ValueDate);
+            Assert.Null(swiftMt103Message.Currency);
+        }
+
+        [Theory]
+        [InlineData("201525SEK1000,10")]
+        [InlineData("201045SEK1000,10")]
+        public void Mt103Message_InvalidField32AValueDate_WillLogError(string field32A)
+        {
+            // Arrange
             var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace(SwiftMessagesMock.SwiftMessage_2.TextBlock, $":32A:{field32A}\r\n:50F:");
 
             // Act
@@ -103,25 +126,7 @@ namespace XB.MtParser.Tests
 
             Assert.Equal(DateTime.MinValue, swiftMt103Message.ValueDate);
             Assert.Equal("SEK", swiftMt103Message.Currency);
-            Assert.Equal(1000, swiftMt103Message.SettledAmount);
-        }
-
-        [Fact]
-        public void Mt103Message_InvalidField32ASettledAmount_WillLogError()
-        {
-            // Arrange
-            const string field32A = "200825SEKSettledAmount";
-            var rawSwiftMessage = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace(SwiftMessagesMock.SwiftMessage_2.TextBlock, $":32A:{field32A}\r\n:50F:");
-
-            // Act
-            var swiftMt103Message = new Mt103Message(rawSwiftMessage, _loggerMock.Object);
-
-            // Assert
-            _loggerMock.VerifyLoggerCall(LogLevel.Error, $"Couldn't extract SettledAmount from field 32A with value: {field32A}", Times.Once());
-
-            Assert.Equal(new DateTime(2020, 8, 25), swiftMt103Message.ValueDate);
-            Assert.Equal("SEK", swiftMt103Message.Currency);
-            Assert.Equal(0, swiftMt103Message.SettledAmount);
+            Assert.Equal(1000.1m, swiftMt103Message.SettledAmount);
         }
     }
 }

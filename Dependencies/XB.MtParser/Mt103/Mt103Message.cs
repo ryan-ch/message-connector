@@ -107,7 +107,7 @@ namespace XB.MtParser.Mt103
             SenderReference = ExtractFieldByKey(FieldsKeys.SenderReference_20Key);
             BankOperationCode = EnumUtil.ParseEnum(ExtractFieldByKey(FieldsKeys.BankOperationCode_23BKey), OperationTypes.Unknown);
 
-            (ValueDate, Currency, SettledAmount) = ExtractDateCurrencyAmount();
+            (ValueDate, Currency, SettledAmount) = ExtractDateCurrencyAndAmount();
 
             OrderingCustomer = new OrderingCustomer(ExtractFieldByKey(FieldsKeys.OrderingCustomer_50AKey),
                 ExtractFieldByKey(FieldsKeys.OrderingCustomer_50FKey),
@@ -138,23 +138,25 @@ namespace XB.MtParser.Mt103
             return regex.Success ? regex.Groups[1].Value.TrimEnd('\n', '\r') : string.Empty;
         }
 
-        private (DateTime date, string currency, decimal amount) ExtractDateCurrencyAmount()
+        private (DateTime date, string currency, decimal amount) ExtractDateCurrencyAndAmount()
         {
-            var Date_Currency_SettledAmount = ExtractFieldByKey(FieldsKeys.Date_Currency_SettledAmount_32AKey);
-            if (string.IsNullOrWhiteSpace(Date_Currency_SettledAmount) || Date_Currency_SettledAmount.Length < 10)
+            var field32A = ExtractFieldByKey(FieldsKeys.Date_Currency_SettledAmount_32AKey);
+
+            if (!Regex.IsMatch(field32A, "^\\d{6}\\w{3}\\d+,\\d*$"))
             {
-                Logger.LogError($"Invalid field {FieldsKeys.Date_Currency_SettledAmount_32AKey} with value: {Date_Currency_SettledAmount}");
+                Logger.LogError("Field 32A is not formatted correctly: {field32A}", field32A);
                 return default;
             }
 
-            if (!DateTime.TryParseExact(Date_Currency_SettledAmount.Substring(0, 6), "yyMMdd", null, DateTimeStyles.None, out var parsedDate))
-                Logger.LogError($"Couldn't extract Date from field {FieldsKeys.Date_Currency_SettledAmount_32AKey} with value: {Date_Currency_SettledAmount}");
+            if (!DateTime.TryParseExact(field32A.Substring(0, 6), "yyMMdd", null, DateTimeStyles.None, out var parsedDate))
+                Logger.LogError("Couldn't extract Date from field 32A with value: {field32A}", field32A);
 
-            var currency = Date_Currency_SettledAmount.Substring(6, 3);
+            var currency = field32A.Substring(6, 3);
 
+            var amountString = field32A[9..].Replace(",", field32A.EndsWith(',') ? "" : ".");
             // Todo: should we consider a formatter?
-            if (!decimal.TryParse(Date_Currency_SettledAmount[9..].Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount))
-                Logger.LogError($"Couldn't extract SettledAmount from field {FieldsKeys.Date_Currency_SettledAmount_32AKey} with value: {Date_Currency_SettledAmount}");
+            if (!decimal.TryParse(amountString, NumberStyles.Any, CultureInfo.InvariantCulture, out var amount))
+                Logger.LogError("Couldn't extract SettledAmount from field 32A with value: {field32A}", field32A);
 
             return (parsedDate, currency, amount);
         }

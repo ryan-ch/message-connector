@@ -17,7 +17,7 @@ namespace MqTool
             string mtMessage1 = @"{1:F01ESSESES0AXXX8000019102}{2:O1030955100518CIBCCATTAXXX7676396079" + DateTime.Now.ToString("yyMMddHHmm") + @"N}{3:{103:}{108:WA SQ9E3P}{119:}{111:001}{121:"+ Guid.NewGuid() +@"}}{4:
 :20:GEcG
 :23B:CRED
-:32A:200825SEK3500,00
+:32A:200825SEK3500,
 :50F:/SE2880000832790000012345
 1/Vårgårda Kromverk
 2/Lilla Korsgatan 3
