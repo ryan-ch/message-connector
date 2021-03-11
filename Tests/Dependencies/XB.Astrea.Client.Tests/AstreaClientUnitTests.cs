@@ -53,7 +53,7 @@ namespace XB.Astrea.Client.Tests
             _configMock.Setup(c => c.Value)
                 .Returns(new AstreaClientOptions { RetryPeriodInMin = 0.03, WaitingBeforeRetryInSec = 1, AcceptableTransactionTypes = new List<string> { "103" }, RiskThreshold = 3, Version = "1.0" });
 
-            (_httpClientFactoryMock, _messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject));
+            (_httpClientFactoryMock, _messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject),"http://fake.com");
 
             _huberClientMock = new Mock<IHubertClient>();
             _huberClientMock.Setup(a => a.SendAssessmentResultAsync(It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -121,7 +121,7 @@ namespace XB.Astrea.Client.Tests
         public async Task AssessAsync_WhenAstreaFail_WillLogItAndRetry()
         {
             // Arrange
-            var (httpClientFactoryMock, messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject),
+            var (httpClientFactoryMock, messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject),"http://fake.com",
                 HttpStatusCode.InternalServerError);
             var astreaClient = new AstreaClient(httpClientFactoryMock.Object, _kafkaProducerMock.Object,
                 _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _huberClientMock.Object);

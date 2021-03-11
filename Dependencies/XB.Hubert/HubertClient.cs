@@ -11,15 +11,15 @@ namespace XB.Hubert
     public class HubertClient : IHubertClient
     {
         private const string HubertDateTimeFormat = "yyyy-MM-dd HH:mm:ss.ffffff";
-        private readonly HubertClientOptions _config;
+        private readonly string _clientId;
         private readonly HttpClient _httpClient;
 
 
         public HubertClient(IHttpClientFactory httpClientFactory, IOptions<HubertClientOptions> config)
         {
-            _config = config.Value;
+            _clientId = config.Value.ClientId;
             _httpClient = httpClientFactory.CreateClient(HubertClientOptions.HttpClientIdentifier);
-            _httpClient.BaseAddress = new Uri(_config.Url);
+            _httpClient.BaseAddress = new Uri(config.Value.Url);
         }
 
         public async Task<CrossbordpmtUpdate01Fcpsts01Response> SendAssessmentResultAsync(DateTime timestamp, string id, string transactionStatus)
@@ -41,7 +41,7 @@ namespace XB.Hubert
                 }
             };
 
-            return await hubertServiceClient.PostAsync(null, null, null, _config.ClientId, request);
+            return await hubertServiceClient.PostAsync(null, null, null, _clientId, request);
         }
     }
 }

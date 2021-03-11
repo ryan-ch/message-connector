@@ -11,7 +11,7 @@ namespace Testing.Common
 {
     public static class TestUtilities
     {
-        public static (Mock<IHttpClientFactory>, Mock<HttpMessageHandler>) GetHttpClientFactoryMock(string expectedResultString, HttpStatusCode status = HttpStatusCode.OK)
+        public static (Mock<IHttpClientFactory>, Mock<HttpMessageHandler>) GetHttpClientFactoryMock(string expectedResultString, string baseUri = null, HttpStatusCode status = HttpStatusCode.OK)
         {
             var factoryMock = new Mock<IHttpClientFactory>();
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
@@ -24,7 +24,7 @@ namespace Testing.Common
                 });
 
             factoryMock.Setup(a => a.CreateClient(It.IsAny<string>()))
-                .Returns(new HttpClient(mockHttpMessageHandler.Object) { BaseAddress = new Uri("http://www.fake.com") });
+                .Returns(new HttpClient(mockHttpMessageHandler.Object) { BaseAddress = baseUri == null ? null : new Uri(baseUri) });
 
             return (factoryMock, mockHttpMessageHandler);
         }
