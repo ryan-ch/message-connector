@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Testing.Common;
 using Testing.Common.Test_Data;
 using XB.Astrea.Client.Config;
+using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.Hubert;
 using XB.Kafka;
@@ -36,7 +37,7 @@ namespace XB.Astrea.Client.Tests
         private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
         private readonly Mock<HttpMessageHandler> _messageHandlerMock;
         private readonly Mock<IOptions<AstreaClientOptions>> _configMock;
-        private readonly Mock<IHubertClient> _huberClientMock;
+        private readonly Mock<IHubertClient> _hubertClientMock;
 
         private readonly AstreaClient _astreaClient;
 
@@ -55,12 +56,12 @@ namespace XB.Astrea.Client.Tests
 
             (_httpClientFactoryMock, _messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject),"http://fake.com");
 
-            _huberClientMock = new Mock<IHubertClient>();
-            _huberClientMock.Setup(a => a.SendAssessmentResultAsync(It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>()))
+            _hubertClientMock = new Mock<IHubertClient>();
+            _hubertClientMock.Setup(a => a.SendAssessmentResultAsync(It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(_hubertResponse);
 
             _astreaClient = new AstreaClient(_httpClientFactoryMock.Object, _kafkaProducerMock.Object,
-                _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _huberClientMock.Object);
+                _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _hubertClientMock.Object);
         }
 
         [Fact]
@@ -124,7 +125,7 @@ namespace XB.Astrea.Client.Tests
             var (httpClientFactoryMock, messageHandlerMock) = TestUtilities.GetHttpClientFactoryMock(JsonConvert.SerializeObject(_expectedResultObject),"http://fake.com",
                 HttpStatusCode.InternalServerError);
             var astreaClient = new AstreaClient(httpClientFactoryMock.Object, _kafkaProducerMock.Object,
-                _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _huberClientMock.Object);
+                _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _hubertClientMock.Object);
 
             // Act
             var result = await astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
@@ -181,6 +182,57 @@ namespace XB.Astrea.Client.Tests
 
             _loggerMock.VerifyLoggerCall(LogLevel.Error, "Couldn't Send Requested ProcessTrail for request", Times.Once(), ex);
             _loggerMock.VerifyLoggerCall(LogLevel.Error, "Couldn't Send Decision ProcessTrail for response", Times.Once(), ex);
+        }
+
+        [Fact]
+        public async Task AssessAsync_WillSendAssessmentResponseToHubert()
+        {
+            // Arrange
+            // Act
+            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+
+            // Assert
+            _hubertClientMock.Verify(a => a.SendAssessmentResultAsync(It.IsAny<DateTime>(), It.Is<string>(s => s == "E01EBC0C-0B22-322A-A8F1-097839E991F4"), It.Is<string>(s => s == _expectedResultObject.RiskLevel)), Times.Once);
+        }
+
+        [Fact]
+        public async Task AssessAsync_WillSendTimeOutToHubertandSendOfferedTimeOutProcessTrail_WhenRequestTimeout()
+        {
+            // Arrange
+            _configMock.Setup(c => c.Value)
+                .Returns(new AstreaClientOptions { RetryPeriodInMin = -1, WaitingBeforeRetryInSec = 1, AcceptableTransactionTypes = new List<string> { "103" }, RiskThreshold = 3, Version = "1.0" });
+            var timedOutAstreaClient = new AstreaClient(_httpClientFactoryMock.Object, _kafkaProducerMock.Object,
+                _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _hubertClientMock.Object);
+
+            // Act
+            _ = await timedOutAstreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+
+            // Assert
+            _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains("INVOKE_ASTREA_HTTP") && s.Contains("ASTREA:RESPONSE"))), Times.Once);
+            _loggerMock.VerifyLoggerCall(LogLevel.Information, "Sending OfferedTimeOutProcessTrail", Times.Once());
+
+            _hubertClientMock.Verify(a => a.SendAssessmentResultAsync(It.IsAny<DateTime>(), It.IsAny<string>(), It.Is<string>(s => s == AstreaClientConstants.Hubert_Timeout)), Times.Once);
+        }
+
+        [Fact]
+        public async Task AssessAsync_WillLogError_WhenExceptionWhileSendingOfferedProcessTrail()
+        {
+            // Arrange
+            var ex = new Exception("Test Exception");
+            _kafkaProducerMock.Setup(a => a.Produce(It.IsAny<string>()))
+                .Throws(ex);
+            _configMock.Setup(c => c.Value)
+                .Returns(new AstreaClientOptions { RetryPeriodInMin = -1, WaitingBeforeRetryInSec = 1, AcceptableTransactionTypes = new List<string> { "103" }, RiskThreshold = 3, Version = "1.0" });
+            var timedOutAstreaClient = new AstreaClient(_httpClientFactoryMock.Object, _kafkaProducerMock.Object,
+                _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _hubertClientMock.Object);
+
+            // Act
+            _ = await timedOutAstreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+
+            // Assert
+            _kafkaProducerMock.Verify(a => a.Produce(It.IsAny<string>()), Times.Once);
+            _loggerMock.VerifyLoggerCall(LogLevel.Information, "Sending OfferedTimeOutProcessTrail", Times.Once());
+            _loggerMock.VerifyLoggerCall(LogLevel.Error, "Couldn't Send OfferedTimeOutProcessTrail for request", Times.Once(), ex);
         }
     }
 }
