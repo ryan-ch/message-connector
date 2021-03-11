@@ -75,11 +75,9 @@ namespace XB.Astrea.Client.Tests
 
             Assert.Equal(request.PaymentInstructions[0].DebitAccount.First().Identity, result.Payloads[0].Payload.Payment.DebitAccount.First().Id);
             Assert.Equal(AstreaClientConstants.Iban, result.Payloads[0].Payload.Payment.DebitAccount.First().IdType);
-            Assert.Equal("", result.Payloads[0].Payload.Payment.DebitAccount.First().Bic);
 
             Assert.Equal(request.PaymentInstructions[0].CreditAccount.First().Identity, result.Payloads[0].Payload.Payment.CreditAccount.First().Id);
             Assert.Equal(AstreaClientConstants.Bban, result.Payloads[0].Payload.Payment.CreditAccount.First().IdType);
-            Assert.Equal("", result.Payloads[0].Payload.Payment.CreditAccount.First().Bic);
 
             Assert.Equal(request.PaymentInstructions.First().CreditAccount.First().Type, result.Payloads.First().Payload.Payment.CreditAccount.First().IdType);
             Assert.Equal(request.PaymentInstructions.First().DebitAccount.First().Type, result.Payloads.First().Payload.Payment.DebitAccount.First().IdType);
