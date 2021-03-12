@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using XB.Astrea.Client.Constants;
+﻿using XB.Astrea.Client.Constants;
 using XB.Astrea.Client.Messages.Assessment;
 using XB.MtParser.Mt103;
 

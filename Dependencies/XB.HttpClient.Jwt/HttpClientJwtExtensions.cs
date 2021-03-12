@@ -6,14 +6,14 @@ namespace XB.HttpClientJwt
 {
     public static class HttpClientJwtExtensions
     {
-        public static IServiceCollection AddHttpClientJwt(this IServiceCollection services, IConfiguration configuration, string httpClientIdentifier = "default")
+        public static IHttpClientBuilder AddHttpClientJwt(this IServiceCollection services, IConfiguration configuration,
+            string httpClientIdentifier = "default")
         {
-            services.Configure<HttpClientJwtOptions>(configuration.GetSection(HttpClientJwtOptions.ConfigurationSection))
-                .AddTransient<AuthenticationDelegatingHandler>()
-                .AddHttpClient(httpClientIdentifier, c => { c.DefaultRequestHeaders.Add("Accept", "application/json"); })
-                .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
-
-            return services;
+            return services
+                 .Configure<HttpClientJwtOptions>(configuration.GetSection(HttpClientJwtOptions.ConfigurationSection))
+                 .AddTransient<AuthenticationDelegatingHandler>()
+                 .AddHttpClient(httpClientIdentifier, c => { c.DefaultRequestHeaders.Add("Accept", "application/json"); })
+                 .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
         }
     }
 }

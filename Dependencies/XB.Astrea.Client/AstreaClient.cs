@@ -69,7 +69,7 @@ namespace XB.Astrea.Client
                     await Task.Delay(Convert.ToInt32(_config.WaitingBeforeRetryInSec * 1000)).ConfigureAwait(false);
                 }
             }
-            _ = HandleTimeOutAsync(assessmentRequest, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt);
+            _ = HandleTimeOutToAstreaAsync(assessmentRequest, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt);
             _logger.LogError("Couldn't Handle this transaction message, stopped: {originalMessage}", originalMessage);
 
             return new AssessmentResponse();
@@ -99,14 +99,15 @@ namespace XB.Astrea.Client
 
             var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
 
-            var hubertStatus = await SendToHubert(assessmentResponse.RiskLevel, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt).ConfigureAwait(false);
+            var hubertStatus = await SendToHubert(assessmentResponse.RiskLevel,
+                mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt).ConfigureAwait(false);
             _ = SendDecisionProcessTrail(hubertStatus, assessmentResponse, mt103);
 
             return assessmentResponse;
         }
 
         //TODO: Refactor logic in this method. Should we send to Hubert? Do we need to wait for the response from Hubert? etc
-        private async Task HandleTimeOutAsync(AssessmentRequest request, string transactionReference, DateTime receivedAt)
+        private async Task HandleTimeOutToAstreaAsync(AssessmentRequest request, string transactionReference, DateTime receivedAt)
         {
             try
             {
@@ -127,8 +128,16 @@ namespace XB.Astrea.Client
 
         private async Task<string> SendToHubert(string status, string transactionReference, DateTime receivedAt)
         {
-            var hubertResponse = await _hubertClient.SendAssessmentResultAsync(receivedAt, transactionReference, status);
-            return hubertResponse.Result.Uakw4630.TransactionStatus.ToUpper();
+            try
+            {
+                var hubertResponse = await _hubertClient.SendAssessmentResultAsync(receivedAt, transactionReference, status);
+                return hubertResponse.Result.Uakw4630.TransactionStatus.ToUpper();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Couldn't contact Hubert for transactionReference: {transactionReference}", transactionReference);
+                return AstreaClientConstants.Hubert_Timeout;
+            }
         }
 
         private async Task SendRequestedProcessTrail(AssessmentRequest request)
