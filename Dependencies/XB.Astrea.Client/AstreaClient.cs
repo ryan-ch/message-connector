@@ -61,12 +61,12 @@ namespace XB.Astrea.Client
             {
                 try
                 {
-                    return await HandleAssessAsync(assessmentRequest, mt103, receivedAt).ConfigureAwait(false);
+                    return await HandleAssessAsync(assessmentRequest, mt103, receivedAt);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error caught when trying to assess message, will retry: {mt103}", mt103);
-                    await Task.Delay(Convert.ToInt32(_config.WaitingBeforeRetryInSec * 1000)).ConfigureAwait(false);
+                    await Task.Delay(Convert.ToInt32(_config.WaitingBeforeRetryInSec * 1000));
                 }
             }
             _ = HandleTimeOutToAstreaAsync(assessmentRequest, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt);
@@ -90,9 +90,9 @@ namespace XB.Astrea.Client
             var data = new StringContent(postBody, Encoding.UTF8, "application/json");
 
             _ = SendRequestedProcessTrail(request);
-            var result = await _httpClient.PostAsync("/sas/v3/assessOrders/paymentInstruction", data).ConfigureAwait(false);
+            var result = await _httpClient.PostAsync("/sas/v3/assessOrders/paymentInstruction", data);
 
-            var apiResponse = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var apiResponse = await result.Content.ReadAsStringAsync();
 
             if (!result.IsSuccessStatusCode)
                 throw new Exception("Request to Astrea API could not be completed, returned code: " + result.StatusCode + ". Response from API: " + apiResponse);
@@ -100,7 +100,7 @@ namespace XB.Astrea.Client
             var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
 
             var hubertStatus = await SendToHubert(assessmentResponse.RiskLevel,
-                mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt).ConfigureAwait(false);
+                mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt);
             _ = SendDecisionProcessTrail(hubertStatus, assessmentResponse, mt103);
 
             return assessmentResponse;
@@ -111,14 +111,14 @@ namespace XB.Astrea.Client
         {
             try
             {
-                _ = SendToHubert(AstreaClientConstants.Hubert_Timeout, transactionReference, receivedAt).ConfigureAwait(false);
+                _ = SendToHubert(AstreaClientConstants.Hubert_Timeout, transactionReference, receivedAt);
 
                 var offeredTimeOut = new OfferedTimeOutProcessTrail(request, _config.Version);
 
                 var offeredTimeOutProcessTrail = JsonConvert.SerializeObject(offeredTimeOut, AstreaClientOptions.ProcessTrailDefaultJsonSettings);
                 _logger.LogInformation("Sending OfferedTimeOutProcessTrail: {offeredTimeOutProcessTrail}", offeredTimeOutProcessTrail);
 
-                await _kafkaProducer.Produce(offeredTimeOutProcessTrail).ConfigureAwait(false);
+                await _kafkaProducer.Produce(offeredTimeOutProcessTrail);
             }
             catch (Exception e)
             {
@@ -147,7 +147,7 @@ namespace XB.Astrea.Client
                 var requestedProcessTrail = new RequestedProcessTrail(request, _config.Version);
                 var kafkaMessage = JsonConvert.SerializeObject(requestedProcessTrail, AstreaClientOptions.ProcessTrailDefaultJsonSettings);
                 _logger.LogInformation("Sending RequestedProcessTrail: {kafkaMessage}", kafkaMessage);
-                await _kafkaProducer.Produce(kafkaMessage).ConfigureAwait(false);
+                await _kafkaProducer.Produce(kafkaMessage);
             }
             catch (Exception e)
             {
@@ -165,7 +165,7 @@ namespace XB.Astrea.Client
                          AstreaClientOptions.ProcessTrailDefaultJsonSettings);
 
                 _logger.LogInformation("Sending DecisionProcessTrail: {kafkaMessage}", kafkaMessage);
-                await _kafkaProducer.Produce(kafkaMessage).ConfigureAwait(false);
+                await _kafkaProducer.Produce(kafkaMessage);
             }
             catch (Exception e)
             {

@@ -80,7 +80,7 @@ namespace XB.Astrea.Client.Tests
             var message = SwiftMessagesMock.SwiftMessage_2.OriginalMessage.Replace("{2:O103", "{2:O102");
 
             // Act
-            var result = await _astreaClient.AssessAsync(message).ConfigureAwait(false);
+            var result = await _astreaClient.AssessAsync(message);
 
             // Assert
             Assert.Equal(new AssessmentResponse(), result);
@@ -91,7 +91,7 @@ namespace XB.Astrea.Client.Tests
         {
             // Arrange
             // Act
-            var result = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+            var result = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage);
 
             // Assert
             _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), Times.Once);
@@ -108,7 +108,7 @@ namespace XB.Astrea.Client.Tests
                 .Throws(ex);
 
             // Act
-            var result = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+            var result = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage);
 
             // Assert
             _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), Times.Once);
@@ -128,7 +128,7 @@ namespace XB.Astrea.Client.Tests
                 _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _hubertClientMock.Object);
 
             // Act
-            var result = await astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+            var result = await astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage);
 
             // Assert
             _mTParserMock.Verify(a => a.ParseSwiftMt103Message(SwiftMessagesMock.SwiftMessage_2.OriginalMessage), Times.Once);
@@ -145,7 +145,7 @@ namespace XB.Astrea.Client.Tests
         {
             // Arrange
             // Act
-            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage);
 
             // Assert
             _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains(JsonConvert.SerializeObject(SwiftMessagesMock.SwiftMessage_2.OriginalMessage)))), Times.Once);
@@ -157,7 +157,7 @@ namespace XB.Astrea.Client.Tests
         {
             // Arrange
             // Act
-            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage);
 
             // Assert
             _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains(_expectedResultObject.Identity))), Times.Once);
@@ -173,7 +173,7 @@ namespace XB.Astrea.Client.Tests
                 .Throws(ex);
 
             // Act
-            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage);
 
             // Assert
             _kafkaProducerMock.Verify(a => a.Produce(It.IsAny<string>()), Times.Exactly(2));
@@ -189,7 +189,7 @@ namespace XB.Astrea.Client.Tests
         {
             // Arrange
             // Act
-            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+            _ = await _astreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage);
 
             // Assert
             _hubertClientMock.Verify(a => a.SendAssessmentResultAsync(It.IsAny<DateTime>(), It.Is<string>(s => s == "E01EBC0C-0B22-322A-A8F1-097839E991F4"), It.Is<string>(s => s == _expectedResultObject.RiskLevel)), Times.Once);
@@ -205,7 +205,7 @@ namespace XB.Astrea.Client.Tests
                 _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _hubertClientMock.Object);
 
             // Act
-            _ = await timedOutAstreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+            _ = await timedOutAstreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage);
 
             // Assert
             _kafkaProducerMock.Verify(a => a.Produce(It.Is<string>(s => s.Contains("INVOKE_ASTREA_HTTP") && s.Contains("ASTREA:RESPONSE"))), Times.Once);
@@ -227,7 +227,7 @@ namespace XB.Astrea.Client.Tests
                 _configMock.Object, _loggerMock.Object, _mTParserMock.Object, _hubertClientMock.Object);
 
             // Act
-            _ = await timedOutAstreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage).ConfigureAwait(false);
+            _ = await timedOutAstreaClient.AssessAsync(SwiftMessagesMock.SwiftMessage_2.OriginalMessage);
 
             // Assert
             _kafkaProducerMock.Verify(a => a.Produce(It.IsAny<string>()), Times.Once);

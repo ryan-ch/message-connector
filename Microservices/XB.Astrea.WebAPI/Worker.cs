@@ -68,7 +68,7 @@ namespace XB.Astrea.WebAPI
             {
                 using var scope = _services.CreateScope();
                 var scopedAstreaClient = scope.ServiceProvider.GetRequiredService<IAstreaClient>();
-                await scopedAstreaClient.AssessAsync(message).ConfigureAwait(false);
+                await scopedAstreaClient.AssessAsync(message);
             }
             catch (Exception e)
             {
