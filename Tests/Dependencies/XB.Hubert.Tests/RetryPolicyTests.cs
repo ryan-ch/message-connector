@@ -29,6 +29,31 @@ namespace XB.Hubert.Tests
         }
 
         [Fact]
+        public async Task RetryPolicy_ShouldNotRetry_OnSubsequentSuccess()
+        {
+            // Arrange
+            var policy = HubertExtensions.GetRetryPolicy(5, 0);
+            (var client, var messageHandlerMock) = GetHttpClientMock(HttpStatusCode.NotFound);
+            messageHandlerMock.Protected().SetupSequence<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.RequestTimeout,
+                    Content = null
+                })
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = null
+                });
+
+            // Act
+            _ = Assert.ThrowsAnyAsync<HttpRequestException>(async () => await policy.ExecuteAsync(() => client.SendAsync(new HttpRequestMessage())));
+
+            // Assert
+            messageHandlerMock.Protected().Verify("SendAsync", Times.Exactly(2), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
+        }
+
+        [Fact]
         public async Task RetryPolicy_ShouldRetryCalls_OnHttpExceptions()
         {
             // Arrange
