@@ -47,7 +47,7 @@ namespace XB.Hubert.Tests
                 });
 
             // Act
-            _ = Assert.ThrowsAnyAsync<HttpRequestException>(async () => await policy.ExecuteAsync(() => client.SendAsync(new HttpRequestMessage())));
+            await policy.ExecuteAsync(() => client.SendAsync(new HttpRequestMessage()));
 
             // Assert
             messageHandlerMock.Protected().Verify("SendAsync", Times.Exactly(2), ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
