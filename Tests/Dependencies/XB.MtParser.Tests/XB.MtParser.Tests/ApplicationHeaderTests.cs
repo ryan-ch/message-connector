@@ -2,9 +2,9 @@
 using Moq;
 using System;
 using System.Globalization;
-using Testing.Common;
 using XB.MtParser.Enums;
 using XB.MtParser.Swift_Message;
+using XGalaxy.Common.TestHelpers;
 using Xunit;
 
 
@@ -20,7 +20,7 @@ namespace XB.MtParser.Tests
         }
 
         [Theory]
-        [InlineData('I', "103", "SOGEFRPPZXXX", "U", "3", "003")]        
+        [InlineData('I', "103", "SOGEFRPPZXXX", "U", "3", "003")]
         public void ApplicationHeader_ShouldInitializeWithCorrectValues_WithInputApplicationHeaderContent(char ioIdentifier, string swiftMessageType, string destinationAddress, string priority, string deliveryMonitoring, string obsolescencePeriod)
         {
             //Arrange
@@ -90,7 +90,7 @@ namespace XB.MtParser.Tests
             const string invalidOutputDateTimeApplicationHeaderContent = "O1030955100518IRVTUS3NAXXX7676396079210215ABCDN";
 
             //Act
-            var applicationHeader = new ApplicationHeader(invalidOutputDateTimeApplicationHeaderContent, _loggerMock.Object);
+            _ = new ApplicationHeader(invalidOutputDateTimeApplicationHeaderContent, _loggerMock.Object);
 
             //Assert
             _loggerMock.VerifyLoggerCall(LogLevel.Error, $"ApplicationHeader: Unable to parse output date correctly", Times.Once());
