@@ -34,8 +34,8 @@ namespace XB.Astrea.Client.Tests
             Assert.Equal("DE89370400440532013000", paymentInstruction.DebitAccount.Identity);
             Assert.Equal("iban", paymentInstruction.DebitAccount.Type);
 
-            Assert.Equal("50601001079", paymentInstruction.CreditAccount.First().Identity);
-            Assert.Equal("bban", paymentInstruction.CreditAccount.First().Type);
+            Assert.Equal("50601001079", paymentInstruction.CreditAccount.Identity);
+            Assert.Equal("bban", paymentInstruction.CreditAccount.Type);
         }
     }
 }

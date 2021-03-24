@@ -109,7 +109,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         public decimal InstructedAmount { get; init; }
         public string InstructedCurrency { get; init; } = "";
         public Account DebitAccount { get; init; }
-        public IEnumerable<Account> CreditAccount { get; init; }
+        public Account CreditAccount { get; init; }
         public IEnumerable<References> References { get; init; }
         public IEnumerable<ProcessTrailRemittanceInfo> RemittanceInfos { get; init; }
     }

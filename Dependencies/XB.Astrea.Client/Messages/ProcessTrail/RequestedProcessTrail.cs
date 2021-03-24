@@ -31,7 +31,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                             References = GetReferences(request.BasketIdentity, request.Mt103Model.SenderReference),
                             RemittanceInfos = GetRemittanceInfos(request.Mt103Model),
                             DebitAccount = new Account(pi.DebitAccount.Identity),
-                            CreditAccount = new List<Account> { new Account(pi.CreditAccount.First().Identity) }
+                            CreditAccount = new Account(pi.CreditAccount.Identity)
                         },
                         Original = new Original(request.Mt)
                     }
