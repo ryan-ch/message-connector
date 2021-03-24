@@ -31,14 +31,8 @@ namespace XB.Astrea.Client.Tests
                         InstructedDate = DateTime.Now,
                         Amount = 1000,
                         Currency = "SEK",
-                        DebitAccount = new List<Messages.Assessment.Account>
-                        {
-                            new Messages.Assessment.Account("SE12345678910")
-                        },
-                        CreditAccount = new List<Messages.Assessment.Account>
-                        {
-                            new Messages.Assessment.Account("1234567")
-                        },
+                        DebitAccount = new Messages.Assessment.Account("SE12345678910"),
+                        CreditAccount = new Messages.Assessment.Account("1234567"),
                         RemittanceInfo = new List<RemittanceInfo>(),
                         InstructionContext = new InstructionContext(new List<string>(), "", "0"),
                     }
@@ -73,14 +67,14 @@ namespace XB.Astrea.Client.Tests
             Assert.Single(result.Payloads[0].Payload.Payment.RemittanceInfos);
             Assert.Equal(new ProcessTrailRemittanceInfo(request.Mt103Model.RemittanceInformation, "swift.tag70.remittanceInfo"), result.Payloads[0].Payload.Payment.RemittanceInfos.First());
 
-            Assert.Equal(request.PaymentInstructions[0].DebitAccount.First().Identity, result.Payloads[0].Payload.Payment.DebitAccount.First().Id);
-            Assert.Equal(AstreaClientConstants.Iban, result.Payloads[0].Payload.Payment.DebitAccount.First().IdType);
+            Assert.Equal(request.PaymentInstructions[0].DebitAccount.Identity, result.Payloads[0].Payload.Payment.DebitAccount.Id);
+            Assert.Equal(AstreaClientConstants.Iban, result.Payloads[0].Payload.Payment.DebitAccount.IdType);
 
-            Assert.Equal(request.PaymentInstructions[0].CreditAccount.First().Identity, result.Payloads[0].Payload.Payment.CreditAccount.First().Id);
-            Assert.Equal(AstreaClientConstants.Bban, result.Payloads[0].Payload.Payment.CreditAccount.First().IdType);
+            Assert.Equal(request.PaymentInstructions[0].CreditAccount.Identity, result.Payloads[0].Payload.Payment.CreditAccount.Id);
+            Assert.Equal(AstreaClientConstants.Bban, result.Payloads[0].Payload.Payment.CreditAccount.IdType);
 
-            Assert.Equal(request.PaymentInstructions.First().CreditAccount.First().Type, result.Payloads.First().Payload.Payment.CreditAccount.First().IdType);
-            Assert.Equal(request.PaymentInstructions.First().DebitAccount.First().Type, result.Payloads.First().Payload.Payment.DebitAccount.First().IdType);
+            Assert.Equal(request.PaymentInstructions.First().CreditAccount.Type, result.Payloads.First().Payload.Payment.CreditAccount.IdType);
+            Assert.Equal(request.PaymentInstructions.First().DebitAccount.Type, result.Payloads.First().Payload.Payment.DebitAccount.IdType);
 
             Assert.Equal(new Original(request.Mt), result.Payloads[0].Payload.Original);
         }
