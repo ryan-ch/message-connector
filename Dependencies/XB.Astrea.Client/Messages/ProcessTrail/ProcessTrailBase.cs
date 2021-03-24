@@ -35,6 +35,9 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
             response.Results.ForEach(assessmentResult =>
             {
                 _ = int.TryParse(assessmentResult.RiskLevel, out int riskLevel);
+                var hints = assessmentResult.Hints?.Where(h => h.Name != null);
+                if (hubertStatus == AstreaClientConstants.Hubert_Timeout)
+                    hints = hints.Concat(new[] {new Hint("timeout", new[] {"HUBERT_TIMEOUT"})});
 
                 payloads.Add(new ProcessTrailPayload
                 {
@@ -54,7 +57,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
                         {
                             Id = assessmentResult.OrderIdentity,
                             RiskLevel = riskLevel,
-                            Hints = hubertStatus == AstreaClientConstants.Hubert_Timeout ? assessmentResult.Hints.Concat(new[] { new Hint("timeout", new[] { "HUBERT_TIMEOUT" }) }) : assessmentResult.Hints,
+                            Hints = hints,
                             Extras = new AssessExtras
                             {
                                 BeneficiaryCustomerAccount = assessmentResult.Extras.AccountNumber,

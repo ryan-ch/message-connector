@@ -44,7 +44,7 @@ namespace XB.Astrea.Client.Messages.Assessment
                     InstructedDate = mt.ValueDate,
                     Amount = mt.SettledAmount,
                     Currency = mt.Currency,
-                    DebitAccount = new List<Account> { GetDebitAccount(mt) },
+                    DebitAccount = GetDebitAccount(mt),
                     CreditAccount = new List<Account> { GetCreditAccount(mt) },
                     RemittanceInfo = new List<RemittanceInfo>(),
                     InstructionContext = new InstructionContext(new List<string>(),"", "0"),
@@ -106,7 +106,7 @@ namespace XB.Astrea.Client.Messages.Assessment
         public DateTime InstructedDate { get; init; }
         public decimal Amount { get; init; }
         public string Currency { get; init; }
-        public IEnumerable<Account> DebitAccount { get; init; }
+        public Account DebitAccount { get; init; }
         public IEnumerable<Account> CreditAccount { get; init; }
         public IEnumerable<RemittanceInfo> RemittanceInfo { get; init; }
         public InstructionContext InstructionContext { get; init; }
