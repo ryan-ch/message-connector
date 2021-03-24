@@ -41,7 +41,6 @@ namespace XB.Astrea.Client
             if (!ValidMessageType(originalMessage))
                 return new AssessmentResponse();
 
-            var finishTimestamp = DateTime.Now.AddMinutes(_config.RetryPeriodInMin);
             var receivedAt = DateTime.Now;
             AssessmentRequest assessmentRequest;
             Mt103Message mt103;
@@ -57,20 +56,15 @@ namespace XB.Astrea.Client
                 return new AssessmentResponse();
             }
 
-            while (DateTime.Now <= finishTimestamp)
+            try
             {
-                try
-                {
-                    return await HandleAssessAsync(assessmentRequest, mt103, receivedAt);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error caught when trying to assess message, will retry: {mt103}", mt103);
-                    await Task.Delay(Convert.ToInt32(_config.WaitingBeforeRetryInSec * 1000));
-                }
+                return await HandleAssessAsync(assessmentRequest, mt103, receivedAt);
             }
-            _ = HandleTimeOutToAstreaAsync(assessmentRequest, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt);
-            _logger.LogError("Couldn't Handle this transaction message, stopped: {originalMessage}", originalMessage);
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Couldn't assess this transaction message: {originalMessage}", originalMessage);
+                _ = HandleAstreaFailAsync(assessmentRequest, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt);
+            }
 
             return new AssessmentResponse();
         }
@@ -106,8 +100,7 @@ namespace XB.Astrea.Client
             return assessmentResponse;
         }
 
-        //TODO: Refactor logic in this method. Should we send to Hubert? Do we need to wait for the response from Hubert? etc
-        private async Task HandleTimeOutToAstreaAsync(AssessmentRequest request, string transactionReference, DateTime receivedAt)
+        private async Task HandleAstreaFailAsync(AssessmentRequest request, string transactionReference, DateTime receivedAt)
         {
             try
             {

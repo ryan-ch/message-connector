@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
 using System;
-using Testing.Common;
 using Testing.Common.Test_Data;
 using XB.MtParser.Enums;
 using XB.MtParser.Mt103;
+using XGalaxy.Common.TestHelpers;
 using Xunit;
 
 namespace XB.MtParser.Tests

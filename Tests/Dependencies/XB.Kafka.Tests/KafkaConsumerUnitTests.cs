@@ -4,8 +4,8 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Threading;
-using Testing.Common;
 using XB.Kafka.Config;
+using XGalaxy.Common.TestHelpers;
 using Xunit;
 
 namespace XB.Kafka.Tests

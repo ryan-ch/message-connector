@@ -9,8 +9,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Testing.Common;
 using XB.HttpClientJwt.Config;
+using XGalaxy.Common.TestHelpers;
 using Xunit;
 
 namespace XB.HttpClientJwt.Tests
