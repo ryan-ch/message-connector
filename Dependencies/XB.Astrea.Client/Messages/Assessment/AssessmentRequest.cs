@@ -6,7 +6,7 @@ using XB.MtParser.Mt103;
 
 namespace XB.Astrea.Client.Messages.Assessment
 {
-    public record AssessmentRequest 
+    public record AssessmentRequest
     {
         public AssessmentRequest() { }
 
@@ -44,15 +44,15 @@ namespace XB.Astrea.Client.Messages.Assessment
                     InstructedDate = mt.ValueDate,
                     Amount = mt.SettledAmount,
                     Currency = mt.Currency,
-                    DebitAccount = new List<Account> {GetDebitAccount(mt) },
-                    CreditAccount = new List<Account> {GetCreditAccount(mt)},
+                    DebitAccount = new List<Account> { GetDebitAccount(mt) },
+                    CreditAccount = new List<Account> { GetCreditAccount(mt) },
                     RemittanceInfo = new List<RemittanceInfo>(),
                     InstructionContext = new InstructionContext(new List<string>(),"", "0"),
                 }
             };
             return paymentInstructionList;
         }
-        
+
         private static Account GetDebitAccount(Mt103Message model)
         {
             var account = string.Empty;
