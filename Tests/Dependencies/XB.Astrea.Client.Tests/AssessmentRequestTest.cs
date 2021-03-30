@@ -31,11 +31,11 @@ namespace XB.Astrea.Client.Tests
             Assert.Equal(12.00M, paymentInstruction.Amount);
             Assert.Equal("SEK", paymentInstruction.Currency);
 
-            Assert.Equal("DE89370400440532013000", paymentInstruction.DebitAccount.Identity);
-            Assert.Equal("iban", paymentInstruction.DebitAccount.Type);
+            Assert.Equal("DE89370400440532013000", paymentInstruction.DebitAccount.First().Identity);
+            Assert.Equal("iban", paymentInstruction.DebitAccount.First().Type);
 
-            Assert.Equal("50601001079", paymentInstruction.CreditAccount.Identity);
-            Assert.Equal("bban", paymentInstruction.CreditAccount.Type);
+            Assert.Equal("50601001079", paymentInstruction.CreditAccount.First().Identity);
+            Assert.Equal("bban", paymentInstruction.CreditAccount.First().Type);
         }
     }
 }
