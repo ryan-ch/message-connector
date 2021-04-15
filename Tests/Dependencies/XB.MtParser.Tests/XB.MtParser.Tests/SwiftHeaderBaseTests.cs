@@ -19,7 +19,7 @@ namespace XB.MtParser.Tests
 
         private record SwiftHeaderBaseMock : SwiftHeaderBase
         {
-            public SwiftHeaderBaseMock(string blockContent, SwiftMessageBlockIdentifiers headerType) : base(blockContent, headerType) {}
+            public SwiftHeaderBaseMock(string blockContent, SwiftMessageBlockIdentifiers headerType) : base(blockContent, headerType) { }
         }
     }
 }

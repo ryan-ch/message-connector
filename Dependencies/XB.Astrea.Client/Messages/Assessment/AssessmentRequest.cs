@@ -55,23 +55,15 @@ namespace XB.Astrea.Client.Messages.Assessment
 
         private static Account GetDebitAccount(Mt103Message model)
         {
-            var account = string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(model.OrderingCustomer.Account))
-                account = model.OrderingCustomer.Account;
-
-            return new Account(account);
-        }
-
-        private static Account GetCreditAccount(Mt103Message model)
-        {
-            var account = string.Empty;
-
-            if (!string.IsNullOrEmpty(model.BeneficiaryCustomer.Account))
-                account = model.BeneficiaryCustomer.Account;
+            var account = string.IsNullOrWhiteSpace(model.OrderingCustomer.Account)
+                ? model.OrderingCustomer.PartyIdentifier
+                : model.OrderingCustomer.Account;
 
             return new Account(account);
         }
+
+        private static Account GetCreditAccount(Mt103Message model) => new Account(model.BeneficiaryCustomer.Account);
+
     }
 
     public record RegisteringParty(string AuthId, string SebId);
@@ -85,8 +77,8 @@ namespace XB.Astrea.Client.Messages.Assessment
     {
         public Account(string account)
         {
-            Identity = account;
-            Type = account.Length >= 11 && char.IsLetter(account[0]) && char.IsLetter(account[1])
+            Identity = account ?? string.Empty;
+            Type = Identity.Length >= 11 && char.IsLetter(Identity[0]) && char.IsLetter(Identity[1])
                 ? AstreaClientConstants.Iban
                 : AstreaClientConstants.Bban;
         }

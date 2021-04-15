@@ -17,9 +17,9 @@ namespace KafkaProducerTool
                 string input = Console.ReadLine();
                 await kafkaProducerClient.Produce(input);
             }
-            
+
         }
 
-        
+
     }
 }

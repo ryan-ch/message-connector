@@ -112,7 +112,8 @@ namespace XB.Astrea.Client.Tests
             payloads = _processTrailBaseMock.SetupPayloads(_assessmentResponse, Mt103MessagesMock.Mt103Message_02, act, hubertStatus);
 
             // Assert
-            payloads.ForEach(p => {
+            payloads.ForEach(p =>
+            {
                 Assert.Equal(new Reason("timeout", "Timeout approval decision received in response"), p.Payload.Reason);
                 Assert.Contains(p.Payload.Assess.Hints, h => h.Name == "timeout" && h.Values.Contains("HUBERT_TIMEOUT"));
             });

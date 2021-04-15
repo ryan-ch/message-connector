@@ -16,7 +16,7 @@ namespace KafkaConsumerTool
             {
                 kafkaConsumerClient.Consume("ses-fcp-payment-orders");
             }
-            
+
         }
     }
 }

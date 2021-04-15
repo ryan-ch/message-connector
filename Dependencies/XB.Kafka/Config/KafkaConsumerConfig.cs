@@ -3,7 +3,7 @@ using System;
 
 namespace XB.Kafka.Config
 {
-    public class KafkaConsumerConfig: ConsumerConfig
+    public class KafkaConsumerConfig : ConsumerConfig
     {
         public const string ConfigurationSection = "KafkaConsumer";
 

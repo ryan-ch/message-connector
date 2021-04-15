@@ -19,7 +19,7 @@ namespace XB.MtParser.Swift_Message
         public string Identifier { get; init; }
         public int IdentifierAsInt => int.TryParse(Identifier, out var result) ? result : -1;
         public string Content { get; init; }
-        
+
         public static List<Block> ParseOneLevelBlocks(string blocksString)
         {
             var blockRegex = Regex.Matches(blocksString, "{(\\w{1,3}):(.*?)}", RegexOptions.Singleline);

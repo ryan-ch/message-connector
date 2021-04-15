@@ -9,7 +9,7 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
         public OfferedProcessTrail(AssessmentResponse response, string appVersion, Mt103Message parsedMt, string hubertStatus = AstreaClientConstants.Hubert_Accepted) : base(appVersion)
         {
             General = SetupGeneral(AstreaClientConstants.EventType_Offered, response, parsedMt);
-            Payloads = SetupPayloads(response, parsedMt, AstreaClientConstants.Action_PassThrough, hubertStatus);            
+            Payloads = SetupPayloads(response, parsedMt, AstreaClientConstants.Action_PassThrough, hubertStatus);
         }
     }
 }
