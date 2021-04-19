@@ -154,8 +154,7 @@ namespace XB.Astrea.Client
             {
                 var kafkaMessage = hubertStatus == AstreaClientConstants.Hubert_Rejected
                      ? JsonConvert.SerializeObject(new RejectedProcessTrail(assessmentResponse, _config.Version, parsedMt, hubertStatus), AstreaClientOptions.ProcessTrailDefaultJsonSettings)
-                     : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt, hubertStatus),
-                         AstreaClientOptions.ProcessTrailDefaultJsonSettings);
+                     : JsonConvert.SerializeObject(new OfferedProcessTrail(assessmentResponse, _config.Version, parsedMt, hubertStatus), AstreaClientOptions.ProcessTrailDefaultJsonSettings);
 
                 _logger.LogInformation("Sending DecisionProcessTrail: {kafkaMessage}", kafkaMessage);
                 await _kafkaProducer.Produce(kafkaMessage);

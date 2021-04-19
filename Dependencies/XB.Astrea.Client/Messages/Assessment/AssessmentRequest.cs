@@ -44,26 +44,30 @@ namespace XB.Astrea.Client.Messages.Assessment
                     InstructedDate = mt.ValueDate,
                     Amount = mt.SettledAmount,
                     Currency = mt.Currency,
-                    DebitAccount = new List<Account> { GetDebitAccount(mt) },
-                    CreditAccount = new List<Account> { GetCreditAccount(mt) },
+                    DebitAccount = GetDebitAccount(mt),
+                    CreditAccount = GetCreditAccount(mt),
                     RemittanceInfo = new List<RemittanceInfo>(),
-                    InstructionContext = new InstructionContext(new List<string>(),"", "0"),
+                    InstructionContext = new InstructionContext(new List<string>(), "", "0"),
                 }
             };
             return paymentInstructionList;
         }
 
-        private static Account GetDebitAccount(Mt103Message model)
+        private static IEnumerable<Account> GetDebitAccount(Mt103Message model)
         {
             var account = string.IsNullOrWhiteSpace(model.OrderingCustomer.Account)
                 ? model.OrderingCustomer.PartyIdentifier
                 : model.OrderingCustomer.Account;
 
-            return new Account(account);
+            return new List<Account> { new Account(account) };
         }
 
-        private static Account GetCreditAccount(Mt103Message model) => new Account(model.BeneficiaryCustomer.Account);
-
+        private static IEnumerable<Account> GetCreditAccount(Mt103Message model)
+        {
+            return string.IsNullOrWhiteSpace(model.BeneficiaryCustomer.Account)
+                ? new List<Account>()
+                : new List<Account> { new Account(model.BeneficiaryCustomer.Account) };
+        }
     }
 
     public record RegisteringParty(string AuthId, string SebId);
