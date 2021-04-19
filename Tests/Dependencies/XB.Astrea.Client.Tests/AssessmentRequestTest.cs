@@ -17,7 +17,7 @@ namespace XB.Astrea.Client.Tests
             var request = new AssessmentRequest(Mt103MessagesMock.Mt103Message_02);
 
             // Assert
-            Assert.True(Guid.TryParse(request.OrderIdentity, out var newGuid));
+            Assert.True(Guid.TryParse(request.OrderIdentity, out Guid _));
             Assert.Equal("E01EBC0C-0B22-322A-A8F1-097839E991F4", request.BasketIdentity);
             Assert.Equal(SwiftMessagesMock.SwiftMessage_2.OriginalMessage, request.Mt);
             Assert.NotNull(request.Mt103Model);
@@ -52,7 +52,7 @@ namespace XB.Astrea.Client.Tests
             // Assert
             var paymentInstruction = request.PaymentInstructions[0];
             Assert.Equal("DRLC/BE/BRUSSELS/NB09490442", paymentInstruction.DebitAccount.First().Identity);
-            Assert.Equal("iban", paymentInstruction.DebitAccount.First().Type);
+            Assert.Equal("bban", paymentInstruction.DebitAccount.First().Type);
         }
 
         [Fact]

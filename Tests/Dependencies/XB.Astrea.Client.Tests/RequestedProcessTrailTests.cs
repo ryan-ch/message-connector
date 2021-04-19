@@ -25,7 +25,7 @@ namespace XB.Astrea.Client.Tests
                 {
                     new PaymentInstruction
                     {
-                        Identity = "dummy payment instruction identitiy",
+                        Identity = "dummy payment instruction identity",
                         PaymentType = "dummy payment type",
                         RegistrationTime = DateTime.Now,
                         InstructedDate = DateTime.Now,
@@ -33,11 +33,11 @@ namespace XB.Astrea.Client.Tests
                         Currency = "SEK",
                         DebitAccount = new List<Messages.Assessment.Account>
                         {
-                            new("SE12345678910")
+                            new("GB82WEST12345698765432")
                         },
                         CreditAccount = new List<Messages.Assessment.Account>
                         {
-                            new("1234567")
+                            new("SE12345678910")
                         },
                         RemittanceInfo = new List<RemittanceInfo>(),
                         InstructionContext = new InstructionContext(new List<string>(), "", "0"),
