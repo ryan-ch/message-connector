@@ -96,9 +96,9 @@ namespace XB.MtParser.Swift_Message
         {
             InputTime = HeaderContent.Substring(4, 4);
             MessageInputReference = HeaderContent.Substring(8, 28);
-            if (!DateTime.TryParseExact($"{HeaderContent.Substring(36, 6)}{HeaderContent.Substring(42, 4)}", "yyMMddHHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime outputdate))
+            if (!DateTime.TryParseExact($"{HeaderContent.Substring(36, 10)}", "yyMMddHHmm", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out DateTime outputDate))
                 _logger.LogError("ApplicationHeader: Unable to parse output date correctly");
-            OutputDate = outputdate;
+            OutputDate = outputDate;
             Priority = HeaderContent.Substring(46, 1);
         }
     }
