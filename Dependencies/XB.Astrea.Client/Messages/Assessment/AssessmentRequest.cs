@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Text.RegularExpressions;
 using XB.Astrea.Client.Constants;
 using XB.MtParser.Mt103;
 
@@ -44,26 +46,31 @@ namespace XB.Astrea.Client.Messages.Assessment
                     InstructedDate = mt.ValueDate,
                     Amount = mt.SettledAmount,
                     Currency = mt.Currency,
-                    DebitAccount = new List<Account> { GetDebitAccount(mt) },
-                    CreditAccount = new List<Account> { GetCreditAccount(mt) },
+                    DebitAccount = GetDebitAccount(mt),
+                    CreditAccount = GetCreditAccount(mt),
                     RemittanceInfo = new List<RemittanceInfo>(),
-                    InstructionContext = new InstructionContext(new List<string>(),"", "0"),
+                    InstructionContext = new InstructionContext(new List<string>(), "", "0"),
                 }
             };
             return paymentInstructionList;
         }
 
-        private static Account GetDebitAccount(Mt103Message model)
+        private static IEnumerable<Account> GetDebitAccount(Mt103Message model)
         {
+            //Todo: the type should be 'other' in case we use PartyIdentifier instead of account
             var account = string.IsNullOrWhiteSpace(model.OrderingCustomer.Account)
                 ? model.OrderingCustomer.PartyIdentifier
                 : model.OrderingCustomer.Account;
 
-            return new Account(account);
+            return new List<Account> { new Account(account) };
         }
 
-        private static Account GetCreditAccount(Mt103Message model) => new Account(model.BeneficiaryCustomer.Account);
-
+        private static IEnumerable<Account> GetCreditAccount(Mt103Message model)
+        {
+            return string.IsNullOrWhiteSpace(model.BeneficiaryCustomer.Account)
+                ? new List<Account>()
+                : new List<Account> { new Account(model.BeneficiaryCustomer.Account) };
+        }
     }
 
     public record RegisteringParty(string AuthId, string SebId);
@@ -78,13 +85,27 @@ namespace XB.Astrea.Client.Messages.Assessment
         public Account(string account)
         {
             Identity = account ?? string.Empty;
-            Type = Identity.Length >= 11 && char.IsLetter(Identity[0]) && char.IsLetter(Identity[1])
+            Type = IsValidIban(account)
                 ? AstreaClientConstants.Iban
                 : AstreaClientConstants.Bban;
         }
 
         public string Identity { get; init; }
         public string Type { get; init; }
+
+        private bool IsValidIban(string account)
+        {
+            // 2 letters followed by 2 digits followed by 7-30 char
+            if (!Regex.IsMatch(account, "^[a-zA-Z]{2}\\d{2}\\w{7,30}$"))
+                return false;
+
+            var ibanCheck = account[4..].ToUpper() + account.Substring(0, 4).ToUpper();
+            ibanCheck = Regex.Replace(ibanCheck, "\\D", c => (c.Value[0] - 55).ToString());
+
+            var remainder = BigInteger.Parse(ibanCheck) % 97;
+
+            return remainder == 1;
+        }
     }
 
     public record PaymentInstruction

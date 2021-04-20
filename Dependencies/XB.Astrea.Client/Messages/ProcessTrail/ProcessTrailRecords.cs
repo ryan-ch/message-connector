@@ -30,11 +30,15 @@ namespace XB.Astrea.Client.Messages.ProcessTrail
 
     public record Bo(string Id, string Type, string IdType = AstreaClientConstants.Tag121);
 
-    public record Account(string Id)
+    public record Account
     {
-        public string IdType => Id.Length >= 11 && char.IsLetter(Id[0]) && char.IsLetter(Id[1])
-            ? AstreaClientConstants.Iban
-            : AstreaClientConstants.Bban;
+        public Account(Assessment.Account account)
+        {
+            Id = account.Identity;
+            IdType = account.Type;
+        }
+        public string Id { get; init; }
+        public string IdType { get; init; }
     }
 
     public record General
