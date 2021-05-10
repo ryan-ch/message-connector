@@ -62,7 +62,16 @@ namespace XB.Astrea.WebAPI
                     finally
                     {
                         if (messageReceived)
+                        {
+                            if (_debugging)
+                                _logger.LogInformation("Exiting task after committing message");
                             _mqConsumer.Commit();
+                        }
+                        else
+                        {
+                            if (_debugging)
+                                _logger.LogInformation("Exited task without message received");
+                        }
                     }
                 }
                 return Task.CompletedTask;

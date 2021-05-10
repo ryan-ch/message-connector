@@ -24,6 +24,7 @@ namespace XB.Astrea.Client
         private readonly IMTParser _mTParser;
         private readonly ILogger<AstreaClient> _logger;
         private readonly IHubertClient _hubertClient;
+        private readonly bool _debugging;
 
         public AstreaClient(IHttpClientFactory httpClientFactory, IKafkaProducer kafkaProducer, IOptions<AstreaClientOptions> config,
             ILogger<AstreaClient> logger, IMTParser mTParser, IHubertClient hubertClient)
@@ -34,10 +35,13 @@ namespace XB.Astrea.Client
             _config = config.Value;
             _httpClient = httpClientFactory.CreateClient(AstreaClientExtensions.HttpClientName);
             _hubertClient = hubertClient;
+            _ = bool.TryParse(Environment.GetEnvironmentVariable("Debugging"), out var _debugging);
         }
 
         public async Task<AssessmentResponse> AssessAsync(string originalMessage)
         {
+            if (_debugging)
+                _logger.LogInformation($"Processing message: {originalMessage}");
             if (!ValidMessageType(originalMessage))
                 return new AssessmentResponse();
 
