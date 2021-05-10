@@ -16,6 +16,7 @@ namespace XB.Astrea.WebAPI
         private readonly ILogger<Worker> _logger;
         private readonly IMqConsumer _mqConsumer;
         private readonly IServiceProvider _services;
+        private readonly bool _debugging;
 
         public Worker(ILogger<Worker> logger, IMqConsumer mqConsumer, IServiceProvider services)
         {
@@ -26,6 +27,7 @@ namespace XB.Astrea.WebAPI
             using var scope = _services.CreateScope();
             var backgroundServiceController = scope.ServiceProvider.GetRequiredService<BackgroundServicesManager>();
             backgroundServiceController.RegisterBackgroundService(this);
+            _ = bool.TryParse(Environment.GetEnvironmentVariable("Debugging"), out _debugging);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,9 +39,14 @@ namespace XB.Astrea.WebAPI
                     var messageReceived = false;
                     try
                     {
+                        if (_debugging)
+                            _logger.LogInformation("Running worker in debug mode");
                         var message = _mqConsumer.ReceiveMessage(waitTimeMs);
                         if (string.IsNullOrEmpty(message))
+                        {
+                            _logger.LogInformation($"No message received: {message}");
                             continue;
+                        }
 
                         bool.TryParse(Environment.GetEnvironmentVariable("DryRun"), out bool dryRun);
                         if (!dryRun)
