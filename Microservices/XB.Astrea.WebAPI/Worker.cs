@@ -11,7 +11,7 @@ namespace XB.Astrea.WebAPI
 {
     public class Worker : BackgroundService
     {
-        private const int waitTimeMs = 1000;
+        private const int waitTimeMs = 0;
 
         private readonly ILogger<Worker> _logger;
         private readonly IMqConsumer _mqConsumer;
