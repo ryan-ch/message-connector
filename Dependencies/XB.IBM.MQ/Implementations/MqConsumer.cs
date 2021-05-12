@@ -24,9 +24,10 @@ namespace XB.IBM.MQ.Implementations
             string messageText = message?.Text;
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Prod")
             {
-                var mainFrameEncoder = CodePagesEncodingProvider.Instance.GetEncoding(Environment.GetEnvironmentVariable("EncodingFormat"));
-                var bytes = mainFrameEncoder.GetBytes(message?.Text);
-                messageText = Encoding.UTF8.GetString(bytes);
+                var mainFrameEncoding = CodePagesEncodingProvider.Instance.GetEncoding(Environment.GetEnvironmentVariable("EncodingFormat"));
+                var mainFramebytes = mainFrameEncoding.GetBytes(message?.Text);
+                var utf8bytes = Encoding.Convert(mainFrameEncoding, Encoding.UTF8, mainFramebytes);
+                messageText = Encoding.UTF8.GetString(utf8bytes);
             }
             return messageText;
         }
