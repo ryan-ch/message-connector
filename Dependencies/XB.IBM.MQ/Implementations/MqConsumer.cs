@@ -21,15 +21,7 @@ namespace XB.IBM.MQ.Implementations
         public string ReceiveMessage(long waitTimeMs = 0)
         {
             var message = _consumer.Receive(waitTimeMs) as ITextMessage;
-            string messageText = message?.Text;
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Prod")
-            {
-                var mainFrameEncoding = CodePagesEncodingProvider.Instance.GetEncoding(Environment.GetEnvironmentVariable("EncodingFormat"));
-                var mainFramebytes = mainFrameEncoding.GetBytes(message?.Text);
-                var utf8bytes = Encoding.Convert(mainFrameEncoding, Encoding.UTF8, mainFramebytes);
-                messageText = Encoding.UTF8.GetString(utf8bytes);
-            }
-            return messageText;
+            return message?.Text;
         }
 
         ~MqConsumer()
