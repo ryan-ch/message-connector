@@ -65,6 +65,7 @@ namespace XB.IBM.MQ.Implementations
             connectionFactory.SetIntProperty(XMSC.WMQ_CLIENT_RECONNECT_TIMEOUT, XMSC.WMQ_CLIENT_RECONNECT_TIMEOUT_DEFAULT);
             connectionFactory.SetIntProperty(XMSC.WMQ_RECEIVE_CONVERSION, XMSC.WMQ_RECEIVE_CONVERSION_QMGR);
             connectionFactory.SetIntProperty(XMSC.WMQ_RECEIVE_CCSID, 1208);
+            connectionFactory.SetIntProperty(XMSC.WMQ_QMGR_CCSID, 278);
         }
 
         private void AddCertificate(string certPath, string password)
