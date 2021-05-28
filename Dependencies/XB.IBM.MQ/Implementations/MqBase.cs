@@ -18,7 +18,7 @@ namespace XB.IBM.MQ.Implementations
             var connectionWmq = connectionFactory.CreateConnection();
             SessionWmq = connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
             Destination = SessionWmq.CreateQueue(configurations.MqQueueName);
-
+            Destination.SetIntProperty(XMSC.WMQ_RECEIVE_CONVERSION, XMSC.WMQ_RECEIVE_CONVERSION_QMGR);
             connectionWmq.Start();
         }
 
@@ -63,9 +63,6 @@ namespace XB.IBM.MQ.Implementations
             connectionFactory.SetIntProperty(XMSC.WMQ_CONNECTION_MODE, XMSC.WMQ_CM_CLIENT);
             connectionFactory.SetIntProperty(XMSC.WMQ_CLIENT_RECONNECT_OPTIONS, XMSC.WMQ_CLIENT_RECONNECT);
             connectionFactory.SetIntProperty(XMSC.WMQ_CLIENT_RECONNECT_TIMEOUT, XMSC.WMQ_CLIENT_RECONNECT_TIMEOUT_DEFAULT);
-            connectionFactory.SetIntProperty(XMSC.WMQ_RECEIVE_CONVERSION, XMSC.WMQ_RECEIVE_CONVERSION_QMGR);
-            connectionFactory.SetIntProperty(XMSC.WMQ_RECEIVE_CCSID, 1208);
-            connectionFactory.SetIntProperty(XMSC.WMQ_QMGR_CCSID, 278);
         }
 
         private void AddCertificate(string certPath, string password)
