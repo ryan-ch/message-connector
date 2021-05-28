@@ -61,6 +61,8 @@ namespace XB.IBM.MQ.Implementations
             connectionFactory.SetStringProperty(XMSC.WMQ_QUEUE_MANAGER, config.MqQueueManagerName);
             connectionFactory.SetStringProperty(XMSC.WMQ_QUEUE_NAME, config.MqQueueName);
             connectionFactory.SetIntProperty(XMSC.WMQ_CONNECTION_MODE, XMSC.WMQ_CM_CLIENT);
+            connectionFactory.SetIntProperty(XMSC.WMQ_CLIENT_RECONNECT_OPTIONS, XMSC.WMQ_CLIENT_RECONNECT);
+            connectionFactory.SetIntProperty(XMSC.WMQ_CLIENT_RECONNECT_TIMEOUT, XMSC.WMQ_CLIENT_RECONNECT_TIMEOUT_DEFAULT);
         }
 
         private void AddCertificate(string certPath, string password)
