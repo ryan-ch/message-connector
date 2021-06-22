@@ -84,7 +84,7 @@ namespace XB.Astrea.Client
             var data = new StringContent(postBody, Encoding.UTF8, "application/json");
 
             _ = SendRequestedProcessTrail(request);
-            var result = await _httpClient.PostAsync("/sas/v3/assessOrders/paymentInstruction", data);
+            var result = await _httpClient.PostAsync(_config.FraudEndpoint, data);
 
             var apiResponse = await result.Content.ReadAsStringAsync();
 
