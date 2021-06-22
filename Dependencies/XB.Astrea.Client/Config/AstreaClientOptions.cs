@@ -16,6 +16,7 @@ namespace XB.Astrea.Client.Config
         };
 
         public string Url { get; set; }
+        public string FraudEndpoint { get; set; }
         public string Version { get; set; }
         public List<string> AcceptableTransactionTypes { get; set; }
     }
