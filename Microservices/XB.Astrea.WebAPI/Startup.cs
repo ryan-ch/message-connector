@@ -32,6 +32,7 @@ namespace XB.Astrea.WebAPI
             services.AddControllers();
             services.AddSingleton<BackgroundServicesManager>();
             services.AddHostedService<Worker>();
+            services.AddHealthChecks();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -50,6 +51,10 @@ namespace XB.Astrea.WebAPI
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseEndpoints(endpoints => {
+                endpoints.MapHealthChecks("/api/health");
             });
         }
     }
