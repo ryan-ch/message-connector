@@ -50,11 +50,8 @@ namespace XB.Astrea.WebAPI
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
-            });
-
-            app.UseEndpoints(endpoints => {
                 endpoints.MapHealthChecks("/api/health");
+                endpoints.MapControllers();
             });
         }
     }
