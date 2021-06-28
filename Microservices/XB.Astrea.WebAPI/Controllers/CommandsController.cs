@@ -56,5 +56,11 @@ namespace XB.Astrea.WebAPI.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        [HttpGet]
+        public void Health() 
+        {
+            _logger.LogInformation(" ===== Health check complete ===== ");
+        }
     }
 }
