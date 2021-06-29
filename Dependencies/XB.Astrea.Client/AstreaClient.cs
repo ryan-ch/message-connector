@@ -39,7 +39,10 @@ namespace XB.Astrea.Client
         public async Task<AssessmentResponse> AssessAsync(string originalMessage)
         {
             if (!ValidMessageType(originalMessage))
+            {
+                _logger.LogWarning("Message is not supported, ignoring message: {originalMessage}", originalMessage);
                 return new AssessmentResponse();
+            }
 
             var receivedAt = DateTime.Now;
             AssessmentRequest assessmentRequest;
