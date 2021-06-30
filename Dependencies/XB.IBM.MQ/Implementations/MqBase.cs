@@ -18,7 +18,6 @@ namespace XB.IBM.MQ.Implementations
             var connectionWmq = connectionFactory.CreateConnection();
             SessionWmq = connectionWmq.CreateSession(true, AcknowledgeMode.AutoAcknowledge);
             Destination = SessionWmq.CreateQueue(configurations.MqQueueName);
-            Destination.SetIntProperty(XMSC.WMQ_RECEIVE_CONVERSION, XMSC.WMQ_RECEIVE_CONVERSION_QMGR);
 
             connectionWmq.Start();
         }
