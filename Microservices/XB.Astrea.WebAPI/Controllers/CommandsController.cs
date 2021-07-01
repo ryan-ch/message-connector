@@ -33,7 +33,7 @@ namespace XB.Astrea.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while stoping background services");
+                _logger.LogError(ex, "Error while stopping background services");
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }

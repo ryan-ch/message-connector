@@ -38,9 +38,10 @@ namespace XB.Astrea.Client
 
         public async Task<AssessmentResponse> AssessAsync(string originalMessage)
         {
-            if (!ValidMessageType(originalMessage))
+            var messageType = GetMessageType(originalMessage);
+            if (!_config.AcceptableTransactionTypes.Contains(messageType))
             {
-                _logger.LogWarning("Message is not supported, ignoring message: {originalMessage}", originalMessage);
+                _logger.LogWarning("Message is not supported, ignoring message with type: {messageType}", messageType);
                 return new AssessmentResponse();
             }
 
@@ -72,13 +73,12 @@ namespace XB.Astrea.Client
             return new AssessmentResponse();
         }
 
-        private bool ValidMessageType(string originalMessage)
+        private string GetMessageType(string originalMessage)
         {
-            foreach (var t in _config.AcceptableTransactionTypes)
-                if (originalMessage.Contains("}{2:O" + t))
-                    return true;
-
-            return false;
+            var secondBlockIndex = originalMessage.IndexOf("}{2:O");
+            return secondBlockIndex == -1
+                ? originalMessage
+                : originalMessage.Substring(secondBlockIndex + 5, 3);
         }
 
         private async Task<AssessmentResponse> HandleAssessAsync(AssessmentRequest request, Mt103Message mt103, DateTime receivedAt)
@@ -96,8 +96,7 @@ namespace XB.Astrea.Client
 
             var assessmentResponse = JsonConvert.DeserializeObject<AssessmentResponse>(apiResponse);
 
-            var hubertStatus = await SendToHubert(assessmentResponse.RiskLevel,
-                mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt);
+            var hubertStatus = await SendToHubert(assessmentResponse.RiskLevel, mt103.UserHeader.UniqueEndToEndTransactionReference, receivedAt);
             _ = SendDecisionProcessTrail(hubertStatus, assessmentResponse, mt103);
 
             return assessmentResponse;
